@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produk Gizi — iYup Care</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>iYup Care</div>
+      </div>
+
+      <div class="nav-links">
+        <a href="index.html">Beranda</a>
+        <a href="produk.html">Produk</a>
+        <a href="login.html">Masuk</a>
+      </div>
+
+      <div class="row">
+        <a class="btn secondary" href="dashboard.html">Dashboard</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>Produk Gizi (Edukasi)</h1>
+    <div class="small">Data diambil dari endpoint public <b>/api/produk-gizi</b>.</div>
+
+    <div id="msg" style="margin-top:12px"></div>
+
+    <div class="grid grid-3" style="margin-top:14px" id="produkGrid">
+      <div class="card">Memuat...</div>
+    </div>
+
+    <div class="footer">
+      <div class="small">© <span id="year"></span> iYup Care</div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const grid = document.getElementById("produkGrid");
+    const msg = document.getElementById("msg");
+
+    function show(text, kind="ok"){
+      msg.innerHTML = `<div class="badge ${kind==="ok"?"blue":"red"}">${text}</div>`;
+    }
+
+    (async () => {
+      try{
+        const res = await api("/produk-gizi");
+        const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+
+        if(!list.length){
+          grid.innerHTML = `<div class="card">Belum ada produk.</div>`;
+          return;
+        }
+
+        grid.innerHTML = list.map(p => `
+          <div class="card">
+            <div class="badge green">${p.nama ?? "Produk"}</div>
+            <h3 style="margin-top:10px">${p.judul ?? p.nama ?? "Produk Gizi"}</h3>
+            <div class="small">${(p.deskripsi ?? "").toString().slice(0,120)}...</div>
+            <div class="row" style="margin-top:12px">
+              <a class="btn secondary" href="produk-detail.html?id=${p.id}">Lihat Detail</a>
+            </div>
+          </div>
+        `).join("");
+
+        show("Produk berhasil dimuat.", "ok");
+      }catch(e){
+        grid.innerHTML = `<div class="card">Gagal memuat produk. Pastikan backend hidup.</div>`;
+        show("Gagal memuat produk.", "err");
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>

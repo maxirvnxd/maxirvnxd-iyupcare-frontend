@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">Gizi Anak</div>
+    <div class="links">
+      <a href="index.html">Beranda</a>
+      <a href="register.html">Daftar</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h1>Login</h1>
+
+      <div id="msg"></div>
+
+      <label>Email</label>
+      <input id="email" type="email" placeholder="email@contoh.com" />
+
+      <label>Password</label>
+      <input id="password" type="password" />
+
+      <div style="margin-top:12px" class="row">
+        <button id="btnLogin">Masuk</button>
+        <button class="secondary" onclick="location.href='register.html'">Daftar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const msg = document.getElementById("msg");
+    document.getElementById("btnLogin").addEventListener("click", async () => {
+      msg.textContent = "";
+      try {
+        const payload = {
+          email: document.getElementById("email").value.trim(),
+          password: document.getElementById("password").value,
+        };
+
+        const resp = await api("/auth/login", { method: "POST", body: payload });
+
+        const token = extractToken(resp);
+        if (!token) {
+          throw new Error("Login berhasil tapi token tidak ditemukan di response. Cek AuthController (return token).");
+        }
+
+        setToken(token);
+        showOk(msg, "Login berhasil. Token tersimpan. Redirect ke dashboard...");
+        setTimeout(() => location.href = "dashboard.html", 600);
+      } catch (err) {
+        showError(msg, err);
+      }
+    });
+  </script>
+</body>
+</html>

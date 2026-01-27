@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detail Produk — iYup Care</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>iYup Care</div>
+      </div>
+
+      <div class="nav-links">
+        <a href="index.html">Beranda</a>
+        <a href="produk.html">Produk</a>
+      </div>
+
+      <div class="row">
+        <a class="btn secondary" href="produk.html">Kembali</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="msg"></div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="badge blue" id="tag">Produk</div>
+      <h1 id="nama" style="margin-top:10px">Memuat...</h1>
+
+      <div class="hero-visual" style="min-height:220px; margin-top:12px">
+        <!-- opsional: ganti dengan gambar produk -->
+      </div>
+
+      <hr />
+
+      <h2>Deskripsi</h2>
+      <p class="small" id="deskripsi">—</p>
+
+      <h2 style="margin-top:14px">Tabel Kandungan (contoh format)</h2>
+      <table class="table">
+        <thead>
+          <tr><th>Komponen</th><th>Nilai</th></tr>
+        </thead>
+        <tbody id="kandunganBody">
+          <tr><td colspan="2" class="small">Belum ada data kandungan (isi sesuai struktur data kamu).</td></tr>
+        </tbody>
+      </table>
+
+      <div style="margin-top:14px" class="card">
+        <div class="badge green">Tahukah Bunda?</div>
+        <div class="small" id="fakta" style="margin-top:10px">—</div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="small">© <span id="year"></span> iYup Care</div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const msg = document.getElementById("msg");
+    const qs = new URLSearchParams(location.search);
+    const id = qs.get("id");
+
+    function show(text, kind="ok"){
+      msg.innerHTML = `<div class="badge ${kind==="ok"?"blue":"red"}">${text}</div>`;
+    }
+
+    (async () => {
+      if(!id){
+        show("ID produk tidak ada. Balik ke halaman produk.", "err");
+        return;
+      }
+
+      try{
+        const p = await api(`/produk-gizi/${id}`);
+        const data = p?.data ?? p;
+
+        document.getElementById("nama").textContent = data?.nama ?? "Produk";
+        document.getElementById("tag").textContent = data?.kategori ?? "Produk";
+        document.getElementById("deskripsi").textContent = data?.deskripsi ?? "—";
+        document.getElementById("fakta").textContent =
+          data?.fakta ?? "Fakta singkat bisa kamu isi dari database produk.";
+
+        show("Detail produk berhasil dimuat.", "ok");
+      }catch(e){
+        show("Gagal memuat detail produk.", "err");
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>

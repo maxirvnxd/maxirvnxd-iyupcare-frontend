@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kalkulator</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">Gizi Anak</div>
+    <div class="links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="#" id="logoutLink">Logout</a>
+    </div>
+  </div>
+
+  <div class="container grid">
+    <div class="card">
+      <h1>Kalkulator Gizi</h1>
+      <p class="small">Ini contoh panggil endpoint <b>/api/kalkulator</b> (protected).</p>
+      <div id="msg"></div>
+
+      <!-- FORM: semua input + tombol hitung dibungkus di sini -->
+      <form id="formKalkulator">
+        <div class="grid grid-2">
+          <div>
+            <label>Nama Anak</label>
+            <input id="nama" type="text" placeholder="Anak Contoh" />
+          </div>
+
+          <div>
+            <label>Tanggal</label>
+            <input id="tanggal" type="date" />
+          </div>
+
+          <div>
+            <label>Berat Badan (kg)</label>
+            <input id="berat_badan" type="number" step="0.1" min="1" placeholder="12.5" />
+          </div>
+
+          <div>
+            <label>Tinggi Badan (cm)</label>
+            <input id="tinggi_badan" type="number" step="0.1" min="30" placeholder="89" />
+          </div>
+
+          <div>
+            <label>Usia (bulan)</label>
+            <input id="usia_bulan" type="number" step="1" min="0" placeholder="24" />
+          </div>
+
+          <div>
+            <label>Jenis Kelamin</label>
+            <select id="jenis_kelamin">
+              <option value="">- pilih -</option>
+              <option value="L">L</option>
+              <option value="P">P</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Aktivitas</label>
+            <select id="aktivitas">
+              <option value="">- pilih -</option>
+              <option value="Ringan">Ringan</option>
+              <option value="Sedang">Sedang</option>
+              <option value="Berat">Berat</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="row">
+          <button type="submit">Hitung</button>
+          <button class="secondary" type="button" onclick="location.href='dashboard.html'">Kembali</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card">
+      <h3>Hasil</h3>
+      <!-- result -> hasil -->
+      <pre id="hasil" style="white-space:pre-wrap;margin:0"></pre>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    requireAuthOrRedirect();
+
+    // set tanggal hari ini otomatis
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const dd = String(today.getDate()).padStart(2, "0");
+    document.getElementById("tanggal").value = `${yyyy}-${mm}-${dd}`;
+
+    const msg = document.getElementById("msg");
+    const hasil = document.getElementById("hasil");
+
+    function readText(id) {
+      const el = document.getElementById(id);
+      return el ? el.value.trim() : "";
+    }
+
+    function readNumberRequired(id, label) {
+      const el = document.getElementById(id);
+      const raw = el ? el.value : "";
+      if (raw === "" || raw === null || raw === undefined) {
+        throw new Error(`${label} wajib diisi`);
+      }
+      const n = Number(raw);
+      if (!Number.isFinite(n)) {
+        throw new Error(`${label} harus angka`);
+      }
+      return n;
+    }
+
+    function readSelectRequired(id, label) {
+      const el = document.getElementById(id);
+      const v = el ? el.value : "";
+      if (!v) throw new Error(`${label} wajib dipilih`);
+      return v;
+    }
+
+    // Submit form (ganti dari btnHitung click)
+    document.getElementById("formKalkulator").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      msg.textContent = "";
+      hasil.textContent = "";
+
+      try {
+        const payload = {
+          nama: readText("nama") || null,
+          tanggal: readText("tanggal") || null,
+
+          berat_badan: readNumberRequired("berat_badan", "Berat badan"),
+          tinggi_badan: readNumberRequired("tinggi_badan", "Tinggi badan"),
+
+          // kamu set WAJIB (sesuai kebutuhan WHO BMI/U)
+          usia_bulan: readNumberRequired("usia_bulan", "Usia (bulan)"),
+
+          jenis_kelamin: readSelectRequired("jenis_kelamin", "Jenis kelamin"),
+          aktivitas: readSelectRequired("aktivitas", "Aktivitas"),
+        };
+
+        // DEBUG: cek payload di F12 > Console
+        console.log("PAYLOAD KIRIM:", payload);
+
+        const resp = await api("/kalkulator", { method: "POST", body: payload, auth: true });
+
+        showOk(msg, "Berhasil menghitung dan menyimpan ke database.");
+        hasil.textContent = JSON.stringify(resp, null, 2);
+      } catch (err) {
+        showError(msg, err);
+      }
+    });
+
+    document.getElementById("logoutLink").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try { await api("/auth/logout", { method: "POST", auth: true }); } catch {}
+      clearToken();
+      location.href = "login.html";
+    });
+  </script>
+</body>
+</html>

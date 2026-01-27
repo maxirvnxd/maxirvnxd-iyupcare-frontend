@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daftar</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">Gizi Anak</div>
+    <div class="links">
+      <a href="index.html">Beranda</a>
+      <a href="login.html">Masuk</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <h1>Daftar Akun</h1>
+      <p class="small">Data akan disimpan di database backend (tabel users).</p>
+
+      <div id="msg"></div>
+
+      <label>Nama</label>
+      <input id="name" placeholder="Nama" />
+
+      <label>Email</label>
+      <input id="email" type="email" placeholder="email@contoh.com" />
+
+      <label>Password</label>
+      <input id="password" type="password" placeholder="minimal 8 karakter" />
+
+      <label>Konfirmasi Password</label>
+      <input id="password_confirmation" type="password" />
+
+      <div style="margin-top:12px" class="row">
+        <button id="btnRegister">Daftar</button>
+        <button class="secondary" onclick="location.href='login.html'">Ke Login</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const msg = document.getElementById("msg");
+    document.getElementById("btnRegister").addEventListener("click", async () => {
+      msg.textContent = "";
+      try {
+        const payload = {
+          name: document.getElementById("name").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          password: document.getElementById("password").value,
+          password_confirmation: document.getElementById("password_confirmation").value,
+        };
+
+        const resp = await api("/auth/register", { method: "POST", body: payload });
+
+        const token = extractToken(resp);
+        if (token) {
+          setToken(token);
+          showOk(msg, "Register berhasil. Token tersimpan. Redirect ke dashboard...");
+          setTimeout(() => location.href = "dashboard.html", 600);
+        } else {
+          // kalau register kamu memang tidak mengembalikan token, arahkan ke login
+          showOk(msg, "Register berhasil. Silakan login.");
+          setTimeout(() => location.href = "login.html", 600);
+        }
+      } catch (err) {
+        showError(msg, err);
+      }
+    });
+  </script>
+</body>
+</html>

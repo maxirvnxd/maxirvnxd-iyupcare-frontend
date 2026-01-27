@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Konsultasi — iYup Care</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="nav">
+    <div class="nav-inner">
+      <div class="brand">
+        <div class="logo"></div>
+        <div>iYup Care</div>
+      </div>
+
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="monitoring.html">Monitoring</a>
+        <a href="produk.html">Produk</a>
+        <a href="kalkulator.html">Kalkulator</a>
+      </div>
+
+      <div class="row">
+        <a href="#" id="logoutLink" class="btn">Logout</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>Konsultasi & Komunitas</h1>
+    <div class="small">Tanya AI (UI), konsultasi ahli (link WA), komunitas (banner).</div>
+
+    <div class="card" style="margin-top:14px" id="tabsRoot">
+      <div class="tabs">
+        <button class="tab" data-tab="ai" type="button">Tanya AI</button>
+        <button class="tab" data-tab="ahli" type="button">Konsultasi Ahli</button>
+        <button class="tab" data-tab="komunitas" type="button">Komunitas</button>
+      </div>
+
+      <!-- TAB AI -->
+      <div class="tab-panel" data-panel="ai">
+        <div class="small">Ini UI dulu. Integrasi AI ke backend bisa kamu tambahkan tahap berikutnya.</div>
+
+        <div class="chat" id="chatBox" style="margin-top:12px">
+          <div class="bubble ai">Halo! Saya asisten iYup Care. Tanyakan hal seputar gizi anak.</div>
+        </div>
+
+        <div class="row" style="margin-top:10px">
+          <input id="chatInput" placeholder="Tulis pertanyaan..." />
+          <button class="btn" id="sendBtn" type="button">Kirim</button>
+        </div>
+      </div>
+
+      <!-- TAB AHLI -->
+      <div class="tab-panel" data-panel="ahli">
+        <div class="grid grid-2" style="margin-top:12px">
+          <div class="card">
+            <div class="badge green">Ahli Gizi</div>
+            <h3 style="margin-top:10px">Nama Ahli 1</h3>
+            <div class="small">Spesialis gizi anak & stunting.</div>
+            <div class="row" style="margin-top:12px">
+              <a class="btn" href="https://wa.me/628xxxxxxxxxx" target="_blank" rel="noreferrer">Chat via WA</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="badge blue">Bidan/Perawat</div>
+            <h3 style="margin-top:10px">Nama Ahli 2</h3>
+            <div class="small">Pendamping tumbuh kembang.</div>
+            <div class="row" style="margin-top:12px">
+              <a class="btn blue" href="https://wa.me/628xxxxxxxxxx" target="_blank" rel="noreferrer">Chat via WA</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB KOMUNITAS -->
+      <div class="tab-panel" data-panel="komunitas">
+        <div class="card" style="margin-top:12px">
+          <div class="badge orange">Komunitas Ibu-ibu Desa Binaan</div>
+          <h2 style="margin-top:10px">Gabung Grup WhatsApp</h2>
+          <div class="small">Dapat info menu sehat, pengingat posyandu, dan berbagi pengalaman.</div>
+          <div class="row" style="margin-top:12px">
+            <a class="btn orange" href="https://wa.me/628xxxxxxxxxx" target="_blank" rel="noreferrer">Gabung Sekarang</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="small">© <span id="year"></span> iYup Care</div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script>
+    requireAuthOrRedirect();
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    setupTabs("tabsRoot");
+    setupAccordion("tabsRoot");
+
+    document.getElementById("logoutLink").addEventListener("click", async (e) => {
+      e.preventDefault();
+      try { await api("/auth/logout", { method:"POST", auth:true }); } catch {}
+      clearToken();
+      location.href = "login.html";
+    });
+
+    // Chat UI (tanpa backend AI)
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    function addBubble(text, who){
+      const div = document.createElement("div");
+      div.className = "bubble " + (who==="me" ? "me" : "ai");
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function fakeAIReply(q){
+      // jawaban placeholder (UI saja)
+      return "Saya catat pertanyaanmu. Fitur AI akan diaktifkan setelah backend AI siap. Untuk sekarang, gunakan Produk & Kalkulator sebagai panduan.";
+    }
+
+    sendBtn.addEventListener("click", () => {
+      const text = (chatInput.value || "").trim();
+      if(!text) return;
+      addBubble(text, "me");
+      chatInput.value = "";
+      setTimeout(() => addBubble(fakeAIReply(text), "ai"), 400);
+    });
+
+    chatInput.addEventListener("keydown", (e) => {
+      if(e.key === "Enter"){
+        e.preventDefault();
+        sendBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
