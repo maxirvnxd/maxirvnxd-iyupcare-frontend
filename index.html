@@ -14,34 +14,19 @@
       background:#fff;
     }
 
-    /* HERO: kolase berdampingan (lebih kecil, tidak makan tempat) */
-    .hero-visual{ display:flex; justify-content:center; align-items:flex-start; }
-    .hero-collage{
-      width:100%;
-      max-width: 520px;          /* batas agar tidak melebar */
+    /* HERO: dibuat 1 kolom (karena kolase dihapus) */
+    .hero-wrap{
       display:grid;
-      grid-template-columns: 1fr 1fr; /* berdampingan */
-      gap: 12px;
-      align-items: start;
-    }
-    .hero-collage img{
-      width:100%;
-      height: 220px;             /* bikin ringkas */
-      object-fit: cover;         /* biar rapih */
-      border-radius: 16px;
-      border:1px solid rgba(0,0,0,.08);
-      box-shadow: 0 10px 22px rgba(0,0,0,.10);
-      background:#fff;
-    }
-    @media (max-width: 900px){
-      .hero-collage{ grid-template-columns: 1fr; }
-      .hero-collage img{ height: 240px; }
+      grid-template-columns: 1fr;
+      gap:18px;
+      align-items:center;
     }
 
     /* Produk cards */
     .product-card{
       display:grid;
       gap:10px;
+      overflow:hidden;
     }
     .product-card img{
       width:100%;
@@ -129,13 +114,14 @@
       <div class="hero-card">
         <div class="badge green">Program Pemantauan Gizi Anak • Ringan • Mudah</div>
         <h1 class="hero-title">Pantau Gizi Anak + Kenali Pangan Lokal Bergizi.</h1>
+
         <p class="small" style="max-width:720px">
           iYup Care membantu orang tua mencatat pertumbuhan, menghitung kebutuhan energi harian,
           dan belajar dari pangan lokal seperti ikan penja & kelor — sekaligus mengenal produk gizi InnoviYup.
         </p>
 
+        <!-- HANYA tombol Lihat Fitur -->
         <div class="row" style="margin-top:14px">
-          <a class="btn" href="register.html">Mulai Pantau Gizi Sekarang</a>
           <a class="btn secondary" href="#fitur">Lihat Fitur</a>
         </div>
 
@@ -147,6 +133,7 @@
             </div>
             <span class="badge blue">Mudah</span>
           </div>
+
           <div class="kpi">
             <div>
               <div style="font-weight:900">Kalkulator</div>
@@ -154,6 +141,7 @@
             </div>
             <span class="badge orange">Cepat</span>
           </div>
+
           <div class="kpi">
             <div>
               <div style="font-weight:900">Edukasi</div>
@@ -161,19 +149,6 @@
             </div>
             <span class="badge green">Bermanfaat</span>
           </div>
-        </div>
-
-        <div class="row" style="margin-top:14px">
-          <a class="btn blue" href="kalkulator.html">Buka Kalkulator Gizi</a>
-          <a class="btn secondary" href="monitoring.html">Buka Monitoring</a>
-        </div>
-      </div>
-
-      <!-- Kolase foto berdampingan (lebih kecil) -->
-      <div class="hero-visual">
-        <div class="hero-collage">
-          <img src="assets/susu-analog-front.png" alt="Susu Analog Ikan Penja & Daun Kelor">
-          <img src="assets/biskuit-multigrains-front.png" alt="Biskuit Multigrains">
         </div>
       </div>
     </div>
@@ -195,7 +170,8 @@
         <h3>Monitoring Tumbuh Kembang</h3>
         <p class="small">Input BB/TB, lihat riwayat dan grafik sederhana untuk membantu pemantauan rutin.</p>
         <div class="row" style="margin-top:10px">
-          <a class="btn secondary" href="monitoring.html">Buka Monitoring</a>
+          <!-- diarahkan ke login -->
+          <a class="btn secondary" href="login.html">Buka Monitoring</a>
         </div>
       </div>
 
@@ -204,7 +180,8 @@
         <h3>Kalkulator Gizi</h3>
         <p class="small">Hitung kebutuhan energi harian berdasarkan data anak + aktivitas.</p>
         <div class="row" style="margin-top:10px">
-          <a class="btn secondary" href="kalkulator.html">Buka Kalkulator</a>
+          <!-- diarahkan ke login -->
+          <a class="btn secondary" href="login.html">Buka Kalkulator</a>
         </div>
       </div>
 
@@ -213,7 +190,8 @@
         <h3>Edukasi Pangan Lokal</h3>
         <p class="small">Kenali bahan unggulan seperti ikan penja, kelor, serta produk multigrains.</p>
         <div class="row" style="margin-top:10px">
-          <a class="btn secondary" href="produk.html">Buka Edukasi Produk</a>
+          <!-- diarahkan ke login -->
+          <a class="btn secondary" href="login.html">Buka Edukasi Produk</a>
         </div>
       </div>
     </div>
@@ -226,7 +204,9 @@
         <h2>Produk Gizi Unggulan</h2>
         <div class="small">Informasi ringkas + akses cepat ke pemesanan & detail.</div>
       </div>
-      <a class="btn blue" href="produk.html">Lihat Semua Produk</a>
+
+      <!-- diarahkan ke login dulu -->
+      <a class="btn blue" href="login.html">Lihat Semua Produk</a>
     </div>
 
     <div class="grid grid-3" style="margin-top:14px">
@@ -282,7 +262,6 @@
             <div class="small"><b>Platform:</b> Instagram & YouTube</div>
           </div>
 
-          <!-- YouTube embed (default pause, autoplay=0) -->
           <div class="yt-box" aria-label="Video YouTube (preview)">
             <iframe
               src="https://www.youtube.com/embed/TU2Lk9T8YWg?rel=0&modestbranding=1&autoplay=0"
