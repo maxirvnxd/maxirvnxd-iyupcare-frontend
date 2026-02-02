@@ -9,122 +9,458 @@
 
   <title>Dashboard — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    :root{
+      --bg:#f6f9ff;
+      --card:#ffffff;
+      --ink:#0b1b3a;
+      --muted:#5b6b80;
+      --line: rgba(15,23,42,.10);
+      --shadow: 0 18px 50px rgba(15,23,42,.10);
+      --shadow2: 0 12px 30px rgba(15,23,42,.08);
+      --primary:#1e63d6;
+      --green:#1f9d55;
+      --orange:#f2994a;
+      --radius:18px;
+      --max:1100px;
+    }
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.16), transparent 60%),
+        radial-gradient(800px 520px at 90% 0%, rgba(31,157,85,.12), transparent 58%),
+        radial-gradient(800px 520px at 90% 90%, rgba(242,153,74,.10), transparent 55%),
+        var(--bg);
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
+
+    /* Topbar */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.70);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .topbar-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      min-width: 180px;
+    }
+    .brand .logo{
+      width:36px; height:36px;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(31,157,85,1), rgba(30,99,214,1));
+      box-shadow: 0 10px 20px rgba(15,23,42,.14);
+      border: 1px solid rgba(255,255,255,.7);
+    }
+    .brand .b1{ font-weight: 950; letter-spacing:.2px; }
+    .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
+
+    .nav{
+      display:flex; gap:8px; flex-wrap:wrap;
+      align-items:center; justify-content:center;
+    }
+    .nav a{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.78);
+      font-weight: 900;
+      font-size: 13px;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .nav a:hover{
+      border-color: rgba(30,99,214,.25);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+      transform: translateY(-1px);
+    }
+    .nav a.active{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
+    }
+
+    .top-actions{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .icon-btn{
+      width:42px; height:42px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.78);
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(15,23,42,.06);
+      font-size: 18px;
+      display:grid; place-items:center;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .icon-btn:hover{ border-color: rgba(30,99,214,.25); transform: translateY(-1px); }
+
+    .logout{
+      padding: 11px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(31,157,85,.25);
+      background: rgba(31,157,85,.12);
+      font-weight: 950;
+      cursor:pointer;
+      transition: filter .12s ease, transform .12s ease;
+    }
+    .logout:hover{ filter: brightness(.98); transform: translateY(-1px); }
+
+    /* Page header */
+    .page-head{
+      padding: 18px 0 8px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .page-head h1{
+      margin:0;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -.3px;
+    }
+    .sub{
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-weight: 950;
+      border:1px solid rgba(30,99,214,.18);
+      background: rgba(30,99,214,.10);
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    /* Cards */
+    .grid2{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .card2{
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(8px);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .card-inner{ padding: 16px; }
+
+    .card-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.70);
+    }
+    .tag.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
+    .tag.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
+    .tag.blue{ border-color: rgba(30,99,214,.22); background: rgba(30,99,214,.10); }
+
+    .title2{
+      margin: 10px 0 4px;
+      font-size: 18px;
+      letter-spacing: -.1px;
+    }
+    .muted{ color: var(--muted); font-size: 13px; line-height:1.6; }
+
+    .avatar{
+      width: 56px; height:56px;
+      border-radius: 18px;
+      display:grid; place-items:center;
+      border:1px solid rgba(15,23,42,.10);
+      background: linear-gradient(180deg, rgba(31,157,85,.10), rgba(30,99,214,.10));
+      font-size: 26px;
+      box-shadow: 0 10px 22px rgba(15,23,42,.08);
+    }
+    .divider{ height:1px; background: rgba(15,23,42,.08); margin: 14px 0; }
+
+    .row2{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+    }
+    .btn2{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 11px 14px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.78);
+      font-weight: 950;
+      font-size: 13px;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .btn2:hover{ border-color: rgba(30,99,214,.25); transform: translateY(-1px); }
+    .btn2.primary{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
+    }
+    .btn2.primary:hover{ filter: brightness(.98); }
+
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size: 12px;
+      border:1px solid rgba(30,99,214,.22);
+      background: rgba(30,99,214,.10);
+      color: var(--ink);
+    }
+    .status-badge.good{
+      border-color: rgba(31,157,85,.25);
+      background: rgba(31,157,85,.10);
+    }
+
+    /* Chart frame */
+    .chart-wrap{
+      margin-top: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      padding: 12px;
+    }
+    #miniChart{ width:100% !important; }
+
+    /* Quick actions */
+    .quick{
+      margin-top: 14px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(8px);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow2);
+    }
+    .quick .head{
+      padding: 16px;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .quick h2{ margin:0; font-size: 18px; letter-spacing:-.1px; }
+    .quick .grid{
+      padding: 0 16px 16px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+    .tile{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.78);
+      padding: 14px;
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .tile:hover{
+      border-color: rgba(30,99,214,.25);
+      box-shadow: 0 12px 26px rgba(15,23,42,.08);
+      transform: translateY(-1px);
+    }
+    .tile .ico{
+      width: 44px; height:44px;
+      border-radius: 16px;
+      display:grid; place-items:center;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(30,99,214,.10);
+      font-size: 20px;
+      flex: 0 0 auto;
+    }
+    .tile.blue .ico{ background: rgba(30,99,214,.12); }
+    .tile.orange .ico{ background: rgba(242,153,74,.14); }
+    .tile.green .ico{ background: rgba(31,157,85,.12); }
+    .tile .t{ font-weight: 950; }
+    .tile .d{ margin-top: 3px; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .foot{
+      margin-top: 16px;
+      padding: 14px 0 4px;
+      border-top: 1px solid rgba(15,23,42,.08);
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    @media (max-width: 980px){
+      .grid2{ grid-template-columns: 1fr; }
+      .nav{ display:none; } /* biar topbar tidak penuh di hp */
+      .quick .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
+
 <body>
-  <div class="nav">
-    <div class="nav-inner">
+  <!-- TOPBAR baru (tidak pakai .nav lama supaya UI konsisten) -->
+  <header class="topbar">
+    <div class="topbar-inner">
       <div class="brand">
-        <div class="logo"></div>
-        <div>iYup Care</div>
+        <div class="logo" aria-hidden="true"></div>
+        <div>
+          <div class="b1">iYup Care</div>
+          <div class="b2">Dashboard</div>
+        </div>
       </div>
 
-      <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
+      <nav class="nav" aria-label="Navigasi utama">
+        <a class="active" href="dashboard.html">Dashboard</a>
         <a href="monitoring.html">Monitoring</a>
         <a href="produk.html">Produk</a>
         <a href="kalkulator.html">Kalkulator</a>
         <a href="konsultasi.html">Konsultasi</a>
-      </div>
+      </nav>
 
-      <div class="row">
-        <button class="btn secondary" id="bellBtn" type="button">🔔</button>
-        <a href="#" id="logoutLink" class="btn">Logout</a>
+      <div class="top-actions">
+        <button class="icon-btn" id="bellBtn" type="button" title="Notifikasi">🔔</button>
+        <button class="logout" id="logoutLink" type="button">Logout</button>
       </div>
     </div>
-  </div>
+  </header>
 
-  <div class="container">
-    <div class="row" style="justify-content:space-between; align-items:flex-end">
+  <main class="wrap">
+    <div class="page-head">
       <div>
         <h1 id="greeting">Halo, Bunda!</h1>
-        <div class="small">Ringkasan kondisi dan akses cepat.</div>
+        <div class="sub">Ringkasan kondisi dan akses cepat.</div>
       </div>
-      <div class="badge blue" id="notifBadge">Notifikasi: aktif</div>
+      <div class="pill" id="notifBadge">Notifikasi: aktif</div>
     </div>
 
-    <div class="grid grid-2" style="margin-top:14px">
+    <section class="grid2" aria-label="Ringkasan">
       <!-- Profil anak -->
-      <div class="card">
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="badge green">Profil Anak</div>
-            <h2 id="anakNama" style="margin-top:10px">—</h2>
-            <div class="small">Usia: <span id="anakUsia">—</span></div>
+      <article class="card2">
+        <div class="card-inner">
+          <div class="card-head">
+            <div>
+              <div class="tag green">Profil Anak</div>
+              <h2 id="anakNama" class="title2">—</h2>
+              <div class="muted">Usia: <span id="anakUsia">—</span></div>
+            </div>
+            <div class="avatar" aria-hidden="true">👶</div>
           </div>
-          <div style="width:70px;height:70px;border-radius:22px;border:1px solid var(--line);display:grid;place-items:center;background:rgba(47,158,68,.08);font-weight:900">
-            👶
-          </div>
-        </div>
 
-        <hr />
-        <div class="row" style="justify-content:space-between">
-          <div>
-            <div class="small">Status gizi terkini</div>
-            <div id="statusLabel" class="badge blue" style="margin-top:8px">Belum ada data</div>
-          </div>
-          <div>
-            <a class="btn secondary" href="monitoring.html">Input Data</a>
-          </div>
-        </div>
+          <div class="divider"></div>
 
-        <div class="small" style="margin-top:10px">
-          Catatan: status ini akan semakin akurat kalau monitoring rutin dan kalkulator dipakai.
+          <div class="row2">
+            <div>
+              <div class="muted">Status gizi terkini</div>
+              <div id="statusLabel" class="status-badge" style="margin-top:8px">Belum ada data</div>
+            </div>
+            <a class="btn2" href="monitoring.html">Input Data</a>
+          </div>
+
+          <div class="muted" style="margin-top:10px">
+            Catatan: status akan semakin akurat jika monitoring rutin dan kalkulator dipakai.
+          </div>
         </div>
-      </div>
+      </article>
 
       <!-- Mini chart -->
-      <div class="card">
-        <div class="row" style="justify-content:space-between; align-items:flex-end">
-          <div>
-            <div class="badge orange">Grafik Mini</div>
-            <h2 style="margin-top:10px">Berat badan 3 data terakhir</h2>
-            <div class="small">Preview cepat (bukan laporan lengkap).</div>
+      <article class="card2">
+        <div class="card-inner">
+          <div class="card-head">
+            <div>
+              <div class="tag orange">Grafik Mini</div>
+              <h2 class="title2">Berat badan 3 data terakhir</h2>
+              <div class="muted">Preview cepat (bukan laporan lengkap).</div>
+            </div>
+            <a class="btn2" href="monitoring.html">Buka Grafik</a>
           </div>
-          <a class="btn secondary" href="monitoring.html">Buka Grafik</a>
-        </div>
 
-        <div style="margin-top:12px">
-          <canvas id="miniChart" height="120"></canvas>
-          <div class="small" id="miniChartHint" style="margin-top:8px"></div>
+          <div class="chart-wrap">
+            <canvas id="miniChart" height="120"></canvas>
+            <div class="muted" id="miniChartHint" style="margin-top:8px"></div>
+          </div>
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
 
     <!-- Quick Actions -->
-    <div class="card" style="margin-top:16px">
-      <div class="row" style="justify-content:space-between; align-items:flex-end">
+    <section class="quick" aria-label="Menu utama">
+      <div class="head">
         <div>
           <h2>Menu Utama</h2>
-          <div class="small">Akses cepat fitur yang paling sering dipakai.</div>
+          <div class="muted">Akses cepat fitur yang paling sering dipakai.</div>
         </div>
+        <a class="btn2 primary" href="monitoring.html">Mulai Input Monitoring</a>
       </div>
 
-      <div class="grid grid-2" style="margin-top:14px">
-        <div class="action-tile" onclick="location.href='monitoring.html'">
+      <div class="grid">
+        <div class="tile green" onclick="location.href='monitoring.html'">
           <div class="ico">📝</div>
           <div>
             <div class="t">Input Data (Monitoring)</div>
-            <div class="d">Catat BB/TB dan lihat riwayat.</div>
+            <div class="d">Catat BB/TB dan lihat riwayat pertumbuhan.</div>
           </div>
         </div>
 
-        <div class="action-tile blue" onclick="location.href='kalkulator.html'">
+        <div class="tile blue" onclick="location.href='kalkulator.html'">
           <div class="ico">🧮</div>
           <div>
             <div class="t">Cek Kalori (Kalkulator)</div>
-            <div class="d">Kebutuhan kkal/hari berdasarkan aktivitas.</div>
+            <div class="d">Hitung kebutuhan kkal/hari berdasarkan aktivitas.</div>
           </div>
         </div>
 
-        <div class="action-tile orange" onclick="location.href='produk.html'">
+        <div class="tile orange" onclick="location.href='produk.html'">
           <div class="ico">🥗</div>
           <div>
             <div class="t">Resep Sehat / Produk</div>
-            <div class="d">Edukasi pangan lokal dan ide menu.</div>
+            <div class="d">Edukasi pangan lokal dan info produk gizi InnoviYup.</div>
           </div>
         </div>
 
-        <div class="action-tile" onclick="location.href='konsultasi.html'">
+        <div class="tile" onclick="location.href='konsultasi.html'">
           <div class="ico">💬</div>
           <div>
             <div class="t">Tanya Ahli</div>
@@ -132,18 +468,17 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
-    <div class="footer">
-      <div class="small">© <span id="year"></span> iYup Care</div>
+    <div class="foot">
+      © <span id="year"></span> iYup Care
     </div>
-  </div>
+  </main>
 
   <!-- Chart.js (opsional). Kalau offline, chart akan fallback ke teks. -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- IMPORTANT:
-       api.js harus diload sebelum auth.js & app.js (karena mereka pakai api(), getToken(), dll) -->
+  <!-- IMPORTANT: api.js sebelum auth.js & app.js -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
@@ -160,9 +495,8 @@
       alert("Notifikasi: fitur pengingat akan kamu aktifkan di tahap berikutnya.");
     });
 
-    // logout
-    document.getElementById("logoutLink").addEventListener("click", async (e) => {
-      e.preventDefault();
+    // logout (tetap sesuai logic kamu)
+    document.getElementById("logoutLink").addEventListener("click", async () => {
       try { await api("/auth/logout", { method:"POST", auth:true }); } catch {}
       clearToken();
       location.href = "login.html";
@@ -197,11 +531,13 @@
       const weights = last3.map(x => Number(x.berat_badan ?? x.bb ?? 0));
 
       // status label sederhana (UI only)
-      document.getElementById("statusLabel").className = "badge green";
-      document.getElementById("statusLabel").textContent = "Data masuk";
+      const status = document.getElementById("statusLabel");
+      status.className = "status-badge good";
+      status.textContent = "Data masuk";
 
       if(typeof Chart === "undefined"){
-        document.getElementById("miniChartHint").textContent = "Chart.js tidak tersedia (offline). Data: " + weights.join(", ");
+        document.getElementById("miniChartHint").textContent =
+          "Chart.js tidak tersedia (offline). Data BB: " + weights.join(", ");
         return;
       }
 
@@ -213,7 +549,8 @@
             label: "BB (kg)",
             data: weights,
             tension: 0.35,
-            fill: false
+            fill: false,
+            pointRadius: 3
           }]
         },
         options: {
