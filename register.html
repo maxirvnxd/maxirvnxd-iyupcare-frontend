@@ -32,7 +32,7 @@
         linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
-    /* NAV (custom, supaya menu jadi tombol/pill dan gampang dinotice) */
+    /* NAV */
     .topbar{
       position: sticky;
       top: 0;
@@ -85,7 +85,8 @@
       font-size: 13px;
       text-decoration:none;
       color: var(--ink);
-      min-width: 110px; /* ini yang bikin terasa "kolom" dan gampang dinotice */
+      min-width: 110px;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
     }
     .nav-pill:hover{
       border-color: rgba(30,99,214,.25);
@@ -223,6 +224,11 @@
       font-weight: 900;
       font-size: 14px;
       cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: filter .12s ease, border-color .12s ease;
     }
     .btn2.primary{
       background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
@@ -231,6 +237,30 @@
     }
     .btn2.primary:hover{ filter: brightness(.98); }
     .btn2.secondary:hover{ border-color: rgba(30,99,214,.25); }
+    .btn2[disabled]{
+      opacity: .75;
+      cursor: not-allowed;
+      filter: grayscale(.1);
+    }
+
+    /* Spinner */
+    .spinner{
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(255,255,255,.55);
+      border-top-color: rgba(255,255,255,1);
+      display:none;
+      animation: spin .8s linear infinite;
+    }
+    .btn2.secondary .spinner{
+      border: 2px solid rgba(15,23,42,.25);
+      border-top-color: rgba(15,23,42,.65);
+    }
+    .btn2.is-loading .spinner{ display:inline-block; }
+    .btn2.is-loading .btn-text{ opacity: .95; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
 
     #msg{
       margin-top: 10px;
@@ -254,7 +284,6 @@
 </head>
 
 <body>
-  <!-- NAVBAR modern: menu dalam bentuk tombol/pill -->
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
@@ -274,7 +303,6 @@
 
   <div class="auth-wrap">
     <div class="auth-card">
-      <!-- LEFT -->
       <section class="auth-left">
         <div class="hero-badge">🔒 Aman • 🚀 Cepat • 📱 Mobile friendly</div>
         <h2 class="hero-title">Buat akun untuk mulai pemantauan gizi.</h2>
@@ -290,7 +318,6 @@
         </div>
       </section>
 
-      <!-- RIGHT -->
       <section class="auth-right">
         <h1 class="form-title">Daftar Akun</h1>
         <p class="form-sub">Data akan disimpan di backend (tabel users). Pastikan email aktif.</p>
@@ -326,8 +353,15 @@
         </div>
 
         <div class="row-actions">
-          <button class="btn2 primary" id="btnRegister" type="button">Daftar</button>
-          <button class="btn2 secondary" type="button" onclick="location.href='login.html'">Ke Login</button>
+          <button class="btn2 primary" id="btnRegister" type="button">
+            <span class="btn-text">Daftar</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+
+          <button class="btn2 secondary" id="btnToLogin" type="button" onclick="location.href='login.html'">
+            <span class="btn-text">Ke Login</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
         </div>
       </section>
     </div>
@@ -338,11 +372,27 @@
 
   <script>
     const msg = document.getElementById("msg");
+    const btnRegister = document.getElementById("btnRegister");
+    const btnToLogin = document.getElementById("btnToLogin");
+
     function showMsgVisible(){ msg.style.display = "block"; }
 
-    document.getElementById("btnRegister").addEventListener("click", async () => {
+    function setLoading(isLoading){
+      if(isLoading){
+        btnRegister.classList.add("is-loading");
+        btnRegister.disabled = true;
+        btnToLogin.disabled = true;
+      }else{
+        btnRegister.classList.remove("is-loading");
+        btnRegister.disabled = false;
+        btnToLogin.disabled = false;
+      }
+    }
+
+    btnRegister.addEventListener("click", async () => {
       msg.textContent = "";
       showMsgVisible();
+      setLoading(true);
 
       try {
         const payload = {
@@ -357,14 +407,15 @@
 
         if (token) {
           setToken(token);
-          showOk(msg, "Register berhasil. Token tersimpan. Redirect ke dashboard...");
-          setTimeout(() => (location.href = "dashboard.html"), 600);
+          showOk(msg, "Register berhasil. Mengalihkan ke dashboard...");
+          setTimeout(() => (location.href = "dashboard.html"), 450);
         } else {
-          showOk(msg, "Register berhasil. Silakan login.");
-          setTimeout(() => (location.href = "login.html"), 600);
+          showOk(msg, "Register berhasil. Mengalihkan ke login...");
+          setTimeout(() => (location.href = "login.html"), 450);
         }
       } catch (err) {
         showError(msg, err);
+        setLoading(false);
       }
     });
   </script>
