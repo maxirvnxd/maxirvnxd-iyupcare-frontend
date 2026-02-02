@@ -4,86 +4,484 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- API BASE (HF) -->
+  <!-- API BASE (HF) - jangan dihapus -->
   <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
 
-  <title>Produk Gizi — iYup Care</title>
+  <title>Produk InnoviYup — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
-</head>
-<body>
-  <div class="nav">
-    <div class="nav-inner">
-      <div class="brand">
-        <div class="logo"></div>
-        <div>iYup Care</div>
-      </div>
 
-      <div class="nav-links">
-        <a href="index.html">Beranda</a>
-        <a href="produk.html">Produk</a>
-        <a href="login.html">Masuk</a>
-      </div>
+  <style>
+    :root{
+      --bg:#f6f9ff;
+      --card:#ffffff;
+      --ink:#0b1b3a;
+      --muted:#5b6b80;
+      --line: rgba(15,23,42,.10);
+      --shadow: 0 18px 50px rgba(15,23,42,.10);
+      --shadow2: 0 12px 30px rgba(15,23,42,.08);
+      --primary:#1e63d6;
+      --green:#1f9d55;
+      --orange:#f2994a;
+      --radius:18px;
+      --max:1100px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.16), transparent 60%),
+        radial-gradient(800px 520px at 90% 0%, rgba(31,157,85,.12), transparent 58%),
+        radial-gradient(800px 520px at 90% 90%, rgba(242,153,74,.10), transparent 55%),
+        var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue";
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
 
-      <div class="row">
-        <a class="btn secondary" href="dashboard.html">Dashboard</a>
-      </div>
-    </div>
-  </div>
+    /* Topbar */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.72);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .topbar-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 220px;
+    }
+    .brand img{
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      object-fit: cover;
+      background:#fff;
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 10px 20px rgba(15,23,42,.12);
+      display:block;
+    }
+    .brand .b1{ font-weight: 950; letter-spacing:.2px; }
+    .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
 
-  <div class="container">
-    <h1>Produk Gizi (Edukasi)</h1>
-    <div class="small">Data diambil dari endpoint public <b>/api/produk-gizi</b>.</div>
-
-    <div id="msg" style="margin-top:12px"></div>
-
-    <div class="grid grid-3" style="margin-top:14px" id="produkGrid">
-      <div class="card">Memuat...</div>
-    </div>
-
-    <div class="footer">
-      <div class="small">© <span id="year"></span> iYup Care</div>
-    </div>
-  </div>
-
-  <script src="js/api.js"></script>
-  <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-
-    const grid = document.getElementById("produkGrid");
-    const msg = document.getElementById("msg");
-
-    function show(text, kind="ok"){
-      msg.innerHTML = `<div class="badge ${kind==="ok"?"blue":"red"}">${text}</div>`;
+    .nav{
+      display:flex; gap:8px; flex-wrap:wrap;
+      align-items:center; justify-content:center;
+    }
+    .nav a{
+      padding: 10px 12px;
+      border-radius: 999px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.80);
+      font-weight: 900;
+      font-size: 13px;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      white-space: nowrap;
+    }
+    .nav a:hover{
+      border-color: rgba(30,99,214,.25);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+      transform: translateY(-1px);
+    }
+    .nav a.active{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
     }
 
-    (async () => {
-      try{
-        const res = await api("/produk-gizi");
-        const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.80);
+      font-weight: 950;
+      font-size: 13px;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .btn:hover{ border-color: rgba(30,99,214,.25); transform: translateY(-1px); }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(31,157,85,1), rgba(18,122,66,1));
+      border-color: rgba(31,157,85,.0);
+      color:#fff;
+    }
+    .btn.primary:hover{ filter: brightness(.98); }
 
-        if(!list.length){
-          grid.innerHTML = `<div class="card">Belum ada produk.</div>`;
-          return;
-        }
+    /* Hero */
+    .hero{
+      margin-top: 16px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: calc(var(--radius) + 8px);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .hero-inner{
+      padding: 18px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:center;
+    }
+    .hero h1{
+      margin:0;
+      font-size: clamp(22px, 3.2vw, 34px);
+      letter-spacing: -.3px;
+      line-height: 1.08;
+    }
+    .hero p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 60ch;
+    }
+    .chips{ margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.72);
+    }
+    .chip.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
+    .chip.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
+    .chip.blue{ border-color: rgba(30,99,214,.22); background: rgba(30,99,214,.10); }
 
-        grid.innerHTML = list.map(p => `
-          <div class="card">
-            <div class="badge green">${p.nama ?? "Produk"}</div>
-            <h3 style="margin-top:10px">${p.judul ?? p.nama ?? "Produk Gizi"}</h3>
-            <div class="small">${(p.deskripsi ?? "").toString().slice(0,120)}...</div>
-            <div class="row" style="margin-top:12px">
-              <a class="btn secondary" href="produk-detail.html?id=${p.id}">Lihat Detail</a>
+    .hero-media{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      padding: 12px;
+      box-shadow: var(--shadow2);
+    }
+    .hero-media img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.08);
+      background:#fff;
+    }
+    .hero-note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Product sections */
+    .section{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .card{
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(8px);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .card-inner{ padding: 16px; }
+
+    .title{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.1px;
+    }
+    .desc{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    .media{
+      margin-top: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      padding: 10px;
+    }
+    .media img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius: 12px;
+      border:1px solid rgba(15,23,42,.08);
+      background:#fff;
+    }
+    .meta{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .box{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,.78);
+      padding: 12px;
+    }
+    .box h3{
+      margin:0;
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: -.1px;
+    }
+    .box ul{
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .box table{
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .box td{
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .box td:last-child{
+      text-align:right;
+      color: var(--ink);
+      font-weight: 900;
+    }
+
+    .cta{
+      margin-top: 12px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .foot{
+      margin-top: 16px;
+      padding: 14px 0 4px;
+      border-top: 1px solid rgba(15,23,42,.08);
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+    }
+
+    /* Mobile */
+    @media (max-width: 980px){
+      .hero-inner{ grid-template-columns: 1fr; }
+      .section{ grid-template-columns: 1fr; }
+      .meta{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
+        <div>
+          <div class="b1">iYup Care</div>
+          <div class="b2">Produk InnoviYup</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Navigasi">
+        <a href="index.html">Beranda</a>
+        <a class="active" href="produk.html">Produk</a>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="#kontak">Kontak</a>
+      </nav>
+
+      <div class="actions">
+        <a class="btn" href="login.html">Masuk</a>
+        <a class="btn primary" href="register.html">Daftar</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- HERO: mockup 4 paket -->
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <h1>Produk gizi InnoviYup untuk dukung pertumbuhan anak</h1>
+          <p>
+            Halaman ini berisi ringkasan produk dan edukasi berbasis materi yang ada pada poster InnoviYup.
+            Kamu bisa tampilkan detail nutrisi dan tahapan pembuatan secara jelas, tanpa bergantung ke endpoint backend.
+          </p>
+
+          <div class="chips">
+            <div class="chip green">Susu analog • berprotein</div>
+            <div class="chip orange">Biskuit multigrain</div>
+            <div class="chip blue">Info nutrisi & proses</div>
+          </div>
+
+          <div class="cta">
+            <a class="btn primary" href="https://wa.me/6287779801049" target="_blank" rel="noopener">Pesan via WA</a>
+            <a class="btn" href="#biskuit">Lihat Biskuit</a>
+          </div>
+        </div>
+
+        <div class="hero-media">
+          <img src="assets/produk-mockup-4paket.png" alt="Mockup produk InnoviYup (4 paket)" />
+          <div class="hero-note">
+            Pastikan file mockup bernama <b>produk-mockup-4paket.png</b> berada di folder <b>assets/</b>.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 kolom: SUSU vs BISKUIT -->
+    <section class="section" aria-label="Produk">
+      <!-- SUSU -->
+      <article class="card" id="susu">
+        <div class="card-inner">
+          <h2 class="title">Susu Analog (Berprotein Tinggi)</h2>
+          <div class="desc">
+            Susu analog InnoviYup berbasis ikan penja dan daun kelor. Pada poster, informasi yang ditonjolkan:
+            takaran saji 25 g (± 3 sdm), perbedaan formulasi berdasarkan usia, serta tahapan pembuatan (isolat/hidrolisat protein).
+          </div>
+
+          <div class="meta">
+            <div class="box">
+              <h3>Ringkas nutrisi (dari poster)</h3>
+              <table aria-label="Ringkas nutrisi susu analog">
+                <tr><td>Anak &gt; 1 tahun — Energi</td><td>111 kkal</td></tr>
+                <tr><td>Anak &gt; 1 tahun — Lemak</td><td>3 g</td></tr>
+                <tr><td>Anak &gt; 1 tahun — Protein</td><td>7 g</td></tr>
+                <tr><td>Anak &gt; 1 tahun — Karbohidrat</td><td>14 g</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Energi</td><td>105 kkal</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Lemak</td><td>5 g</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Protein</td><td>6 g</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Karbohidrat</td><td>9 g</td></tr>
+              </table>
+              <div class="desc" style="margin-top:10px;font-size:12px">
+                * Angka di atas saya ambil dari tabel “Nutrisi Susu” pada poster.
+              </div>
+            </div>
+
+            <div class="box">
+              <h3>Tahapan utama (dari poster)</h3>
+              <ul>
+                <li>Persiapan ikan penja: cuci/ rendam air jeruk, rebus, keringkan (dehydrator 60°C), blender.</li>
+                <li>Pembuatan isolat protein: ayak 60 mesh, perlakuan basa, sentrifugasi, pengendapan asam, sentrifugasi ulang.</li>
+                <li>Hidrolisis protein: pH ~7, enzim papain/bromelain, inkubasi 55°C, inaktivasi 90°C.</li>
+                <li>Formulasi berdasarkan usia: &gt;1 tahun (kelor + perisa), &lt;1 tahun (penja/kelor + VCO).</li>
+              </ul>
             </div>
           </div>
-        `).join("");
 
-        show("Produk berhasil dimuat.", "ok");
-      }catch(e){
-        grid.innerHTML = `<div class="card">Gagal memuat produk. Pastikan backend hidup.</div>`;
-        show("Gagal memuat produk.", "err");
-        console.error(e);
-      }
-    })();
+          <div class="media" style="margin-top:14px">
+            <img src="assets/poster-susu.jpg" alt="Poster tahapan dan nutrisi susu analog InnoviYup" />
+          </div>
+
+          <div class="cta">
+            <a class="btn primary" href="https://wa.me/6287779801049" target="_blank" rel="noopener">Pesan Susu via WA</a>
+            <a class="btn" href="#kontak">Kontak</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- BISKUIT -->
+      <article class="card" id="biskuit">
+        <div class="card-inner">
+          <h2 class="title">Biskuit Multigrain</h2>
+          <div class="desc">
+            Biskuit multigrain InnoviYup ditonjolkan sebagai pendamping bergizi. Poster memuat ringkasan produk,
+            tabel nutrisi per 3 keping (± 11 g), dan tahapan pembuatan (persiapan tepung dasar hingga pemanggangan).
+          </div>
+
+          <div class="meta">
+            <div class="box">
+              <h3>Ringkas nutrisi (dari poster)</h3>
+              <table aria-label="Ringkas nutrisi biskuit">
+                <tr><td>Energi total</td><td>50 kkal</td></tr>
+                <tr><td>Lemak</td><td>2 g</td></tr>
+                <tr><td>Protein</td><td>2 g</td></tr>
+                <tr><td>Karbohidrat</td><td>6 g</td></tr>
+              </table>
+              <div class="desc" style="margin-top:10px;font-size:12px">
+                * Tabel di atas saya ambil dari bagian “Nutrisi Biskuit” pada poster (3 keping / 11 g).
+              </div>
+            </div>
+
+            <div class="box">
+              <h3>Tahapan utama (dari poster)</h3>
+              <ul>
+                <li>Persiapan tepung: jagung, beras merah, kacang hijau dicuci, dikeringkan (dehydrator 60°C), diblender & diayak.</li>
+                <li>Penimbangan: masing-masing tepung ditimbang (contoh di poster 15 g) + chia seed 1/2 sdt.</li>
+                <li>Adonan: margarin + susu skim bubuk + telur + gula aren (sesuai takaran poster), campur hingga mengembang.</li>
+                <li>Pemanggangan: cetak, dinginkan, panggang 150°C ± 20 menit.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="media" style="margin-top:14px">
+            <img src="assets/poster-biskuit.jpg" alt="Poster info, nutrisi, dan tahapan pembuatan biskuit InnoviYup" />
+          </div>
+
+          <div class="cta">
+            <a class="btn primary" href="https://wa.me/6287779801049" target="_blank" rel="noopener">Pesan Biskuit via WA</a>
+            <a class="btn" href="#susu">Lihat Susu</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- Kontak singkat -->
+    <section class="card" id="kontak" style="margin-top:14px">
+      <div class="card-inner">
+        <h2 class="title">Kontak</h2>
+        <div class="desc">Tim: InnoviYup • Lokasi: Pombewe • Platform: Instagram & YouTube</div>
+
+        <div class="cta" style="margin-top:12px">
+          <a class="btn primary" href="https://wa.me/6287779801049" target="_blank" rel="noopener">WhatsApp Admin</a>
+          <a class="btn" href="https://instagram.com/innoviyup2025" target="_blank" rel="noopener">Instagram</a>
+          <a class="btn" href="https://www.youtube.com/@InnoviYup2025" target="_blank" rel="noopener">YouTube</a>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">
+      © <span id="year"></span> iYup Care • InnoviYup
+    </div>
+  </main>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
 </html>
