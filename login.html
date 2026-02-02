@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- API BASE (HF) -->
+  <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
+
   <title>Login</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -34,12 +38,17 @@
     </div>
   </div>
 
+  <!-- IMPORTANT:
+       api.js harus diload sebelum auth.js dan sebelum script yang memanggil api() -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
+
   <script>
     const msg = document.getElementById("msg");
+
     document.getElementById("btnLogin").addEventListener("click", async () => {
       msg.textContent = "";
+
       try {
         const payload = {
           email: document.getElementById("email").value.trim(),
@@ -50,12 +59,14 @@
 
         const token = extractToken(resp);
         if (!token) {
-          throw new Error("Login berhasil tapi token tidak ditemukan di response. Cek AuthController (return token).");
+          throw new Error(
+            "Login berhasil tapi token tidak ditemukan di response. Cek AuthController (return token)."
+          );
         }
 
         setToken(token);
         showOk(msg, "Login berhasil. Token tersimpan. Redirect ke dashboard...");
-        setTimeout(() => location.href = "dashboard.html", 600);
+        setTimeout(() => (location.href = "dashboard.html"), 600);
       } catch (err) {
         showError(msg, err);
       }

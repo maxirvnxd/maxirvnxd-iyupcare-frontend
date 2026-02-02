@@ -3,6 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- API BASE (HF) -->
+  <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
+
   <title>Daftar</title>
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -41,12 +45,17 @@
     </div>
   </div>
 
+  <!-- IMPORTANT:
+       api.js harus diload sebelum auth.js dan sebelum script yang memanggil api() -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
+
   <script>
     const msg = document.getElementById("msg");
+
     document.getElementById("btnRegister").addEventListener("click", async () => {
       msg.textContent = "";
+
       try {
         const payload = {
           name: document.getElementById("name").value.trim(),
@@ -58,14 +67,15 @@
         const resp = await api("/auth/register", { method: "POST", body: payload });
 
         const token = extractToken(resp);
+
         if (token) {
           setToken(token);
           showOk(msg, "Register berhasil. Token tersimpan. Redirect ke dashboard...");
-          setTimeout(() => location.href = "dashboard.html", 600);
+          setTimeout(() => (location.href = "dashboard.html"), 600);
         } else {
           // kalau register kamu memang tidak mengembalikan token, arahkan ke login
           showOk(msg, "Register berhasil. Silakan login.");
-          setTimeout(() => location.href = "login.html", 600);
+          setTimeout(() => (location.href = "login.html"), 600);
         }
       } catch (err) {
         showError(msg, err);
