@@ -2,15 +2,105 @@
 <html lang="id">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- API BASE (HF) -->
-  <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
-
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Detail Produk — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    .page{ padding-top: 84px; } /* biar tidak ketutup navbar */
+    .detail-wrap{ max-width: 980px; margin: 0 auto; padding: 18px; }
+    .detail-head{
+      display:flex; justify-content:space-between; align-items:center;
+      gap:12px; flex-wrap:wrap;
+      margin-bottom: 12px;
+    }
+
+    .panel{
+      border:1px solid rgba(0,0,0,.10);
+      border-radius: 18px;
+      background:#fff;
+      box-shadow: 0 12px 28px rgba(0,0,0,.08);
+      overflow:hidden;
+    }
+
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 14px;
+    }
+    .imgbox{
+      border:1px solid rgba(0,0,0,.08);
+      border-radius: 16px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .imgbox img{
+      width:100%;
+      height: 420px;
+      object-fit: cover;
+      display:block;
+    }
+
+    .content{ padding: 14px; }
+    .content h1{ margin: 6px 0 8px; }
+    .content .small{ line-height:1.65; }
+
+    .section{
+      margin-top: 12px;
+      padding: 14px;
+      border-top: 1px solid rgba(0,0,0,.06);
+    }
+    .section h3{ margin: 0 0 8px; }
+
+    table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 12px;
+      border:1px solid rgba(0,0,0,.08);
+      background:#fff;
+    }
+    th, td{
+      text-align:left;
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      font-size: 14px;
+    }
+    th{ font-weight: 900; background: rgba(0,0,0,.02); }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 10px;
+    }
+
+    .yt-box{
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid rgba(0,0,0,.10);
+      box-shadow: 0 10px 22px rgba(0,0,0,.08);
+      background:#fff;
+      margin-top:12px;
+    }
+    .yt-box iframe{
+      width:100%;
+      height: 320px;
+      border:0;
+      display:block;
+    }
+
+    @media (max-width: 900px){
+      .grid2{ grid-template-columns: 1fr; }
+      .imgbox img{ height: 360px; }
+      .yt-box iframe{ height: 240px; }
+    }
+  </style>
 </head>
+
 <body>
+  <!-- Navbar sederhana, tetap konsisten -->
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">
@@ -19,87 +109,192 @@
       </div>
 
       <div class="nav-links">
-        <a href="index.html">Beranda</a>
-        <a href="produk.html">Produk</a>
+        <a href="index.html#beranda">Beranda</a>
+        <a href="index.html#produk">Produk</a>
+        <a href="index.html#kontak">Kontak</a>
       </div>
 
       <div class="row">
-        <a class="btn secondary" href="produk.html">Kembali</a>
+        <a class="btn secondary" href="index.html#produk">Kembali</a>
       </div>
     </div>
   </div>
 
-  <div class="container">
-    <div id="msg"></div>
-
-    <div class="card" style="margin-top:14px">
-      <div class="badge blue" id="tag">Produk</div>
-      <h1 id="nama" style="margin-top:10px">Memuat...</h1>
-
-      <div class="hero-visual" style="min-height:220px; margin-top:12px">
-        <!-- opsional: ganti dengan gambar produk -->
+  <main class="page">
+    <div class="detail-wrap">
+      <div class="detail-head">
+        <div>
+          <div class="badge green" id="badge">Produk</div>
+          <h2 style="margin:8px 0 0;">Detail Produk</h2>
+          <div class="small" id="subtitle">—</div>
+        </div>
+        <div class="row" style="gap:10px; flex-wrap:wrap;">
+          <a class="btn secondary" href="index.html#produk">Kembali ke Produk</a>
+          <a class="btn" id="waBtn" href="https://wa.me/6287779801049" target="_blank" rel="noopener">Pesan via WA</a>
+        </div>
       </div>
 
-      <hr />
+      <section class="panel">
+        <!-- 2 gambar: depan & belakang (yang kamu minta ada di kolom kosong) -->
+        <div class="grid2">
+          <div class="imgbox">
+            <img id="imgFront" src="" alt="Gambar depan produk">
+          </div>
+          <div class="imgbox">
+            <img id="imgBack" src="" alt="Gambar belakang/komposisi produk">
+          </div>
+        </div>
 
-      <h2>Deskripsi</h2>
-      <p class="small" id="deskripsi">—</p>
+        <div class="content">
+          <h1 id="title">Memuat…</h1>
+          <p class="small" id="desc">—</p>
 
-      <h2 style="margin-top:14px">Tabel Kandungan (contoh format)</h2>
-      <table class="table">
-        <thead>
-          <tr><th>Komponen</th><th>Nilai</th></tr>
-        </thead>
-        <tbody id="kandunganBody">
-          <tr><td colspan="2" class="small">Belum ada data kandungan (isi sesuai struktur data kamu).</td></tr>
-        </tbody>
-      </table>
+          <div class="actions">
+            <a class="btn secondary" id="igBtn" href="https://instagram.com/innoviyup2025" target="_blank" rel="noopener">Instagram</a>
+            <a class="btn secondary" id="ytBtn" href="https://www.youtube.com/@InnoviYup2025" target="_blank" rel="noopener">YouTube</a>
+            <a class="btn" href="https://wa.me/6287779801049" target="_blank" rel="noopener">Chat Admin</a>
+          </div>
+        </div>
 
-      <div style="margin-top:14px" class="card">
-        <div class="badge green">Tahukah Bunda?</div>
-        <div class="small" id="fakta" style="margin-top:10px">—</div>
+        <!-- Tabel kandungan: dibuat dari komposisi belakang (bahan-bahan) -->
+        <div class="section">
+          <h3>Tabel Kandungan (Komposisi Bahan)</h3>
+          <div class="small" style="margin-bottom:10px;">
+            Catatan: label belakang pada mockup menampilkan <b>komposisi bahan</b>. Jika kamu punya data gizi numerik (kkal, protein, dll),
+            tabel ini bisa diganti menjadi tabel nilai gizi resmi.
+          </div>
+
+          <table aria-label="Tabel komposisi bahan">
+            <thead>
+              <tr>
+                <th>Komponen</th>
+                <th>Keterangan</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- YouTube embed (pause, no autoplay) -->
+        <div class="section">
+          <h3>Video</h3>
+          <div class="yt-box">
+            <iframe
+              src="https://www.youtube.com/embed/TU2Lk9T8YWg?rel=0&modestbranding=1&autoplay=0"
+              title="InnoviYup Video"
+              loading="lazy"
+              allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
+          </div>
+        </div>
+      </section>
+
+      <div class="small" style="margin-top:14px; opacity:.8;">
+        © <span id="year"></span> iYup Care
       </div>
     </div>
+  </main>
 
-    <div class="footer">
-      <div class="small">© <span id="year"></span> iYup Care</div>
-    </div>
-  </div>
-
-  <script src="js/api.js"></script>
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    const msg = document.getElementById("msg");
-    const qs = new URLSearchParams(location.search);
-    const id = qs.get("id");
+    // Data produk lokal (NO API). Bisa kamu tambah nanti.
+    const PRODUCTS = {
+      "1": {
+        badge: "Susu Analog",
+        subtitle: "Ikan Penja & Daun Kelor",
+        title: "Susu Analog — Ikan Penja & Daun Kelor",
+        desc:
+          "Susu analog ini merupakan minuman tinggi protein yang dibuat dari ikan penja sebagai sumber protein hewani " +
+          "dan daun kelor sebagai sumber zat gizi mikro. Produk ini diformulasikan sebagai alternatif susu yang bergizi, " +
+          "kaya protein, mineral, dan antioksidan, serta cocok untuk membantu pemenuhan gizi masyarakat.",
+        front: "assets/susu-analog-front.png",
+        back:  "assets/susu-analog-komposisi.png",
+        // Komposisi bahan (berdasarkan label belakang yang kamu tunjukkan)
+        komposisi: [
+          { komponen: "Ekstrak ikan penja", ket: "Sumber protein hewani" },
+          { komponen: "Ekstrak daun kelor", ket: "Mikronutrien & antioksidan" },
+          { komponen: "Creamer", ket: "Bahan pendukung tekstur/rasa" },
+          { komponen: "Cacao bubuk", ket: "Rasa & aroma" },
+          { komponen: "Ekstrak daun stevia", ket: "Pemanis" },
+          { komponen: "Vanili", ket: "Aroma" }
+        ]
+      },
 
-    function show(text, kind="ok"){
-      msg.innerHTML = `<div class="badge ${kind==="ok"?"blue":"red"}">${text}</div>`;
+      "3": {
+        badge: "Biskuit",
+        subtitle: "Multigrains",
+        title: "Biskuit Multigrains",
+        desc:
+          "Biskuit multigrains adalah biskuit bergizi yang dibuat dari campuran berbagai biji-bijian seperti beras merah, " +
+          "jagung, kacang hijau, dan chia seed. Produk ini mengandung karbohidrat kompleks, serat, dan protein, sehingga " +
+          "dapat menjadi camilan sehat yang mengenyangkan dan mendukung kebutuhan energi serta gizi harian.",
+        front: "assets/biskuit-multigrains-front.png",
+        back:  "assets/biskuit-multigrains-komposisi.png",
+        komposisi: [
+          { komponen: "Tepung jagung", ket: "Karbohidrat kompleks" },
+          { komponen: "Tepung beras merah", ket: "Karbohidrat + serat" },
+          { komponen: "Tepung kacang hijau", ket: "Protein nabati" },
+          { komponen: "Chia seed", ket: "Serat" },
+          { komponen: "Telur", ket: "Pengikat adonan" },
+          { komponen: "Gula aren", ket: "Pemanis" },
+          { komponen: "Susu bubuk", ket: "Rasa & nutrisi tambahan" },
+          { komponen: "Margarin", ket: "Tekstur & rasa" }
+        ]
+      }
+    };
+
+    function getQueryParam(name){
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name);
     }
 
-    (async () => {
-      if(!id){
-        show("ID produk tidak ada. Balik ke halaman produk.", "err");
-        return;
-      }
+    function render(product){
+      document.getElementById("badge").textContent = product.badge;
+      document.getElementById("subtitle").textContent = product.subtitle;
+      document.getElementById("title").textContent = product.title;
+      document.getElementById("desc").textContent = product.desc;
 
-      try{
-        const p = await api(`/produk-gizi/${id}`);
-        const data = p?.data ?? p;
+      const imgFront = document.getElementById("imgFront");
+      const imgBack = document.getElementById("imgBack");
+      imgFront.src = product.front;
+      imgBack.src = product.back;
 
-        document.getElementById("nama").textContent = data?.nama ?? "Produk";
-        document.getElementById("tag").textContent = data?.kategori ?? "Produk";
-        document.getElementById("deskripsi").textContent = data?.deskripsi ?? "—";
-        document.getElementById("fakta").textContent =
-          data?.fakta ?? "Fakta singkat bisa kamu isi dari database produk.";
+      // Tabel
+      const body = document.getElementById("tableBody");
+      body.innerHTML = "";
+      product.komposisi.forEach(row => {
+        const tr = document.createElement("tr");
+        const td1 = document.createElement("td");
+        const td2 = document.createElement("td");
+        td1.textContent = row.komponen;
+        td2.textContent = row.ket;
+        tr.appendChild(td1);
+        tr.appendChild(td2);
+        body.appendChild(tr);
+      });
+    }
 
-        show("Detail produk berhasil dimuat.", "ok");
-      }catch(e){
-        show("Gagal memuat detail produk.", "err");
-        console.error(e);
-      }
-    })();
+    const id = getQueryParam("id") || "1";
+    const product = PRODUCTS[id];
+
+    if(!product){
+      // fallback kalau id tidak valid
+      document.getElementById("title").textContent = "Produk tidak ditemukan";
+      document.getElementById("desc").textContent = "ID produk tidak valid. Kembali ke halaman produk.";
+      document.getElementById("imgFront").src = "assets/susu-analog-front.png";
+      document.getElementById("imgBack").src = "assets/susu-analog-komposisi.png";
+      document.getElementById("tableBody").innerHTML =
+        "<tr><td>—</td><td>—</td></tr>";
+    } else {
+      render(product);
+    }
   </script>
 </body>
 </html>
