@@ -20,7 +20,6 @@
       --line: rgba(15,23,42,.10);
       --shadow: 0 18px 45px rgba(15,23,42,.10);
       --primary:#1e63d6;
-      --primary2:#27ae60;
       --radius:18px;
     }
     *{ box-sizing:border-box; }
@@ -33,9 +32,77 @@
         linear-gradient(180deg, var(--bg1), var(--bg2));
     }
 
-    /* Layout */
+    /* NAV (custom, supaya menu jadi tombol/pill dan gampang dinotice) */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(255,255,255,.75);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .topbar-inner{
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 180px;
+    }
+    .brand img{
+      width:34px; height:34px;
+      border-radius: 12px;
+      object-fit: cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+    }
+    .brand .b1{ font-weight: 900; letter-spacing:.2px; }
+    .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
+
+    .nav-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .nav-pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.85);
+      font-weight: 900;
+      font-size: 13px;
+      text-decoration:none;
+      color: var(--ink);
+      min-width: 110px; /* ini yang bikin terasa "kolom" dan gampang dinotice */
+    }
+    .nav-pill:hover{
+      border-color: rgba(30,99,214,.25);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+      transform: translateY(-1px);
+    }
+    .nav-pill.primary{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
+      min-width: 120px;
+    }
+    .nav-pill.primary:hover{ filter: brightness(.98); }
+
+    /* Layout form */
     .auth-wrap{
-      min-height: calc(100vh - 74px);
+      min-height: calc(100vh - 62px);
       display:grid;
       place-items:center;
       padding: 26px 16px 34px;
@@ -65,22 +132,6 @@
       border:1px solid rgba(15,23,42,.08);
       background: #fff;
     }
-
-    /* Brand header */
-    .brand-row{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      margin-bottom: 10px;
-    }
-    .brand-row img{
-      width:44px; height:44px; border-radius:14px;
-      object-fit:cover;
-      border:1px solid rgba(15,23,42,.10);
-      background:#fff;
-    }
-    .brand-row .t1{ font-weight: 900; letter-spacing:.2px; }
-    .brand-row .t2{ color:var(--muted); font-size: 12px; margin-top:2px; }
 
     .hero-badge{
       display:inline-flex;
@@ -134,7 +185,6 @@
       font-size: 13px;
       line-height: 1.55;
     }
-
     .field{ margin-top: 10px; }
     .field label{
       display:block;
@@ -142,9 +192,6 @@
       font-size: 13px;
       margin: 0 0 6px;
       color: rgba(11,27,58,.92);
-    }
-    .control{
-      position: relative;
     }
     .control input{
       width:100%;
@@ -185,23 +232,6 @@
     .btn2.primary:hover{ filter: brightness(.98); }
     .btn2.secondary:hover{ border-color: rgba(30,99,214,.25); }
 
-    .helper-links{
-      margin-top: 12px;
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .helper-links a{
-      color: rgba(30,99,214,1);
-      font-weight: 900;
-      text-decoration:none;
-    }
-    .helper-links a:hover{ text-decoration: underline; }
-
-    /* Message box */
     #msg{
       margin-top: 10px;
       padding: 10px 12px;
@@ -214,55 +244,43 @@
       display:none;
     }
 
-    /* Nav adjustment: keep your existing nav but make it nicer if styles.css is old */
-    .nav .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:900;
-    }
-    .nav .brand img{
-      width:28px;height:28px;border-radius:10px;object-fit:cover;
-      border:1px solid rgba(15,23,42,.10);
-      background:#fff;
-    }
-
     @media (max-width: 920px){
       .auth-card{ grid-template-columns: 1fr; }
       .mini-grid{ grid-template-columns: 1fr; }
+      .brand{ min-width:auto; }
+      .nav-pill{ min-width: 96px; padding: 10px 12px; }
     }
   </style>
 </head>
 
 <body>
-  <div class="nav">
-    <div class="brand">
-      <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
-      <div>iYup Care</div>
+  <!-- NAVBAR modern: menu dalam bentuk tombol/pill -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
+        <div>
+          <div class="b1">iYup Care</div>
+          <div class="b2">InnoviYup • Pombewe</div>
+        </div>
+      </div>
+
+      <nav class="nav-actions" aria-label="Navigasi">
+        <a class="nav-pill" href="index.html">Beranda</a>
+        <a class="nav-pill primary" href="login.html">Masuk</a>
+      </nav>
     </div>
-    <div class="links">
-      <a href="index.html">Beranda</a>
-      <a href="login.html">Masuk</a>
-    </div>
-  </div>
+  </header>
 
   <div class="auth-wrap">
     <div class="auth-card">
-      <!-- LEFT: intro -->
+      <!-- LEFT -->
       <section class="auth-left">
-        <div class="brand-row">
-          <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
-          <div>
-            <div class="t1">InnoviYup • iYup Care</div>
-            <div class="t2">Pombewe — Monitoring gizi & edukasi pangan lokal</div>
-          </div>
-        </div>
-
         <div class="hero-badge">🔒 Aman • 🚀 Cepat • 📱 Mobile friendly</div>
         <h2 class="hero-title">Buat akun untuk mulai pemantauan gizi.</h2>
         <p class="hero-desc">
           Setelah daftar, kamu bisa masuk ke dashboard untuk melakukan monitoring BB/TB,
-          menggunakan kalkulator kebutuhan energi, dan melihat edukasi produk pangan lokal.
+          menggunakan kalkulator kebutuhan energi, dan melihat edukasi pangan lokal.
         </p>
 
         <div class="mini-grid">
@@ -272,7 +290,7 @@
         </div>
       </section>
 
-      <!-- RIGHT: form -->
+      <!-- RIGHT -->
       <section class="auth-right">
         <h1 class="form-title">Daftar Akun</h1>
         <p class="form-sub">Data akan disimpan di backend (tabel users). Pastikan email aktif.</p>
@@ -311,25 +329,16 @@
           <button class="btn2 primary" id="btnRegister" type="button">Daftar</button>
           <button class="btn2 secondary" type="button" onclick="location.href='login.html'">Ke Login</button>
         </div>
-
-        <div class="helper-links">
-          <span>Sudah punya akun?</span>
-          <a href="login.html">Masuk di sini</a>
-        </div>
       </section>
     </div>
   </div>
 
-  <!-- IMPORTANT: api.js sebelum auth.js -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
 
   <script>
     const msg = document.getElementById("msg");
-
-    function showMsgVisible() {
-      msg.style.display = "block";
-    }
+    function showMsgVisible(){ msg.style.display = "block"; }
 
     document.getElementById("btnRegister").addEventListener("click", async () => {
       msg.textContent = "";
@@ -344,7 +353,6 @@
         };
 
         const resp = await api("/auth/register", { method: "POST", body: payload });
-
         const token = extractToken(resp);
 
         if (token) {
