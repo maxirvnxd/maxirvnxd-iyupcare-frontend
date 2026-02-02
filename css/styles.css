@@ -75,6 +75,18 @@ h3{font-size:1.06rem; margin:.2rem 0 .6rem}
   box-shadow:0 10px 25px rgba(47,158,68,.18);
 }
 .btn:hover{filter:brightness(.97)}
+
+/* Tombol Kembali: putih + teks hitam */
+.btn.back{
+  background: #ffffff !important;
+  color: #0b1b3a !important; /* hitam/navy gelap */
+  border-color: rgba(15,23,42,.12) !important;
+  box-shadow:none !important;
+}
+.btn.back:hover{
+  color: #0b1b3a !important;
+}
+
 .btn.secondary{
   background:#fff; color:var(--text);
   border:1px solid var(--line);
