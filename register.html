@@ -4,57 +4,336 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- API BASE (HF) -->
+  <!-- API BASE (HF) - JANGAN DIHAPUS -->
   <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
 
-  <title>Daftar</title>
+  <title>Daftar — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    :root{
+      --bg1:#eef6ff;
+      --bg2:#f7fbff;
+      --card:#ffffff;
+      --ink:#0b1b3a;
+      --muted:#5b6b80;
+      --line: rgba(15,23,42,.10);
+      --shadow: 0 18px 45px rgba(15,23,42,.10);
+      --primary:#1e63d6;
+      --primary2:#27ae60;
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.18), transparent 60%),
+        radial-gradient(800px 500px at 90% 0%, rgba(39,174,96,.16), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    /* Layout */
+    .auth-wrap{
+      min-height: calc(100vh - 74px);
+      display:grid;
+      place-items:center;
+      padding: 26px 16px 34px;
+    }
+    .auth-card{
+      width: min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 18px;
+      padding: 18px;
+      border-radius: calc(var(--radius) + 6px);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .auth-left{
+      padding: 18px;
+      border-radius: var(--radius);
+      border:1px solid rgba(15,23,42,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
+    }
+    .auth-right{
+      padding: 18px;
+      border-radius: var(--radius);
+      border:1px solid rgba(15,23,42,.08);
+      background: #fff;
+    }
+
+    /* Brand header */
+    .brand-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .brand-row img{
+      width:44px; height:44px; border-radius:14px;
+      object-fit:cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+    }
+    .brand-row .t1{ font-weight: 900; letter-spacing:.2px; }
+    .brand-row .t2{ color:var(--muted); font-size: 12px; margin-top:2px; }
+
+    .hero-badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      font-weight: 900;
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(30,99,214,.25);
+      background: rgba(30,99,214,.10);
+      margin-top: 10px;
+    }
+    .hero-title{
+      margin: 10px 0 8px;
+      font-size: clamp(20px, 2.4vw, 30px);
+      line-height: 1.1;
+      letter-spacing: -.2px;
+    }
+    .hero-desc{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+      max-width: 56ch;
+    }
+    .mini-grid{
+      margin-top: 14px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+    .mini{
+      border:1px solid rgba(15,23,42,.08);
+      border-radius: 14px;
+      padding: 10px;
+      background: rgba(255,255,255,.70);
+    }
+    .mini b{ display:block; font-size: 13px; }
+    .mini span{ color: var(--muted); font-size: 12px; }
+
+    /* Form */
+    .form-title{
+      margin: 0 0 6px;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .form-sub{
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .field{ margin-top: 10px; }
+    .field label{
+      display:block;
+      font-weight: 800;
+      font-size: 13px;
+      margin: 0 0 6px;
+      color: rgba(11,27,58,.92);
+    }
+    .control{
+      position: relative;
+    }
+    .control input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      outline: none;
+      background: #fff;
+      font-size: 14px;
+    }
+    .control input:focus{
+      border-color: rgba(30,99,214,.35);
+      box-shadow: 0 0 0 4px rgba(30,99,214,.10);
+    }
+
+    .row-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
+      align-items:center;
+    }
+    .btn2{
+      appearance:none;
+      border: 1px solid rgba(15,23,42,.12);
+      background: #fff;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor:pointer;
+    }
+    .btn2.primary{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
+    }
+    .btn2.primary:hover{ filter: brightness(.98); }
+    .btn2.secondary:hover{ border-color: rgba(30,99,214,.25); }
+
+    .helper-links{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .helper-links a{
+      color: rgba(30,99,214,1);
+      font-weight: 900;
+      text-decoration:none;
+    }
+    .helper-links a:hover{ text-decoration: underline; }
+
+    /* Message box */
+    #msg{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.75);
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.55;
+      display:none;
+    }
+
+    /* Nav adjustment: keep your existing nav but make it nicer if styles.css is old */
+    .nav .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+    }
+    .nav .brand img{
+      width:28px;height:28px;border-radius:10px;object-fit:cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+    }
+
+    @media (max-width: 920px){
+      .auth-card{ grid-template-columns: 1fr; }
+      .mini-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
+
 <body>
   <div class="nav">
-    <div class="brand">Gizi Anak</div>
+    <div class="brand">
+      <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
+      <div>iYup Care</div>
+    </div>
     <div class="links">
       <a href="index.html">Beranda</a>
       <a href="login.html">Masuk</a>
     </div>
   </div>
 
-  <div class="container">
-    <div class="card">
-      <h1>Daftar Akun</h1>
-      <p class="small">Data akan disimpan di database backend (tabel users).</p>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <!-- LEFT: intro -->
+      <section class="auth-left">
+        <div class="brand-row">
+          <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
+          <div>
+            <div class="t1">InnoviYup • iYup Care</div>
+            <div class="t2">Pombewe — Monitoring gizi & edukasi pangan lokal</div>
+          </div>
+        </div>
 
-      <div id="msg"></div>
+        <div class="hero-badge">🔒 Aman • 🚀 Cepat • 📱 Mobile friendly</div>
+        <h2 class="hero-title">Buat akun untuk mulai pemantauan gizi.</h2>
+        <p class="hero-desc">
+          Setelah daftar, kamu bisa masuk ke dashboard untuk melakukan monitoring BB/TB,
+          menggunakan kalkulator kebutuhan energi, dan melihat edukasi produk pangan lokal.
+        </p>
 
-      <label>Nama</label>
-      <input id="name" placeholder="Nama" />
+        <div class="mini-grid">
+          <div class="mini"><b>Monitoring</b><span>Catat BB/TB & riwayat</span></div>
+          <div class="mini"><b>Kalkulator</b><span>Hitung kkal/hari</span></div>
+          <div class="mini"><b>Edukasi</b><span>Produk & pangan lokal</span></div>
+        </div>
+      </section>
 
-      <label>Email</label>
-      <input id="email" type="email" placeholder="email@contoh.com" />
+      <!-- RIGHT: form -->
+      <section class="auth-right">
+        <h1 class="form-title">Daftar Akun</h1>
+        <p class="form-sub">Data akan disimpan di backend (tabel users). Pastikan email aktif.</p>
 
-      <label>Password</label>
-      <input id="password" type="password" placeholder="minimal 8 karakter" />
+        <div id="msg"></div>
 
-      <label>Konfirmasi Password</label>
-      <input id="password_confirmation" type="password" />
+        <div class="field">
+          <label for="name">Nama</label>
+          <div class="control">
+            <input id="name" placeholder="Nama lengkap" autocomplete="name" />
+          </div>
+        </div>
 
-      <div style="margin-top:12px" class="row">
-        <button id="btnRegister">Daftar</button>
-        <button class="secondary" onclick="location.href='login.html'">Ke Login</button>
-      </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="control">
+            <input id="email" type="email" placeholder="email@contoh.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="control">
+            <input id="password" type="password" placeholder="minimal 8 karakter" autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password_confirmation">Konfirmasi Password</label>
+          <div class="control">
+            <input id="password_confirmation" type="password" placeholder="ulangi password" autocomplete="new-password" />
+          </div>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn2 primary" id="btnRegister" type="button">Daftar</button>
+          <button class="btn2 secondary" type="button" onclick="location.href='login.html'">Ke Login</button>
+        </div>
+
+        <div class="helper-links">
+          <span>Sudah punya akun?</span>
+          <a href="login.html">Masuk di sini</a>
+        </div>
+      </section>
     </div>
   </div>
 
-  <!-- IMPORTANT:
-       api.js harus diload sebelum auth.js dan sebelum script yang memanggil api() -->
+  <!-- IMPORTANT: api.js sebelum auth.js -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
 
   <script>
     const msg = document.getElementById("msg");
 
+    function showMsgVisible() {
+      msg.style.display = "block";
+    }
+
     document.getElementById("btnRegister").addEventListener("click", async () => {
       msg.textContent = "";
+      showMsgVisible();
 
       try {
         const payload = {
@@ -73,7 +352,6 @@
           showOk(msg, "Register berhasil. Token tersimpan. Redirect ke dashboard...");
           setTimeout(() => (location.href = "dashboard.html"), 600);
         } else {
-          // kalau register kamu memang tidak mengembalikan token, arahkan ke login
           showOk(msg, "Register berhasil. Silakan login.");
           setTimeout(() => (location.href = "login.html"), 600);
         }

@@ -4,50 +4,304 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- API BASE (HF) -->
+  <!-- API BASE (HF) - JANGAN DIHAPUS -->
   <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
 
-  <title>Login</title>
+  <title>Masuk — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    :root{
+      --bg1:#eef6ff;
+      --bg2:#f7fbff;
+      --card:#ffffff;
+      --ink:#0b1b3a;
+      --muted:#5b6b80;
+      --line: rgba(15,23,42,.10);
+      --shadow: 0 18px 45px rgba(15,23,42,.10);
+      --primary:#1e63d6;
+      --radius:18px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.18), transparent 60%),
+        radial-gradient(800px 500px at 90% 0%, rgba(214,168,74,.16), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+    }
+
+    .auth-wrap{
+      min-height: calc(100vh - 74px);
+      display:grid;
+      place-items:center;
+      padding: 26px 16px 34px;
+    }
+    .auth-card{
+      width: min(920px, 100%);
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      padding: 18px;
+      border-radius: calc(var(--radius) + 6px);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.78);
+      backdrop-filter: blur(8px);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .auth-left{
+      padding: 18px;
+      border-radius: var(--radius);
+      border:1px solid rgba(15,23,42,.08);
+      background: linear-gradient(180deg, rgba(255,255,255,.9), rgba(255,255,255,.75));
+    }
+    .auth-right{
+      padding: 18px;
+      border-radius: var(--radius);
+      border:1px solid rgba(15,23,42,.08);
+      background: #fff;
+    }
+
+    .brand-row{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      margin-bottom: 10px;
+    }
+    .brand-row img{
+      width:44px; height:44px; border-radius:14px;
+      object-fit:cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+    }
+    .brand-row .t1{ font-weight: 900; letter-spacing:.2px; }
+    .brand-row .t2{ color:var(--muted); font-size: 12px; margin-top:2px; }
+
+    .hero-badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      font-weight: 900;
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border:1px solid rgba(30,99,214,.25);
+      background: rgba(30,99,214,.10);
+      margin-top: 10px;
+    }
+    .hero-title{
+      margin: 10px 0 8px;
+      font-size: clamp(20px, 2.4vw, 30px);
+      line-height: 1.1;
+      letter-spacing: -.2px;
+    }
+    .hero-desc{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 14px;
+      max-width: 56ch;
+    }
+
+    .form-title{
+      margin: 0 0 6px;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    .form-sub{
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .field{ margin-top: 10px; }
+    .field label{
+      display:block;
+      font-weight: 800;
+      font-size: 13px;
+      margin: 0 0 6px;
+      color: rgba(11,27,58,.92);
+    }
+    .control input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      outline: none;
+      background: #fff;
+      font-size: 14px;
+    }
+    .control input:focus{
+      border-color: rgba(30,99,214,.35);
+      box-shadow: 0 0 0 4px rgba(30,99,214,.10);
+    }
+
+    .row-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
+      align-items:center;
+    }
+    .btn2{
+      appearance:none;
+      border: 1px solid rgba(15,23,42,.12);
+      background: #fff;
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor:pointer;
+    }
+    .btn2.primary{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
+    }
+    .btn2.primary:hover{ filter: brightness(.98); }
+    .btn2.secondary:hover{ border-color: rgba(30,99,214,.25); }
+
+    #msg{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.75);
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.55;
+      display:none;
+    }
+
+    .helper-links{
+      margin-top: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .helper-links a{
+      color: rgba(30,99,214,1);
+      font-weight: 900;
+      text-decoration:none;
+    }
+    .helper-links a:hover{ text-decoration: underline; }
+
+    .nav .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+    }
+    .nav .brand img{
+      width:28px;height:28px;border-radius:10px;object-fit:cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+    }
+
+    @media (max-width: 920px){
+      .auth-card{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
+
 <body>
   <div class="nav">
-    <div class="brand">Gizi Anak</div>
+    <div class="brand">
+      <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
+      <div>iYup Care</div>
+    </div>
     <div class="links">
       <a href="index.html">Beranda</a>
       <a href="register.html">Daftar</a>
     </div>
   </div>
 
-  <div class="container">
-    <div class="card">
-      <h1>Login</h1>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <!-- LEFT -->
+      <section class="auth-left">
+        <div class="brand-row">
+          <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
+          <div>
+            <div class="t1">InnoviYup • iYup Care</div>
+            <div class="t2">Masuk untuk akses monitoring & kalkulator</div>
+          </div>
+        </div>
 
-      <div id="msg"></div>
+        <div class="hero-badge">✅ Cepat masuk • 🔒 Token tersimpan</div>
+        <h2 class="hero-title">Masuk untuk lanjut ke Dashboard.</h2>
+        <p class="hero-desc">
+          Setelah login, kamu bisa mengakses fitur monitoring, kalkulator kebutuhan energi,
+          serta edukasi pangan lokal dan produk gizi.
+        </p>
+      </section>
 
-      <label>Email</label>
-      <input id="email" type="email" placeholder="email@contoh.com" />
+      <!-- RIGHT: form -->
+      <section class="auth-right">
+        <h1 class="form-title">Login</h1>
+        <p class="form-sub">Gunakan email & password yang sudah terdaftar.</p>
 
-      <label>Password</label>
-      <input id="password" type="password" />
+        <div id="msg"></div>
 
-      <div style="margin-top:12px" class="row">
-        <button id="btnLogin">Masuk</button>
-        <button class="secondary" onclick="location.href='register.html'">Daftar</button>
-      </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <div class="control">
+            <input id="email" type="email" placeholder="email@contoh.com" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="control">
+            <input id="password" type="password" placeholder="password" autocomplete="current-password" />
+          </div>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn2 primary" id="btnLogin" type="button">Masuk</button>
+          <button class="btn2 secondary" type="button" onclick="location.href='register.html'">Daftar</button>
+        </div>
+
+        <div class="helper-links">
+          <span>Belum punya akun?</span>
+          <a href="register.html">Daftar sekarang</a>
+        </div>
+      </section>
     </div>
   </div>
 
-  <!-- IMPORTANT:
-       api.js harus diload sebelum auth.js dan sebelum script yang memanggil api() -->
+  <!-- IMPORTANT: api.js sebelum auth.js -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
 
   <script>
     const msg = document.getElementById("msg");
 
+    function showMsgVisible() {
+      msg.style.display = "block";
+    }
+
+    // Submit via Enter juga biar terasa modern
+    function bindEnterToLogin(){
+      const onEnter = (e) => {
+        if(e.key === "Enter"){
+          document.getElementById("btnLogin").click();
+        }
+      };
+      document.getElementById("email").addEventListener("keydown", onEnter);
+      document.getElementById("password").addEventListener("keydown", onEnter);
+    }
+    bindEnterToLogin();
+
     document.getElementById("btnLogin").addEventListener("click", async () => {
       msg.textContent = "";
+      showMsgVisible();
 
       try {
         const payload = {
@@ -59,9 +313,7 @@
 
         const token = extractToken(resp);
         if (!token) {
-          throw new Error(
-            "Login berhasil tapi token tidak ditemukan di response. Cek AuthController (return token)."
-          );
+          throw new Error("Login berhasil tapi token tidak ditemukan di response. Cek AuthController (return token).");
         }
 
         setToken(token);
