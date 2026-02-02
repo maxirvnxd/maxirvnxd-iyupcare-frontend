@@ -76,31 +76,6 @@
     .brand .b1{ font-weight: 950; letter-spacing:.2px; }
     .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
 
-    .nav{
-      display:flex; gap:8px; flex-wrap:wrap;
-      align-items:center; justify-content:center;
-    }
-    .nav a{
-      padding: 10px 12px;
-      border-radius: 999px;
-      border:1px solid rgba(15,23,42,.10);
-      background: rgba(255,255,255,.80);
-      font-weight: 900;
-      font-size: 13px;
-      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-      white-space: nowrap;
-    }
-    .nav a:hover{
-      border-color: rgba(30,99,214,.25);
-      box-shadow: 0 10px 24px rgba(15,23,42,.08);
-      transform: translateY(-1px);
-    }
-    .nav a.active{
-      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
-      border-color: rgba(30,99,214,.0);
-      color:#fff;
-    }
-
     .actions{
       display:flex;
       gap:10px;
@@ -119,12 +94,17 @@
       background: rgba(255,255,255,.80);
       font-weight: 950;
       font-size: 13px;
-      transition: transform .12s ease, border-color .12s ease;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+      white-space: nowrap;
     }
-    .btn:hover{ border-color: rgba(30,99,214,.25); transform: translateY(-1px); }
+    .btn:hover{
+      border-color: rgba(30,99,214,.25);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+    }
     .btn.primary{
-      background: linear-gradient(180deg, rgba(31,157,85,1), rgba(18,122,66,1));
-      border-color: rgba(31,157,85,.0);
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
       color:#fff;
     }
     .btn.primary:hover{ filter: brightness(.98); }
@@ -144,6 +124,13 @@
       grid-template-columns: 1.1fr .9fr;
       gap: 14px;
       align-items:center;
+    }
+    .back-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 10px;
+      flex-wrap:wrap;
     }
     .hero h1{
       margin:0;
@@ -172,7 +159,6 @@
     }
     .chip.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
     .chip.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
-    .chip.blue{ border-color: rgba(30,99,214,.22); background: rgba(30,99,214,.10); }
 
     .hero-media{
       border:1px solid rgba(15,23,42,.10);
@@ -290,6 +276,8 @@
       .hero-inner{ grid-template-columns: 1fr; }
       .section{ grid-template-columns: 1fr; }
       .meta{ grid-template-columns: 1fr; }
+      .topbar-inner{ gap: 10px; }
+      .brand{ min-width: 0; }
     }
   </style>
 </head>
@@ -305,15 +293,8 @@
         </div>
       </div>
 
-      <nav class="nav" aria-label="Navigasi">
-        <a href="index.html">Beranda</a>
-        <a class="active" href="produk.html">Produk</a>
-        <a href="dashboard.html">Dashboard</a>
-      </nav>
-
       <div class="actions">
-        <a class="btn" href="login.html">Masuk</a>
-        <a class="btn primary" href="register.html">Daftar</a>
+        <a class="btn primary" href="dashboard.html">Dashboard</a>
       </div>
     </div>
   </header>
@@ -323,6 +304,10 @@
     <section class="hero">
       <div class="hero-inner">
         <div>
+          <div class="back-row">
+            <a class="btn" href="dashboard.html">← Kembali</a>
+          </div>
+
           <h1>Produk gizi InnoviYup untuk dukung pertumbuhan anak</h1>
           <p>
             Halaman ini berisi ringkasan produk dan edukasi berbasis materi InnoviYup.
@@ -332,7 +317,6 @@
           <div class="chips">
             <div class="chip green">Susu analog • berprotein</div>
             <div class="chip orange">Biskuit multigrain</div>
-            <div class="chip.blue"></div>
           </div>
         </div>
 
