@@ -91,6 +91,17 @@
       display:block;
     }
 
+    /* Navbar logo image */
+    .brand-logo-img{
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      object-fit:cover;
+      border:1px solid rgba(0,0,0,.10);
+      background:#fff;
+      display:block;
+    }
+
     @media (max-width: 900px){
       .grid2{ grid-template-columns: 1fr; }
       .imgbox img{ height: 360px; }
@@ -100,11 +111,11 @@
 </head>
 
 <body>
-  <!-- Navbar sederhana, tetap konsisten -->
+  <!-- Navbar: logo InnoviYup tampil di kiri atas -->
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">
-        <div class="logo"></div>
+        <img class="brand-logo-img" src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
         <div>iYup Care</div>
       </div>
 
@@ -135,7 +146,7 @@
       </div>
 
       <section class="panel">
-        <!-- 2 gambar: depan & belakang (yang kamu minta ada di kolom kosong) -->
+        <!-- 2 gambar: depan & belakang -->
         <div class="grid2">
           <div class="imgbox">
             <img id="imgFront" src="" alt="Gambar depan produk">
@@ -156,13 +167,9 @@
           </div>
         </div>
 
-        <!-- Tabel kandungan: dibuat dari komposisi belakang (bahan-bahan) -->
+        <!-- Tabel kandungan: komposisi bahan (tanpa catatan tambahan) -->
         <div class="section">
           <h3>Tabel Kandungan (Komposisi Bahan)</h3>
-          <div class="small" style="margin-bottom:10px;">
-            Catatan: label belakang pada mockup menampilkan <b>komposisi bahan</b>. Jika kamu punya data gizi numerik (kkal, protein, dll),
-            tabel ini bisa diganti menjadi tabel nilai gizi resmi.
-          </div>
 
           <table aria-label="Tabel komposisi bahan">
             <thead>
@@ -204,7 +211,6 @@
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Data produk lokal (NO API). Bisa kamu tambah nanti.
     const PRODUCTS = {
       "1": {
         badge: "Susu Analog",
@@ -216,7 +222,6 @@
           "kaya protein, mineral, dan antioksidan, serta cocok untuk membantu pemenuhan gizi masyarakat.",
         front: "assets/susu-analog-front.png",
         back:  "assets/susu-analog-komposisi.png",
-        // Komposisi bahan (berdasarkan label belakang yang kamu tunjukkan)
         komposisi: [
           { komponen: "Ekstrak ikan penja", ket: "Sumber protein hewani" },
           { komponen: "Ekstrak daun kelor", ket: "Mikronutrien & antioksidan" },
@@ -266,7 +271,6 @@
       imgFront.src = product.front;
       imgBack.src = product.back;
 
-      // Tabel
       const body = document.getElementById("tableBody");
       body.innerHTML = "";
       product.komposisi.forEach(row => {
@@ -285,13 +289,11 @@
     const product = PRODUCTS[id];
 
     if(!product){
-      // fallback kalau id tidak valid
       document.getElementById("title").textContent = "Produk tidak ditemukan";
       document.getElementById("desc").textContent = "ID produk tidak valid. Kembali ke halaman produk.";
       document.getElementById("imgFront").src = "assets/susu-analog-front.png";
       document.getElementById("imgBack").src = "assets/susu-analog-komposisi.png";
-      document.getElementById("tableBody").innerHTML =
-        "<tr><td>—</td><td>—</td></tr>";
+      document.getElementById("tableBody").innerHTML = "<tr><td>—</td><td>—</td></tr>";
     } else {
       render(product);
     }
