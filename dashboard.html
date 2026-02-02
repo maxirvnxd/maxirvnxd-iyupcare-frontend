@@ -57,16 +57,23 @@
       justify-content:space-between;
       gap: 12px;
     }
+
+    /* BRAND (logo InnoviYup + teks) */
     .brand{
-      display:flex; align-items:center; gap:10px;
-      min-width: 180px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 220px;
     }
-    .brand .logo{
-      width:36px; height:36px;
+    .brand img{
+      width: 38px;
+      height: 38px;
       border-radius: 14px;
-      background: linear-gradient(180deg, rgba(31,157,85,1), rgba(30,99,214,1));
-      box-shadow: 0 10px 20px rgba(15,23,42,.14);
-      border: 1px solid rgba(255,255,255,.7);
+      object-fit: cover;
+      background:#fff;
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 10px 20px rgba(15,23,42,.12);
+      display:block;
     }
     .brand .b1{ font-weight: 950; letter-spacing:.2px; }
     .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
@@ -334,18 +341,18 @@
 
     @media (max-width: 980px){
       .grid2{ grid-template-columns: 1fr; }
-      .nav{ display:none; } /* biar topbar tidak penuh di hp */
+      .nav{ display:none; }
       .quick .grid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
-  <!-- TOPBAR baru (tidak pakai .nav lama supaya UI konsisten) -->
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
-        <div class="logo" aria-hidden="true"></div>
+        <!-- Logo InnoviYup (wajib ada di assets/) -->
+        <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
         <div>
           <div class="b1">iYup Care</div>
           <div class="b2">Dashboard</div>
@@ -377,7 +384,6 @@
     </div>
 
     <section class="grid2" aria-label="Ringkasan">
-      <!-- Profil anak -->
       <article class="card2">
         <div class="card-inner">
           <div class="card-head">
@@ -405,7 +411,6 @@
         </div>
       </article>
 
-      <!-- Mini chart -->
       <article class="card2">
         <div class="card-inner">
           <div class="card-head">
@@ -425,7 +430,6 @@
       </article>
     </section>
 
-    <!-- Quick Actions -->
     <section class="quick" aria-label="Menu utama">
       <div class="head">
         <div>
@@ -475,10 +479,8 @@
     </div>
   </main>
 
-  <!-- Chart.js (opsional). Kalau offline, chart akan fallback ke teks. -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- IMPORTANT: api.js sebelum auth.js & app.js -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
@@ -487,22 +489,18 @@
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // greeting
     loadMeAndRender("greeting");
 
-    // notif demo
     document.getElementById("bellBtn").addEventListener("click", () => {
       alert("Notifikasi: fitur pengingat akan kamu aktifkan di tahap berikutnya.");
     });
 
-    // logout (tetap sesuai logic kamu)
     document.getElementById("logoutLink").addEventListener("click", async () => {
       try { await api("/auth/logout", { method:"POST", auth:true }); } catch {}
       clearToken();
       location.href = "login.html";
     });
 
-    // ambil anak pertama (jika ada) dan tampilkan ringkas
     (async () => {
       const anakList = await api("/anak", { auth:true }).catch(() => null);
       const list = Array.isArray(anakList?.data) ? anakList.data : (Array.isArray(anakList) ? anakList : []);
@@ -518,7 +516,6 @@
       document.getElementById("anakNama").textContent = anak.nama ?? "Anak";
       document.getElementById("anakUsia").textContent = ageTextFromBirthdate(anak.tanggal_lahir);
 
-      // monitoring 3 data terakhir (kalau endpoint tersedia)
       const mon = await loadMonitoringByAnak(anak.id);
       const last3 = mon.slice(-3);
 
@@ -530,7 +527,6 @@
       const labels = last3.map(x => (x.tanggal ?? "").toString().slice(0,10) || "—");
       const weights = last3.map(x => Number(x.berat_badan ?? x.bb ?? 0));
 
-      // status label sederhana (UI only)
       const status = document.getElementById("statusLabel");
       status.className = "status-badge good";
       status.textContent = "Data masuk";
