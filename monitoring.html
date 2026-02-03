@@ -22,133 +22,72 @@
       background:#fff;
     }
 
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:700;
-    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:700;}
     .brand img{
-      width:34px;
-      height:34px;
-      object-fit:contain;
-      border-radius:10px;
-      background:#fff;
-      border:1px solid rgba(0,0,0,.08);
+      width:34px;height:34px;object-fit:contain;border-radius:10px;
+      background:#fff;border:1px solid rgba(0,0,0,.08);
     }
 
-    .nav-right{
-      display:flex;
-      align-items:center;
-      gap:10px;
-    }
+    .nav-right{display:flex;align-items:center;gap:10px;}
     .btn-dashboard{
-      background:#2563eb;
-      color:#fff;
-      border:none;
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:700;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      background:#2563eb;color:#fff;border:none;padding:10px 14px;border-radius:12px;
+      font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
     }
-    .btn-dashboard:hover{ filter:brightness(.95); }
+    .btn-dashboard:hover{filter:brightness(.95);}
 
     .btn-back{
-      background:#fff;
-      color:#111;
-      border:1px solid rgba(0,0,0,.14);
-      padding:10px 14px;
-      border-radius:12px;
-      font-weight:700;
-      text-decoration:none;
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      background:#fff;color:#111;border:1px solid rgba(0,0,0,.14);padding:10px 14px;border-radius:12px;
+      font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:8px;
     }
-    .btn-back:hover{ filter:brightness(.98); }
+    .btn-back:hover{filter:brightness(.98);}
 
     /* Layout header tools */
     .header-tools{
-      margin-top:12px;
-      display:flex;
-      gap:12px;
-      align-items:stretch;
-      flex-wrap:wrap;
+      margin-top:12px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;
     }
     .child-card{
-      display:flex;
-      gap:10px;
-      align-items:flex-end;
-      padding:12px 14px;
-      flex:1;
-      min-width: 280px;
+      display:flex;gap:10px;align-items:flex-end;padding:12px 14px;flex:1;min-width:280px;
     }
-    .child-card .field{
-      flex:1;
-      min-width:220px;
-    }
-    .child-card label{ display:block; }
-    .child-card select{ width:100%; }
+    .child-card .field{flex:1;min-width:220px;}
+    .child-card label{display:block;}
+    .child-card select{width:100%;}
 
-    .right-tools{
-      display:flex;
-      align-items:flex-end;
-    }
+    .right-tools{display:flex;align-items:flex-end;}
 
     /* Modal */
     .modal-backdrop{
-      position:fixed; inset:0;
-      background:rgba(0,0,0,.45);
-      display:none;
-      align-items:center;
-      justify-content:center;
-      padding:18px;
-      z-index:9999;
+      position:fixed; inset:0;background:rgba(0,0,0,.45);
+      display:none;align-items:center;justify-content:center;padding:18px;z-index:9999;
     }
     .modal{
-      width:min(560px, 100%);
-      background:#fff;
-      border-radius:16px;
-      padding:16px;
+      width:min(560px, 100%);background:#fff;border-radius:16px;padding:16px;
       box-shadow:0 18px 60px rgba(0,0,0,.18);
     }
-    .modal h3{ margin:0 0 10px; }
-    .hr{ height:1px; background:rgba(0,0,0,.08); margin:12px 0; }
+    .modal h3{margin:0 0 10px;}
+    .hr{height:1px;background:rgba(0,0,0,.08);margin:12px 0;}
 
     /* Loading spinner (button) */
-    .btn[disabled]{ opacity:.7; cursor:not-allowed; }
+    .btn[disabled]{opacity:.7;cursor:not-allowed;}
     .spinner{
-      width:16px; height:16px;
-      border:2px solid rgba(255,255,255,.5);
-      border-top-color:#fff;
-      border-radius:50%;
-      display:inline-block;
-      animation:spin .75s linear infinite;
-      vertical-align:middle;
-      margin-left:8px; /* dari versi "sesudah" biar rapi */
+      width:16px;height:16px;border:2px solid rgba(255,255,255,.5);
+      border-top-color:#fff;border-radius:50%;display:inline-block;
+      animation:spin .75s linear infinite;vertical-align:middle;margin-left:8px;
     }
-    .spinner.dark{
-      border:2px solid rgba(0,0,0,.2);
-      border-top-color:#111;
-    }
-    @keyframes spin{ to{ transform:rotate(360deg); } }
+    @keyframes spin{to{transform:rotate(360deg);}}
 
     /* Input toggle area */
     .input-actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      flex-wrap:wrap;
-      margin: 2px 0 10px;
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin: 8px 0 10px;
     }
-    .hidden{ display:none !important; }
+    .hidden{display:none !important;}
 
     /* DB-like table */
-    .dbwrap{ margin-top:14px; overflow:auto; }
-    .small-muted{ opacity:.85; }
+    .dbwrap{margin-top:14px;overflow:auto;}
+    .small-muted{opacity:.85;}
+
+    /* Fallback tabs: pastikan panel tampil/hilang */
+    .tab-panel{display:none;}
+    .tab-panel.active{display:block;}
   </style>
 </head>
 
@@ -156,7 +95,6 @@
   <div class="nav">
     <div class="nav-inner">
       <div class="brand">
-        <!-- logo file sesuai permintaan -->
         <img src="assets/logo-innoviyup.png" alt="innoviyup" />
         <div>iYup Care</div>
       </div>
@@ -205,16 +143,17 @@
       <div class="tab-panel" data-panel="input">
         <div id="msg"></div>
 
+        <!-- ✅ tombol yang kamu minta -->
         <div class="input-actions">
           <button class="btn secondary" type="button" id="btnToggleInput">+ Input Data Anak</button>
           <div class="small small-muted" id="inputHint">Klik untuk membuka form input.</div>
         </div>
 
+        <!-- Form input monitoring -->
         <form id="formMonitoring" class="hidden">
           <div class="grid grid-2">
             <div>
-              <label>Tanggal</label>
-              <!-- dipertahankan versi "sebelum": id="tanggal" -->
+              <label>Tanggal Ukur</label>
               <input id="tanggal" type="date" />
             </div>
             <div>
@@ -238,7 +177,7 @@
           </div>
         </form>
 
-        <!-- Tabel “format DB” setelah input -->
+        <!-- Tabel DB -->
         <div class="dbwrap">
           <div class="small" style="margin-bottom:8px;">Data tersimpan (format tabel monitoring)</div>
           <table class="table">
@@ -339,8 +278,6 @@
 
       <div class="row" style="margin-top:12px; justify-content:flex-end; gap:8px;">
         <button class="btn secondary" type="button" id="btnBatalModal">Batal</button>
-
-        <!-- tombol simpan dengan spinner -->
         <button class="btn" type="button" id="btnSimpanAnak">
           <span id="btnSimpanAnakText">Simpan</span>
           <span id="btnSimpanAnakSpin" class="spinner" style="display:none;"></span>
@@ -381,10 +318,56 @@
   <script src="js/app.js"></script>
 
   <script>
+    // ===== Auth + year =====
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
-    setupTabs("tabsRoot");
 
+    // ===== Fallback toISODate (kalau ui.js gagal) =====
+    if(typeof window.toISODate !== "function"){
+      window.toISODate = function(d){
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth()+1).padStart(2,"0");
+        const dd = String(d.getDate()).padStart(2,"0");
+        return `${yyyy}-${mm}-${dd}`;
+      }
+    }
+
+    // ===== Fallback setupTabs (kalau ui.js gagal) =====
+    function setupTabsSafe(rootId){
+      // kalau ui.js ada, pakai itu
+      if(typeof window.setupTabs === "function"){
+        window.setupTabs(rootId);
+        // tapi tetap pastikan panel yang aktif punya class active
+        const root = document.getElementById(rootId);
+        const tabs = root?.querySelectorAll("[data-tab]") || [];
+        const panels = root?.querySelectorAll("[data-panel]") || [];
+        function syncActive(name){
+          panels.forEach(p => p.classList.toggle("active", p.getAttribute("data-panel") === name));
+          tabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tab") === name));
+        }
+        // set default dari tab yang active, kalau tidak ada ambil pertama
+        const activeTab = Array.from(tabs).find(t => t.classList.contains("active")) || tabs[0];
+        if(activeTab) syncActive(activeTab.getAttribute("data-tab"));
+        tabs.forEach(t => t.addEventListener("click", () => syncActive(t.getAttribute("data-tab"))));
+        return;
+      }
+
+      // fallback murni
+      const root = document.getElementById(rootId);
+      if(!root) return;
+      const tabs = root.querySelectorAll("[data-tab]");
+      const panels = root.querySelectorAll("[data-panel]");
+      function activate(name){
+        tabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tab") === name));
+        panels.forEach(p => p.classList.toggle("active", p.getAttribute("data-panel") === name));
+      }
+      tabs.forEach(t => t.addEventListener("click", () => activate(t.getAttribute("data-tab"))));
+      if(tabs[0]) activate(tabs[0].getAttribute("data-tab"));
+    }
+
+    setupTabsSafe("tabsRoot");
+
+    // ===== Elements =====
     const anakSelect = document.getElementById("anakSelect");
     const riwayatBody = document.getElementById("riwayatBody");
     const dbBody = document.getElementById("dbBody");
@@ -394,7 +377,6 @@
     let chartBB = null;
     let chartTB = null;
 
-    // ===== helper msg =====
     function showMsg(text, kind="ok"){
       msg.innerHTML = `<div class="badge ${kind==="ok" ? "green" : "red"}" style="margin-bottom:10px">${text}</div>`;
     }
@@ -403,21 +385,16 @@
         `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
     }
 
-    // ===== input toggle =====
+    // ===== Input toggle =====
     const btnToggleInput = document.getElementById("btnToggleInput");
     const formMonitoring = document.getElementById("formMonitoring");
     const inputHint = document.getElementById("inputHint");
-
-    // kompatibilitas: versi "sesudah" pakai btnTutupInput, versi "sebelum" pakai btnBatalInput
     const btnBatalInput = document.getElementById("btnBatalInput");
-    const btnTutupInput = document.getElementById("btnTutupInput"); // mungkin null
 
     function openInput(){
       formMonitoring.classList.remove("hidden");
       inputHint.textContent = "Isi data, lalu klik Simpan Data.";
-      // set default tanggal hari ini setiap buka
-      const tanggal = document.getElementById("tanggal");
-      tanggal.value = toISODate(new Date());
+      document.getElementById("tanggal").value = toISODate(new Date());
       document.getElementById("berat_badan").focus();
     }
     function closeInput(){
@@ -428,17 +405,15 @@
       if(formMonitoring.classList.contains("hidden")) openInput();
       else closeInput();
     });
-    if(btnBatalInput) btnBatalInput.addEventListener("click", closeInput);
-    if(btnTutupInput) btnTutupInput.addEventListener("click", closeInput);
+    btnBatalInput.addEventListener("click", closeInput);
 
-    // ===== rendering =====
+    // ===== Render DB table =====
     function renderDbTable(list){
       if(!list.length){
         dbBody.innerHTML = `<tr><td colspan="8" class="small">Belum ada data monitoring untuk anak ini.</td></tr>`;
         return;
       }
-      // tampil terbaru di atas untuk tabel DB
-      const rows = list.slice().reverse().map(x => `
+      dbBody.innerHTML = list.slice().reverse().map(x => `
         <tr>
           <td>${x.id ?? "-"}</td>
           <td>${x.anak_id ?? "-"}</td>
@@ -450,9 +425,9 @@
           <td>${x.updated_at ? String(x.updated_at).replace("T"," ").slice(0,19) : "-"}</td>
         </tr>
       `).join("");
-      dbBody.innerHTML = rows;
     }
 
+    // ===== Render riwayat + grafik =====
     async function renderRiwayatAndCharts(anakId){
       riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Memuat...</td></tr>`;
       dbBody.innerHTML = `<tr><td colspan="8" class="small">Memuat...</td></tr>`;
@@ -469,10 +444,10 @@
         return;
       }
 
-      // untuk grafik: kronologis
+      // grafik kronologis
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // tabel riwayat (terbaru di atas)
+      // riwayat terbaru di atas
       riwayatBody.innerHTML = list.slice().reverse().map(x => `
         <tr>
           <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
@@ -482,12 +457,16 @@
         </tr>
       `).join("");
 
-      // tabel DB
       renderDbTable(list);
 
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
       const weights = list.map(x => Number(x.berat_badan ?? 0));
       const heights = list.map(x => Number(x.tinggi_badan ?? 0));
+
+      if(typeof Chart === "undefined"){
+        chartHint.textContent = "Chart.js tidak tersedia.";
+        return;
+      }
 
       if(chartBB) chartBB.destroy();
       if(chartTB) chartTB.destroy();
@@ -507,7 +486,7 @@
       chartHint.textContent = "Grafik otomatis mengikuti data input (entry pertama sampai terakhir).";
     }
 
-    // ===== init dropdown anak =====
+    // ===== Init anak dropdown =====
     (async () => {
       await loadAnakList("anakSelect");
 
@@ -517,14 +496,13 @@
         await renderRiwayatAndCharts(id);
       });
 
-      // auto pilih anak pertama jika ada
       if(anakSelect.options.length > 1){
         anakSelect.selectedIndex = 1;
         await renderRiwayatAndCharts(anakSelect.value);
       }
     })();
 
-    // ===== simpan monitoring =====
+    // ===== Submit monitoring =====
     document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.innerHTML = "";
@@ -536,7 +514,7 @@
       }
 
       const payload = {
-        tanggal_ukur: document.getElementById("tanggal").value || null, // tetap kompatibel
+        tanggal_ukur: document.getElementById("tanggal").value || null,
         berat_badan: Number(document.getElementById("berat_badan").value),
         tinggi_badan: Number(document.getElementById("tinggi_badan").value),
         catatan: document.getElementById("catatan").value?.trim() || null,
@@ -546,12 +524,10 @@
         await api(`/anak/${anakId}/monitoring`, { method:"POST", body:payload, auth:true });
         showMsg("Data berhasil disimpan.", "ok");
 
-        // reset input
         document.getElementById("berat_badan").value = "";
         document.getElementById("tinggi_badan").value = "";
         document.getElementById("catatan").value = "";
 
-        // refresh data + tutup form biar rapi
         await renderRiwayatAndCharts(anakId);
         closeInput();
       }catch(err){
@@ -564,7 +540,7 @@
       }
     });
 
-    // ===== Modal Tambah Anak + Loading =====
+    // ===== Modal tambah anak + loading =====
     const modal = document.getElementById("modalAnak");
     const anakNama = document.getElementById("anakNama");
     const anakTglLahir = document.getElementById("anakTglLahir");
@@ -577,7 +553,6 @@
     function setChildSaveLoading(isLoading){
       btnSimpanAnak.disabled = isLoading;
       document.getElementById("btnBatalModal").disabled = isLoading;
-
       btnSimpanAnakSpin.style.display = isLoading ? "inline-block" : "none";
       btnSimpanAnakText.textContent = isLoading ? "Menyimpan" : "Simpan";
     }
@@ -606,16 +581,15 @@
       const s = String(v || "").trim();
       if(s === "Laki-laki" || s === "Perempuan") return s;
       const lower = s.toLowerCase();
-      if(lower === "l" || lower === "lk" || lower === "laki" || lower === "laki-laki" || lower === "male") return "Laki-laki";
-      if(lower === "p" || lower === "pr" || lower === "perempuan" || lower === "female") return "Perempuan";
+      if(["l","lk","laki","laki-laki","male"].includes(lower)) return "Laki-laki";
+      if(["p","pr","perempuan","female"].includes(lower)) return "Perempuan";
       return s;
     }
 
     btnSimpanAnak.addEventListener("click", async () => {
       const nama = anakNama.value.trim();
       const tgl  = anakTglLahir.value;
-      const jkRaw = anakJK.value;
-      const jk = normalizeGender(jkRaw);
+      const jk   = normalizeGender(anakJK.value);
 
       if(!nama){ showModalError("Nama anak wajib diisi."); return; }
       if(!tgl){ showModalError("Tanggal lahir wajib diisi."); return; }
@@ -631,7 +605,6 @@
         showMsg("Anak berhasil ditambahkan.", "ok");
 
         await loadAnakList("anakSelect");
-
         const newId = created?.data?.id || created?.id;
         if(newId) anakSelect.value = String(newId);
         else anakSelect.selectedIndex = anakSelect.options.length - 1;
@@ -656,7 +629,6 @@
 
       const anakName = anakSelect.options[anakSelect.selectedIndex]?.textContent || "anak";
       const list = await loadMonitoringByAnak(anakId);
-
       if(!list.length){ showMsg("Belum ada data monitoring untuk dibuat PDF.", "err"); return; }
 
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
