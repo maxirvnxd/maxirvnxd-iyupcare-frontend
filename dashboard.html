@@ -56,7 +56,7 @@
       align-items:center;
       justify-content:space-between;
       gap: 12px;
-      flex-wrap: wrap; /* penting: biar di HP turun rapi */
+      flex-wrap: wrap;
     }
 
     /* BRAND (logo InnoviYup + teks) */
@@ -288,6 +288,20 @@
       background: rgba(31,157,85,.10);
     }
 
+    /* Dropdown style selaras */
+    .select2{
+      padding: 11px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.78);
+      font-weight: 900;
+      font-size: 13px;
+      color: var(--ink);
+      outline: none;
+      width: 100%;
+    }
+    .select2:focus{ border-color: rgba(30,99,214,.35); }
+
     /* Chart frame */
     .chart-wrap{
       margin-top: 12px;
@@ -362,9 +376,9 @@
       text-align:center;
     }
 
-    /* MOBILE: jangan numpuk berantakan */
+    /* MOBILE */
     @media (max-width: 980px){
-      .nav{ display:none; }            /* nav disembunyikan di HP */
+      .nav{ display:none; }
       .grid2{ grid-template-columns: 1fr; }
       .quick .grid{ grid-template-columns: 1fr; }
     }
@@ -402,10 +416,7 @@
 
       <div class="top-actions">
         <button class="icon-btn" id="bellBtn" type="button" title="Notifikasi">🔔</button>
-
-        <!-- tombol Beranda (baru) -->
         <a class="action-link" href="index.html" title="Kembali ke Beranda">Beranda</a>
-
         <button class="logout" id="logoutLink" type="button">Logout</button>
       </div>
     </div>
@@ -421,6 +432,7 @@
     </div>
 
     <section class="grid2" aria-label="Ringkasan">
+      <!-- PROFIL ANAK -->
       <article class="card2">
         <div class="card-inner">
           <div class="card-head">
@@ -434,12 +446,21 @@
 
           <div class="divider"></div>
 
-          <div class="row2">
-            <div>
-              <div class="muted">Status gizi terkini</div>
-              <div id="statusLabel" class="status-badge" style="margin-top:8px">Belum ada data</div>
+          <!-- Dropdown pilih anak + status -->
+          <div class="row2" style="align-items:flex-start;">
+            <div style="min-width:260px; flex:1;">
+              <div class="muted">Pilih anak</div>
+              <select id="anakPick" class="select2" style="margin-top:8px;">
+                <option value="">Memuat...</option>
+              </select>
+
+              <div style="margin-top:12px;">
+                <div class="muted">Status gizi terkini</div>
+                <div id="statusLabel" class="status-badge" style="margin-top:8px">Belum ada data</div>
+              </div>
             </div>
-            <a class="btn2" href="monitoring.html">Input Data</a>
+
+            <a class="btn2" id="btnInputData" href="monitoring.html">Input Data</a>
           </div>
 
           <div class="muted" style="margin-top:10px">
@@ -448,6 +469,7 @@
         </div>
       </article>
 
+      <!-- GRAFIK MINI -->
       <article class="card2">
         <div class="card-inner">
           <div class="card-head">
@@ -501,7 +523,6 @@
           </div>
         </div>
 
-        <!-- Tanya Ahli (teks diringkas) -->
         <div class="tile" onclick="location.href='konsultasi.html'">
           <div class="ico">💬</div>
           <div>
@@ -510,7 +531,6 @@
           </div>
         </div>
 
-        <!-- Komunitas (baru) -->
         <div class="tile green" onclick="window.open('https://chat.whatsapp.com/HRE7XG4BCwaKQupmKujhIv','_blank','noopener')">
           <div class="ico">👥</div>
           <div>
@@ -536,6 +556,7 @@
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // greeting user
     loadMeAndRender("greeting");
 
     document.getElementById("bellBtn").addEventListener("click", () => {
@@ -548,43 +569,80 @@
       location.href = "login.html";
     });
 
-    (async () => {
-      const anakList = await api("/anak", { auth:true }).catch(() => null);
-      const list = Array.isArray(anakList?.data) ? anakList.data : (Array.isArray(anakList) ? anakList : []);
-      const anak = list[0];
+    // =========================
+    // Dashboard: pilih anak + grafik mini
+    // =========================
+    const STORAGE_KEY = "iyup_selected_anak_id";
+    const anakPick = document.getElementById("anakPick");
+    const btnInputData = document.getElementById("btnInputData");
 
-      if(!anak){
-        document.getElementById("anakNama").textContent = "Belum ada data anak";
-        document.getElementById("anakUsia").textContent = "—";
-        document.getElementById("miniChartHint").textContent = "Tambahkan data anak dulu agar grafik bisa tampil.";
-        return;
-      }
+    let miniChartInstance = null;
 
-      document.getElementById("anakNama").textContent = anak.nama ?? "Anak";
-      document.getElementById("anakUsia").textContent = ageTextFromBirthdate(anak.tanggal_lahir);
+    function normalizeArray(resp){
+      if(Array.isArray(resp)) return resp;
+      if(Array.isArray(resp?.data)) return resp.data;
+      return [];
+    }
 
-      const mon = await loadMonitoringByAnak(anak.id);
-      const last3 = mon.slice(-3);
-
-      if(!last3.length){
-        document.getElementById("miniChartHint").textContent = "Belum ada monitoring. Isi dulu di menu Monitoring.";
-        return;
-      }
-
-      const labels = last3.map(x => (x.tanggal ?? "").toString().slice(0,10) || "—");
-      const weights = last3.map(x => Number(x.berat_badan ?? x.bb ?? 0));
-
+    function setStatus(hasData){
       const status = document.getElementById("statusLabel");
-      status.className = "status-badge good";
-      status.textContent = "Data masuk";
+      if(hasData){
+        status.className = "status-badge good";
+        status.textContent = "Data masuk";
+      }else{
+        status.className = "status-badge";
+        status.textContent = "Belum ada data";
+      }
+    }
+
+    function destroyMiniChart(){
+      if(miniChartInstance){
+        miniChartInstance.destroy();
+        miniChartInstance = null;
+      }
+    }
+
+    async function renderForAnak(anak){
+      if(!anak) return;
+
+      // profil
+      document.getElementById("anakNama").textContent = anak.nama ?? "Anak";
+      document.getElementById("anakUsia").textContent = anak.tanggal_lahir
+        ? ageTextFromBirthdate(anak.tanggal_lahir)
+        : "—";
+
+      // monitoring anak terpilih
+      const monResp = await loadMonitoringByAnak(anak.id);
+      const mon = normalizeArray(monResp);
+
+      // sort kronologis berdasarkan tanggal_ukur (selaras dengan monitoring.html)
+      mon.sort((a,b) => String(a.tanggal_ukur ?? "").localeCompare(String(b.tanggal_ukur ?? "")));
+
+      const hintEl = document.getElementById("miniChartHint");
+
+      if(!mon.length){
+        setStatus(false);
+        hintEl.textContent = "Belum ada monitoring untuk anak ini. Isi dulu di menu Monitoring.";
+        destroyMiniChart();
+        return;
+      }
+
+      setStatus(true);
+
+      const last3 = mon.slice(-3);
+      const labels = last3.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
+      const weights = last3.map(x => Number(x.berat_badan ?? 0));
 
       if(typeof Chart === "undefined"){
-        document.getElementById("miniChartHint").textContent =
-          "Chart.js tidak tersedia (offline). Data BB: " + weights.join(", ");
+        hintEl.textContent = "Chart.js tidak tersedia. Data BB: " + weights.join(", ");
+        destroyMiniChart();
         return;
       }
 
-      new Chart(document.getElementById("miniChart"), {
+      hintEl.textContent = "Menampilkan 3 data BB terakhir untuk anak terpilih.";
+
+      destroyMiniChart();
+      miniChartInstance = new Chart(document.getElementById("miniChart"), {
         type: "line",
         data: {
           labels,
@@ -599,12 +657,57 @@
         options: {
           responsive:true,
           plugins:{ legend:{ display:false } },
-          scales:{
-            y:{ beginAtZero:false }
-          }
+          scales:{ y:{ beginAtZero:false } }
         }
       });
-    })();
+    }
+
+    async function initAnakPicker(){
+      const resp = await api("/anak", { auth:true }).catch(() => null);
+      const list = normalizeArray(resp);
+
+      if(!list.length){
+        document.getElementById("anakNama").textContent = "Belum ada data anak";
+        document.getElementById("anakUsia").textContent = "—";
+        document.getElementById("miniChartHint").textContent = "Tambahkan data anak dulu agar grafik bisa tampil.";
+        anakPick.innerHTML = `<option value="">Belum ada anak</option>`;
+        setStatus(false);
+        destroyMiniChart();
+        return;
+      }
+
+      anakPick.innerHTML =
+        `<option value="">- pilih -</option>` +
+        list.map(a => `<option value="${a.id}">${a.nama ?? "Anak"}</option>`).join("");
+
+      // default: localStorage -> kalau tidak valid, pakai anak pertama
+      const savedId = localStorage.getItem(STORAGE_KEY);
+      const defaultId =
+        (savedId && list.some(a => String(a.id) === String(savedId)))
+          ? String(savedId)
+          : String(list[0].id);
+
+      anakPick.value = defaultId;
+
+      const selected = list.find(a => String(a.id) === String(anakPick.value));
+      await renderForAnak(selected);
+
+      anakPick.addEventListener("change", async () => {
+        const id = anakPick.value;
+        if(!id) return;
+        localStorage.setItem(STORAGE_KEY, String(id));
+        const chosen = list.find(a => String(a.id) === String(id));
+        await renderForAnak(chosen);
+      });
+
+      // simpan pilihan saat pindah ke monitoring
+      btnInputData.addEventListener("click", () => {
+        const id = anakPick.value;
+        if(id) localStorage.setItem(STORAGE_KEY, String(id));
+      });
+    }
+
+    initAnakPicker();
   </script>
 </body>
 </html>

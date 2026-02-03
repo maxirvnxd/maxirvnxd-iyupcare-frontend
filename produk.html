@@ -4,38 +4,42 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- API BASE (HF) -->
+  <!-- API BASE (HF) - jangan dihapus -->
   <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
 
-  <title>Monitoring — iYup Care</title>
+  <title>Produk InnoviYup — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
 
   <style>
-    /* ============================
-      TOPBAR STYLE (selaras produk.html)
-      NOTE: pakai class khusus (.pbtn) supaya TIDAK merusak .btn di styles.css
-    ============================ */
     :root{
-      --p-bg:#f6f9ff;
-      --p-ink:#0b1b3a;
-      --p-muted:#5b6b80;
-      --p-line: rgba(15,23,42,.10);
-      --p-shadow2: 0 12px 30px rgba(15,23,42,.08);
-      --p-primary:#1e63d6;
-      --p-radius:18px;
-      --p-max:1100px;
+      --bg:#f6f9ff;
+      --card:#ffffff;
+      --ink:#0b1b3a;
+      --muted:#5b6b80;
+      --line: rgba(15,23,42,.10);
+      --shadow: 0 18px 50px rgba(15,23,42,.10);
+      --shadow2: 0 12px 30px rgba(15,23,42,.08);
+      --primary:#1e63d6;
+      --green:#1f9d55;
+      --orange:#f2994a;
+      --radius:18px;
+      --max:1100px;
     }
+    *{ box-sizing:border-box; }
     body{
-      /* biar lebih nyambung feel-nya, tapi tetap aman.
-         kalau kamu mau background lama dari styles.css, hapus block body ini. */
+      margin:0;
+      color:var(--ink);
       background:
         radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.16), transparent 60%),
         radial-gradient(800px 520px at 90% 0%, rgba(31,157,85,.12), transparent 58%),
         radial-gradient(800px 520px at 90% 90%, rgba(242,153,74,.10), transparent 55%),
-        var(--p-bg);
-      color: var(--p-ink);
+        var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue";
     }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
 
+    /* Topbar */
     .topbar{
       position: sticky;
       top: 0;
@@ -45,7 +49,7 @@
       border-bottom: 1px solid rgba(15,23,42,.08);
     }
     .topbar-inner{
-      max-width: var(--p-max);
+      max-width: var(--max);
       margin: 0 auto;
       padding: 12px 16px;
       display:flex;
@@ -53,13 +57,13 @@
       justify-content:space-between;
       gap: 12px;
     }
-    .pbrand{
+    .brand{
       display:flex;
       align-items:center;
       gap:10px;
       min-width: 220px;
     }
-    .pbrand img{
+    .brand img{
       width: 38px;
       height: 38px;
       border-radius: 14px;
@@ -69,18 +73,17 @@
       box-shadow: 0 10px 20px rgba(15,23,42,.12);
       display:block;
     }
-    .pbrand .b1{ font-weight: 950; letter-spacing:.2px; }
-    .pbrand .b2{ font-size: 12px; color: var(--p-muted); margin-top:2px; }
+    .brand .b1{ font-weight: 950; letter-spacing:.2px; }
+    .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
 
-    .pactions{
+    .actions{
       display:flex;
       gap:10px;
       align-items:center;
       justify-content:flex-end;
       flex-wrap:wrap;
     }
-
-    .pbtn{
+    .btn{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -93,714 +96,324 @@
       font-size: 13px;
       transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
       white-space: nowrap;
-      text-decoration:none;
-      color:inherit;
     }
-    .pbtn:hover{
+    .btn:hover{
       border-color: rgba(30,99,214,.25);
       transform: translateY(-1px);
       box-shadow: 0 10px 24px rgba(15,23,42,.08);
     }
-    .pbtn.primary{
+    .btn.primary{
       background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
       border-color: rgba(30,99,214,.0);
       color:#fff;
     }
-    .pbtn.primary:hover{ filter: brightness(.98); }
+    .btn.primary:hover{ filter: brightness(.98); }
 
-    /* back row ala produk.html */
+    /* Hero */
+    .hero{
+      margin-top: 16px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: calc(var(--radius) + 8px);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .hero-inner{
+      padding: 18px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:center;
+    }
     .back-row{
       display:flex;
       align-items:center;
       gap:10px;
-      margin: 12px 0 8px;
+      margin-bottom: 10px;
       flex-wrap:wrap;
     }
+    .hero h1{
+      margin:0;
+      font-size: clamp(22px, 3.2vw, 34px);
+      letter-spacing: -.3px;
+      line-height: 1.08;
+    }
+    .hero p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 60ch;
+    }
+    .chips{ margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.72);
+    }
+    .chip.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
+    .chip.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
 
-    /* ============================
-      Monitoring page patches (existing)
-    ============================ */
-
-    textarea{
+    .hero-media{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      padding: 12px;
+      box-shadow: var(--shadow2);
+    }
+    .hero-media img{
       width:100%;
-      padding:10px 12px;
-      border:1px solid rgba(0,0,0,.12);
-      border-radius:12px;
-      outline:none;
-      resize:vertical;
+      height:auto;
+      display:block;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.08);
       background:#fff;
     }
 
-    /* Layout header tools */
-    .header-tools{
-      margin-top:12px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;
+    /* Product sections */
+    .section{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
-    .child-card{
-      display:flex;gap:10px;align-items:flex-end;padding:12px 14px;flex:1;min-width:280px;
+    .card{
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(8px);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
     }
-    .child-card .field{flex:1;min-width:220px;}
-    .child-card label{display:block;}
-    .child-card select{width:100%;}
+    .card-inner{ padding: 16px; }
 
-    .right-tools{display:flex;align-items:flex-end;}
-
-    /* Modal */
-    .modal-backdrop{
-      position:fixed; inset:0;background:rgba(0,0,0,.45);
-      display:none;align-items:center;justify-content:center;padding:18px;z-index:9999;
+    .title{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.1px;
     }
-    .modal{
-      width:min(560px, 100%);background:#fff;border-radius:16px;padding:16px;
-      box-shadow:0 18px 60px rgba(0,0,0,.18);
+    .desc{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
     }
-    .modal h3{margin:0 0 10px;}
-    .hr{height:1px;background:rgba(0,0,0,.08);margin:12px 0;}
 
-    /* Loading spinner (button) */
-    .btn[disabled]{opacity:.7;cursor:not-allowed;}
-    .spinner{
-      width:16px;height:16px;border:2px solid rgba(255,255,255,.5);
-      border-top-color:#fff;border-radius:50%;display:inline-block;
-      animation:spin .75s linear infinite;vertical-align:middle;margin-left:8px;
+    .media{
+      margin-top: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      padding: 10px;
     }
-    @keyframes spin{to{transform:rotate(360deg);}}
-
-    /* Input toggle area */
-    .input-actions{
-      display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin: 8px 0 10px;
+    .media img{
+      width:100%;
+      height:auto;
+      display:block;
+      border-radius: 12px;
+      border:1px solid rgba(15,23,42,.08);
+      background:#fff;
     }
-    .hidden{display:none !important;}
+    .meta{
+      margin-top: 10px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .box{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,.78);
+      padding: 12px;
+    }
+    .box h3{
+      margin:0;
+      font-size: 13px;
+      font-weight: 950;
+      letter-spacing: -.1px;
+    }
+    .box ul{
+      margin: 8px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .box table{
+      width:100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .box td{
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .box td:last-child{
+      text-align:right;
+      color: var(--ink);
+      font-weight: 900;
+    }
 
-    /* DB-like table */
-    .dbwrap{margin-top:14px;overflow:auto;}
-    .small-muted{opacity:.85;}
+    .foot{
+      margin-top: 16px;
+      padding: 14px 0 4px;
+      border-top: 1px solid rgba(15,23,42,.08);
+      color: var(--muted);
+      font-size: 12px;
+      text-align:center;
+    }
 
-    /* Fallback tabs: pastikan panel tampil/hilang */
-    .tab-panel{display:none;}
-    .tab-panel.active{display:block;}
-
-    /* Mobile tweak for topbar */
+    /* Mobile */
     @media (max-width: 980px){
+      .hero-inner{ grid-template-columns: 1fr; }
+      .section{ grid-template-columns: 1fr; }
+      .meta{ grid-template-columns: 1fr; }
       .topbar-inner{ gap: 10px; }
-      .pbrand{ min-width: 0; }
+      .brand{ min-width: 0; }
     }
   </style>
 </head>
 
 <body>
-  <!-- TOPBAR (selaras produk.html) -->
   <header class="topbar">
     <div class="topbar-inner">
-      <div class="pbrand">
+      <div class="brand">
         <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
         <div>
           <div class="b1">iYup Care</div>
-          <div class="b2">Monitoring</div>
+          <div class="b2">Produk InnoviYup</div>
         </div>
       </div>
 
-      <div class="pactions">
-        <a class="pbtn primary" href="dashboard.html">Dashboard</a>
+      <div class="actions">
+        <a class="btn primary" href="dashboard.html">Dashboard</a>
       </div>
     </div>
   </header>
 
-  <div class="container">
-    <!-- Tombol kembali (selaras produk.html) -->
-    <div class="back-row">
-      <a class="pbtn" href="dashboard.html">← Kembali</a>
-    </div>
-
-    <div style="margin-top:6px;">
-      <h1 style="margin-bottom:6px;">Monitoring Pertumbuhan</h1>
-      <div class="small">Catat dan visualisasi BB/TB secara rutin.</div>
-
-      <!-- Tools row: card (select + tambah anak) di kiri, unduh pdf di kanan -->
-      <div class="header-tools">
-        <div class="card child-card">
-          <div class="field">
-            <label>Pilih Anak</label>
-            <select id="anakSelect"></select>
-          </div>
-          <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
-        </div>
-
-        <div class="right-tools">
-          <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:14px" id="tabsRoot">
-      <div class="tabs">
-        <button class="tab" data-tab="input" type="button">Input Data</button>
-        <button class="tab" data-tab="riwayat" type="button">Riwayat</button>
-        <button class="tab" data-tab="grafik" type="button">Grafik</button>
-        <button class="tab" data-tab="galeri" type="button">Galeri</button>
-      </div>
-
-      <!-- INPUT -->
-      <div class="tab-panel" data-panel="input">
-        <div id="msg"></div>
-
-        <div class="input-actions">
-          <button class="btn secondary" type="button" id="btnToggleInput">+ Input Data Anak</button>
-          <div class="small small-muted" id="inputHint">Klik untuk membuka form input.</div>
-        </div>
-
-        <form id="formMonitoring" class="hidden">
-          <div class="grid grid-2">
-            <div>
-              <label>Tanggal Ukur</label>
-              <input id="tanggal" type="date" />
-            </div>
-            <div>
-              <label>Berat Badan (kg)</label>
-              <input id="berat_badan" type="number" step="0.1" min="1" />
-            </div>
-            <div>
-              <label>Tinggi Badan (cm)</label>
-              <input id="tinggi_badan" type="number" step="0.1" min="30" />
-            </div>
-          </div>
-
-          <div style="margin-top:12px">
-            <label>Catatan (opsional)</label>
-            <textarea id="catatan" rows="3" placeholder="Mis: anak kurang nafsu makan, baru imunisasi, dll."></textarea>
-          </div>
-
-          <div class="row" style="margin-top:12px; gap:10px;">
-            <button class="btn" type="submit" id="btnSimpanMonitoring">Simpan Data</button>
-            <button class="btn secondary" type="button" id="btnBatalInput">Tutup</button>
-          </div>
-        </form>
-
-        <div class="dbwrap">
-          <div class="small" style="margin-bottom:8px;">Data tersimpan (format tabel monitoring)</div>
-          <table class="table">
-            <thead>
-              <tr>
-                <th>id</th>
-                <th>anak_id</th>
-                <th>tanggal_ukur</th>
-                <th>berat_badan</th>
-                <th>tinggi_badan</th>
-                <th>catatan</th>
-                <th>created_at</th>
-                <th>updated_at</th>
-              </tr>
-            </thead>
-            <tbody id="dbBody">
-              <tr><td colspan="8" class="small">Pilih anak, lalu input data untuk melihat baris tersimpan.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- RIWAYAT -->
-      <div class="tab-panel" data-panel="riwayat">
-        <div class="small">Riwayat data akan tampil di bawah.</div>
-        <div style="margin-top:12px; overflow:auto">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Tanggal</th>
-                <th>BB (kg)</th>
-                <th>TB (cm)</th>
-                <th>Catatan</th>
-              </tr>
-            </thead>
-            <tbody id="riwayatBody">
-              <tr><td colspan="4" class="small">Pilih anak untuk memuat data.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- GRAFIK -->
-      <div class="tab-panel" data-panel="grafik">
-        <div class="small">Grafik BB/TB otomatis mengikuti data input.</div>
-        <div style="margin-top:12px">
-          <canvas id="chartBB" height="130"></canvas>
-          <div style="height:14px"></div>
-          <canvas id="chartTB" height="130"></canvas>
-          <div class="small" id="chartHint" style="margin-top:10px"></div>
-        </div>
-      </div>
-
-      <!-- GALERI -->
-      <div class="tab-panel" data-panel="galeri">
-        <div class="small">Galeri foto per bulan (UI siap, fitur upload ditambah tahap lanjut).</div>
-        <div class="grid grid-3" style="margin-top:12px" id="galeriGrid">
-          <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
-          <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
-          <div class="card">📷 Bulan 3<br><span class="small">Belum ada foto</span></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="footer">
-      <div class="small">© <span id="year"></span> iYup Care</div>
-    </div>
-  </div>
-
-  <!-- MODAL: TAMBAH ANAK -->
-  <div class="modal-backdrop" id="modalAnak">
-    <div class="modal">
-      <h3>Tambah Anak</h3>
-      <div class="hr"></div>
-
-      <div id="modalMsg"></div>
-
-      <div class="grid grid-2">
-        <div style="grid-column:1 / -1">
-          <label>Nama Anak</label>
-          <input id="anakNama" type="text" placeholder="Mis: Caca" />
-        </div>
-
+  <main class="wrap">
+    <!-- HERO: mockup 4 paket -->
+    <section class="hero">
+      <div class="hero-inner">
         <div>
-          <label>Tanggal Lahir</label>
-          <input id="anakTglLahir" type="date" />
+          <div class="back-row">
+            <a class="btn back" href="dashboard.html">← Kembali</a>
+          </div>
+
+          <h1>Produk gizi InnoviYup untuk dukung pertumbuhan anak</h1>
+          <p>
+            Halaman ini berisi ringkasan produk dan edukasi berbasis materi InnoviYup.
+            Fokus pada nutrisi ringkas dan tahapan pembuatan agar informasinya mudah dipahami.
+          </p>
+
+          <div class="chips">
+            <div class="chip green">Susu analog • berprotein</div>
+            <div class="chip orange">Biskuit multigrain</div>
+          </div>
         </div>
 
-        <div>
-          <label>Jenis Kelamin</label>
-          <select id="anakJK">
-            <option value="">- pilih -</option>
-            <option value="Laki-laki">Laki-laki</option>
-            <option value="Perempuan">Perempuan</option>
-          </select>
+        <div class="hero-media">
+          <img src="assets/produk-mockup-4paket.png" alt="Mockup produk InnoviYup (4 paket)" />
         </div>
       </div>
+    </section>
 
-      <div class="row" style="margin-top:12px; justify-content:flex-end; gap:8px;">
-        <button class="btn secondary" type="button" id="btnBatalModal">Batal</button>
-        <button class="btn" type="button" id="btnSimpanAnak">
-          <span id="btnSimpanAnakText">Simpan</span>
-          <span id="btnSimpanAnakSpin" class="spinner" style="display:none;"></span>
-        </button>
-      </div>
+    <!-- 2 kolom: SUSU vs BISKUIT -->
+    <section class="section" aria-label="Produk">
+      <!-- SUSU -->
+      <article class="card" id="susu">
+        <div class="card-inner">
+          <h2 class="title">Susu Analog (Berprotein Tinggi)</h2>
+          <div class="desc">
+            Susu analog InnoviYup berbasis ikan penja dan daun kelor. Informasi yang ditonjolkan:
+            takaran saji 25 g (± 3 sdm), perbedaan formulasi berdasarkan usia, serta tahapan pembuatan isolat/hidrolisat protein.
+          </div>
+
+          <div class="meta">
+            <div class="box">
+              <h3>Ringkas nutrisi</h3>
+              <table aria-label="Ringkas nutrisi susu analog">
+                <tr><td>Anak &gt; 1 tahun — Energi</td><td>111 kkal</td></tr>
+                <tr><td>Anak &gt; 1 tahun — Lemak</td><td>3 g</td></tr>
+                <tr><td>Anak &gt; 1 tahun — Protein</td><td>7 g</td></tr>
+                <tr><td>Anak &gt; 1 tahun — Karbohidrat</td><td>14 g</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Energi</td><td>105 kkal</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Lemak</td><td>5 g</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Protein</td><td>6 g</td></tr>
+                <tr><td>Anak &lt; 1 tahun — Karbohidrat</td><td>9 g</td></tr>
+              </table>
+            </div>
+
+            <div class="box">
+              <h3>Tahapan utama</h3>
+              <ul>
+                <li>Persiapan ikan penja: cuci/rendam air jeruk, rebus, keringkan (dehydrator 60°C), blender.</li>
+                <li>Pembuatan isolat protein: ayak 60 mesh, perlakuan basa, sentrifugasi, pengendapan asam, sentrifugasi ulang.</li>
+                <li>Hidrolisis protein: pH ~7, enzim papain/bromelain, inkubasi 55°C, inaktivasi 90°C.</li>
+                <li>Formulasi berdasarkan usia: &gt;1 tahun (kelor + perisa), &lt;1 tahun (penja/kelor + VCO).</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="media" style="margin-top:14px">
+            <img src="assets/poster-susu.jpeg" alt="Poster tahapan dan nutrisi susu analog InnoviYup" />
+          </div>
+        </div>
+      </article>
+
+      <!-- BISKUIT -->
+      <article class="card" id="biskuit">
+        <div class="card-inner">
+          <h2 class="title">Biskuit Multigrain</h2>
+          <div class="desc">
+            Biskuit multigrain InnoviYup ditonjolkan sebagai pendamping bergizi. Informasi yang ditampilkan:
+            ringkasan produk, tabel nutrisi per 3 keping (± 11 g), dan tahapan pembuatan dari persiapan tepung hingga pemanggangan.
+          </div>
+
+          <div class="meta">
+            <div class="box">
+              <h3>Ringkas nutrisi</h3>
+              <table aria-label="Ringkas nutrisi biskuit">
+                <tr><td>Energi total</td><td>50 kkal</td></tr>
+                <tr><td>Lemak</td><td>2 g</td></tr>
+                <tr><td>Protein</td><td>2 g</td></tr>
+                <tr><td>Karbohidrat</td><td>6 g</td></tr>
+              </table>
+            </div>
+
+            <div class="box">
+              <h3>Tahapan utama</h3>
+              <ul>
+                <li>Persiapan tepung: jagung, beras merah, kacang hijau dicuci, dikeringkan (dehydrator 60°C), diblender & diayak.</li>
+                <li>Penimbangan: masing-masing tepung ditimbang (contoh 15 g) + chia seed 1/2 sdt.</li>
+                <li>Adonan: margarin + susu skim bubuk + telur + gula aren, campur hingga mengembang.</li>
+                <li>Pemanggangan: cetak, dinginkan, panggang 150°C ± 20 menit.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="media" style="margin-top:14px">
+            <img src="assets/poster-biskuit.jpeg" alt="Poster info, nutrisi, dan tahapan pembuatan biskuit InnoviYup" />
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="foot">
+      © <span id="year"></span> iYup Care • InnoviYup
     </div>
-  </div>
-
-  <!-- REPORT AREA (untuk PDF) -->
-  <div id="reportArea" style="position:absolute; left:-99999px; top:0; width:900px;">
-    <div class="card">
-      <h2 style="margin:0 0 6px;">Laporan Monitoring</h2>
-      <div class="small" id="reportMeta"></div>
-      <div class="hr"></div>
-
-      <div id="reportRiwayat"></div>
-
-      <div style="height:14px"></div>
-      <canvas id="reportChartBB" height="180"></canvas>
-      <div style="height:14px"></div>
-      <canvas id="reportChartTB" height="180"></canvas>
-
-      <div style="height:14px"></div>
-      <div class="small" style="margin-bottom:8px;">Galeri</div>
-      <div id="reportGaleri" class="grid grid-3"></div>
-    </div>
-  </div>
-
-  <!-- libs -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-  <!-- app -->
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
-  <script src="js/ui.js"></script>
-  <script src="js/app.js"></script>
+  </main>
 
   <script>
-    // ===== Auth + year =====
-    requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    // ===== Fallback toISODate (kalau ui.js gagal) =====
-    if(typeof window.toISODate !== "function"){
-      window.toISODate = function(d){
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth()+1).padStart(2,"0");
-        const dd = String(d.getDate()).padStart(2,"0");
-        return `${yyyy}-${mm}-${dd}`;
-      }
-    }
-
-    // ===== Fallback setupTabs (kalau ui.js gagal / tidak toggle panel) =====
-    function setupTabsSafe(rootId){
-      if(typeof window.setupTabs === "function"){
-        window.setupTabs(rootId);
-        const root = document.getElementById(rootId);
-        const tabs = root?.querySelectorAll("[data-tab]") || [];
-        const panels = root?.querySelectorAll("[data-panel]") || [];
-        function syncActive(name){
-          panels.forEach(p => p.classList.toggle("active", p.getAttribute("data-panel") === name));
-          tabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tab") === name));
-        }
-        const activeTab = Array.from(tabs).find(t => t.classList.contains("active")) || tabs[0];
-        if(activeTab) syncActive(activeTab.getAttribute("data-tab"));
-        tabs.forEach(t => t.addEventListener("click", () => syncActive(t.getAttribute("data-tab"))));
-        return;
-      }
-
-      const root = document.getElementById(rootId);
-      if(!root) return;
-      const tabs = root.querySelectorAll("[data-tab]");
-      const panels = root.querySelectorAll("[data-panel]");
-      function activate(name){
-        tabs.forEach(t => t.classList.toggle("active", t.getAttribute("data-tab") === name));
-        panels.forEach(p => p.classList.toggle("active", p.getAttribute("data-panel") === name));
-      }
-      tabs.forEach(t => t.addEventListener("click", () => activate(t.getAttribute("data-tab"))));
-      if(tabs[0]) activate(tabs[0].getAttribute("data-tab"));
-    }
-    setupTabsSafe("tabsRoot");
-
-    // ===== Elements =====
-    const anakSelect = document.getElementById("anakSelect");
-    const riwayatBody = document.getElementById("riwayatBody");
-    const dbBody = document.getElementById("dbBody");
-    const msg = document.getElementById("msg");
-    const chartHint = document.getElementById("chartHint");
-
-    let chartBB = null;
-    let chartTB = null;
-
-    function showMsg(text, kind="ok"){
-      msg.innerHTML = `<div class="badge ${kind==="ok" ? "green" : "red"}" style="margin-bottom:10px">${text}</div>`;
-    }
-    function showModalError(text){
-      document.getElementById("modalMsg").innerHTML =
-        `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
-    }
-
-    // ===== Input toggle =====
-    const btnToggleInput = document.getElementById("btnToggleInput");
-    const formMonitoring = document.getElementById("formMonitoring");
-    const inputHint = document.getElementById("inputHint");
-    const btnBatalInput = document.getElementById("btnBatalInput");
-
-    function openInput(){
-      formMonitoring.classList.remove("hidden");
-      inputHint.textContent = "Isi data, lalu klik Simpan Data.";
-      document.getElementById("tanggal").value = toISODate(new Date());
-      document.getElementById("berat_badan").focus();
-    }
-    function closeInput(){
-      formMonitoring.classList.add("hidden");
-      inputHint.textContent = "Klik untuk membuka form input.";
-    }
-    btnToggleInput.addEventListener("click", () => {
-      if(formMonitoring.classList.contains("hidden")) openInput();
-      else closeInput();
-    });
-    btnBatalInput.addEventListener("click", closeInput);
-
-    // ===== Render DB table =====
-    function renderDbTable(list){
-      if(!list.length){
-        dbBody.innerHTML = `<tr><td colspan="8" class="small">Belum ada data monitoring untuk anak ini.</td></tr>`;
-        return;
-      }
-      dbBody.innerHTML = list.slice().reverse().map(x => `
-        <tr>
-          <td>${x.id ?? "-"}</td>
-          <td>${x.anak_id ?? "-"}</td>
-          <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
-          <td>${x.berat_badan ?? "-"}</td>
-          <td>${x.tinggi_badan ?? "-"}</td>
-          <td>${(x.catatan ?? "").toString().slice(0,40) || "-"}</td>
-          <td>${x.created_at ? String(x.created_at).replace("T"," ").slice(0,19) : "-"}</td>
-          <td>${x.updated_at ? String(x.updated_at).replace("T"," ").slice(0,19) : "-"}</td>
-        </tr>
-      `).join("");
-    }
-
-    // ===== Render riwayat + grafik =====
-    async function renderRiwayatAndCharts(anakId){
-      riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Memuat...</td></tr>`;
-      dbBody.innerHTML = `<tr><td colspan="8" class="small">Memuat...</td></tr>`;
-      chartHint.textContent = "";
-
-      const list = await loadMonitoringByAnak(anakId);
-
-      if(!list.length){
-        riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Belum ada data monitoring.</td></tr>`;
-        renderDbTable([]);
-        chartHint.textContent = "Belum ada data untuk digrafikkan.";
-        if(chartBB) chartBB.destroy();
-        if(chartTB) chartTB.destroy();
-        return;
-      }
-
-      list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
-
-      riwayatBody.innerHTML = list.slice().reverse().map(x => `
-        <tr>
-          <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
-          <td>${x.berat_badan ?? "-"}</td>
-          <td>${x.tinggi_badan ?? "-"}</td>
-          <td>${(x.catatan ?? "").toString().slice(0,60) || "-"}</td>
-        </tr>
-      `).join("");
-
-      renderDbTable(list);
-
-      const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
-      const weights = list.map(x => Number(x.berat_badan ?? 0));
-      const heights = list.map(x => Number(x.tinggi_badan ?? 0));
-
-      if(typeof Chart === "undefined"){
-        chartHint.textContent = "Chart.js tidak tersedia.";
-        return;
-      }
-
-      if(chartBB) chartBB.destroy();
-      if(chartTB) chartTB.destroy();
-
-      chartBB = new Chart(document.getElementById("chartBB"), {
-        type:"line",
-        data:{ labels, datasets:[{ label:"BB (kg)", data:weights, tension:.35 }] },
-        options:{ responsive:true, plugins:{ legend:{display:false} } }
-      });
-
-      chartTB = new Chart(document.getElementById("chartTB"), {
-        type:"line",
-        data:{ labels, datasets:[{ label:"TB (cm)", data:heights, tension:.35 }] },
-        options:{ responsive:true, plugins:{ legend:{display:false} } }
-      });
-
-      chartHint.textContent = "Grafik otomatis mengikuti data input (entry pertama sampai terakhir).";
-    }
-
-    // ===== Init anak dropdown =====
-    (async () => {
-      await loadAnakList("anakSelect");
-
-      anakSelect.addEventListener("change", async () => {
-        const id = anakSelect.value;
-        if(!id) return;
-        await renderRiwayatAndCharts(id);
-      });
-
-      if(anakSelect.options.length > 1){
-        anakSelect.selectedIndex = 1;
-        await renderRiwayatAndCharts(anakSelect.value);
-      }
-    })();
-
-    // ===== Submit monitoring =====
-    document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.innerHTML = "";
-
-      const anakId = anakSelect.value;
-      if(!anakId){
-        showMsg("Pilih anak dulu sebelum menyimpan.", "err");
-        return;
-      }
-
-      const payload = {
-        tanggal_ukur: document.getElementById("tanggal").value || null,
-        berat_badan: Number(document.getElementById("berat_badan").value),
-        tinggi_badan: Number(document.getElementById("tinggi_badan").value),
-        catatan: document.getElementById("catatan").value?.trim() || null,
-      };
-
-      try{
-        await api(`/anak/${anakId}/monitoring`, { method:"POST", body:payload, auth:true });
-        showMsg("Data berhasil disimpan.", "ok");
-
-        document.getElementById("berat_badan").value = "";
-        document.getElementById("tinggi_badan").value = "";
-        document.getElementById("catatan").value = "";
-
-        await renderRiwayatAndCharts(anakId);
-        closeInput();
-      }catch(err){
-        const errors = err?.payload?.errors;
-        const detail = errors
-          ? Object.entries(errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(", "):v}`).join(" | ")
-          : "";
-        showMsg(detail || err.message || "Gagal menyimpan.", "err");
-        console.error(err);
-      }
-    });
-
-    // ===== Modal tambah anak + loading =====
-    const modal = document.getElementById("modalAnak");
-    const anakNama = document.getElementById("anakNama");
-    const anakTglLahir = document.getElementById("anakTglLahir");
-    const anakJK = document.getElementById("anakJK");
-
-    const btnSimpanAnak = document.getElementById("btnSimpanAnak");
-    const btnSimpanAnakText = document.getElementById("btnSimpanAnakText");
-    const btnSimpanAnakSpin = document.getElementById("btnSimpanAnakSpin");
-
-    function setChildSaveLoading(isLoading){
-      btnSimpanAnak.disabled = isLoading;
-      document.getElementById("btnBatalModal").disabled = isLoading;
-      btnSimpanAnakSpin.style.display = isLoading ? "inline-block" : "none";
-      btnSimpanAnakText.textContent = isLoading ? "Menyimpan" : "Simpan";
-    }
-
-    function openModal(){
-      document.getElementById("modalMsg").innerHTML = "";
-      anakNama.value = "";
-      anakTglLahir.value = "";
-      anakJK.value = "";
-      modal.style.display = "flex";
-      setChildSaveLoading(false);
-      setTimeout(() => anakNama.focus(), 10);
-    }
-    function closeModal(){ modal.style.display = "none"; }
-
-    document.getElementById("btnTambahAnak").addEventListener("click", openModal);
-    document.getElementById("btnBatalModal").addEventListener("click", () => {
-      if(btnSimpanAnak.disabled) return;
-      closeModal();
-    });
-    modal.addEventListener("click", (e) => {
-      if(e.target === modal && !btnSimpanAnak.disabled) closeModal();
-    });
-
-    function normalizeGender(v){
-      const s = String(v || "").trim();
-      if(s === "Laki-laki" || s === "Perempuan") return s;
-      const lower = s.toLowerCase();
-      if(["l","lk","laki","laki-laki","male"].includes(lower)) return "Laki-laki";
-      if(["p","pr","perempuan","female"].includes(lower)) return "Perempuan";
-      return s;
-    }
-
-    btnSimpanAnak.addEventListener("click", async () => {
-      const nama = anakNama.value.trim();
-      const tgl  = anakTglLahir.value;
-      const jk   = normalizeGender(anakJK.value);
-
-      if(!nama){ showModalError("Nama anak wajib diisi."); return; }
-      if(!tgl){ showModalError("Tanggal lahir wajib diisi."); return; }
-      if(!jk){ showModalError("Jenis kelamin wajib dipilih."); return; }
-
-      const body = { nama_anak: nama, tanggal_lahir: tgl, jenis_kelamin: jk };
-
-      try{
-        setChildSaveLoading(true);
-        const created = await api("/anak", { method:"POST", auth:true, body });
-
-        closeModal();
-        showMsg("Anak berhasil ditambahkan.", "ok");
-
-        await loadAnakList("anakSelect");
-        const newId = created?.data?.id || created?.id;
-        if(newId) anakSelect.value = String(newId);
-        else anakSelect.selectedIndex = anakSelect.options.length - 1;
-
-        await renderRiwayatAndCharts(anakSelect.value);
-      }catch(err){
-        const errors = err?.payload?.errors;
-        const detail = errors
-          ? Object.entries(errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(", "):v}`).join(" | ")
-          : "";
-        showModalError(detail || err.message || "Gagal menambahkan anak.");
-        console.error(err);
-      }finally{
-        setChildSaveLoading(false);
-      }
-    });
-
-    // ===== PDF Export =====
-    async function exportPdfForSelectedAnak(){
-      const anakId = anakSelect.value;
-      if(!anakId){ showMsg("Pilih anak dulu sebelum unduh PDF.", "err"); return; }
-
-      const anakName = anakSelect.options[anakSelect.selectedIndex]?.textContent || "anak";
-      const list = await loadMonitoringByAnak(anakId);
-      if(!list.length){ showMsg("Belum ada data monitoring untuk dibuat PDF.", "err"); return; }
-
-      list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
-
-      document.getElementById("reportMeta").textContent =
-        `${anakName} • diekspor: ${toISODate(new Date())} • total data: ${list.length}`;
-
-      document.getElementById("reportRiwayat").innerHTML = `
-        <table class="table">
-          <thead><tr><th>Tanggal</th><th>BB</th><th>TB</th><th>Catatan</th></tr></thead>
-          <tbody>
-            ${list.slice().reverse().map(x => `
-              <tr>
-                <td>${String(x.tanggal_ukur ?? "").slice(0,10)}</td>
-                <td>${x.berat_badan ?? "-"}</td>
-                <td>${x.tinggi_badan ?? "-"}</td>
-                <td>${(x.catatan ?? "").toString().slice(0,80) || "-"}</td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      `;
-
-      document.getElementById("reportGaleri").innerHTML = `
-        <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
-        <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
-        <div class="card">📷 Bulan 3<br><span class="small">Belum ada foto</span></div>
-      `;
-
-      const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
-      const weights = list.map(x => Number(x.berat_badan ?? 0));
-      const heights = list.map(x => Number(x.tinggi_badan ?? 0));
-
-      if(window.__reportChartBB) window.__reportChartBB.destroy();
-      if(window.__reportChartTB) window.__reportChartTB.destroy();
-
-      window.__reportChartBB = new Chart(document.getElementById("reportChartBB"), {
-        type:"line",
-        data:{ labels, datasets:[{ label:"BB (kg)", data:weights, tension:.35 }] },
-        options:{ responsive:false, plugins:{ legend:{display:false} } }
-      });
-
-      window.__reportChartTB = new Chart(document.getElementById("reportChartTB"), {
-        type:"line",
-        data:{ labels, datasets:[{ label:"TB (cm)", data:heights, tension:.35 }] },
-        options:{ responsive:false, plugins:{ legend:{display:false} } }
-      });
-
-      await new Promise(r => setTimeout(r, 300));
-
-      const canvas = await html2canvas(document.getElementById("reportArea"), { scale: 2, useCORS: true });
-      const imgData = canvas.toDataURL("image/png");
-
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let y = 0;
-      let heightLeft = imgHeight;
-
-      pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while(heightLeft > 0){
-        pdf.addPage();
-        y = heightLeft - imgHeight;
-        pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      const safeName = anakName.replace(/[^\w\-]+/g, "-").toLowerCase();
-      pdf.save(`laporan-monitoring-${safeName}.pdf`);
-    }
-
-    document.getElementById("btnUnduhPdf").addEventListener("click", async () => {
-      try{ await exportPdfForSelectedAnak(); }
-      catch(err){ showMsg(err.message || "Gagal membuat PDF.", "err"); console.error(err); }
-    });
   </script>
 </body>
 </html>
