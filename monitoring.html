@@ -9,7 +9,41 @@
 
   <title>Monitoring — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    /* Tambahan kecil agar modal & textarea rapi tanpa edit styles.css */
+    textarea{
+      width:100%;
+      padding:10px 12px;
+      border:1px solid rgba(0,0,0,.12);
+      border-radius:12px;
+      outline:none;
+      resize:vertical;
+      background:#fff;
+    }
+    .modal-backdrop{
+      position:fixed; inset:0;
+      background:rgba(0,0,0,.45);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:9999;
+    }
+    .modal{
+      width:min(520px, 100%);
+      background:#fff;
+      border-radius:16px;
+      padding:16px;
+      box-shadow:0 18px 60px rgba(0,0,0,.18);
+    }
+    .modal .row{ gap:8px; }
+    .modal h3{ margin:0 0 8px; }
+    .modal .small{ margin-bottom:10px; }
+    .hr{ height:1px; background:rgba(0,0,0,.08); margin:12px 0; }
+  </style>
 </head>
+
 <body>
   <div class="nav">
     <div class="nav-inner">
@@ -33,15 +67,22 @@
   </div>
 
   <div class="container">
-    <div class="row" style="justify-content:space-between; align-items:flex-end">
+    <div class="row" style="justify-content:space-between; align-items:flex-end; gap:12px;">
       <div>
         <h1>Monitoring Pertumbuhan</h1>
         <div class="small">Catat dan visualisasi BB/TB secara rutin.</div>
       </div>
 
-      <div class="card" style="padding:12px 14px">
-        <label>Pilih Anak</label>
-        <select id="anakSelect"></select>
+      <div class="row" style="gap:10px; align-items:flex-end; flex-wrap:wrap;">
+        <div class="card" style="padding:12px 14px">
+          <label>Pilih Anak</label>
+          <select id="anakSelect"></select>
+        </div>
+
+        <div class="row" style="gap:8px">
+          <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
+          <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
+        </div>
       </div>
     </div>
 
@@ -73,6 +114,11 @@
             </div>
           </div>
 
+          <div style="margin-top:12px">
+            <label>Catatan (opsional)</label>
+            <textarea id="catatan" rows="3" placeholder="Mis: anak kurang nafsu makan, baru imunisasi, dll."></textarea>
+          </div>
+
           <div class="row" style="margin-top:12px">
             <button class="btn" type="submit">Simpan Data</button>
             <button class="btn secondary" type="button" onclick="location.href='dashboard.html'">Kembali</button>
@@ -82,7 +128,7 @@
 
       <!-- RIWAYAT -->
       <div class="tab-panel" data-panel="riwayat">
-        <div class="small">Riwayat data terakhir akan tampil di bawah.</div>
+        <div class="small">Riwayat data akan tampil di bawah.</div>
         <div style="margin-top:12px; overflow:auto">
           <table class="table">
             <thead>
@@ -90,10 +136,11 @@
                 <th>Tanggal</th>
                 <th>BB (kg)</th>
                 <th>TB (cm)</th>
+                <th>Catatan</th>
               </tr>
             </thead>
             <tbody id="riwayatBody">
-              <tr><td colspan="3" class="small">Pilih anak untuk memuat data.</td></tr>
+              <tr><td colspan="4" class="small">Pilih anak untuk memuat data.</td></tr>
             </tbody>
           </table>
         </div>
@@ -101,7 +148,7 @@
 
       <!-- GRAFIK -->
       <div class="tab-panel" data-panel="grafik">
-        <div class="small">Grafik sederhana BB/TB (zona warna KMS digital bisa ditambah di tahap lanjut).</div>
+        <div class="small">Grafik BB/TB akan otomatis mengikuti data input.</div>
         <div style="margin-top:12px">
           <canvas id="chartBB" height="130"></canvas>
           <div style="height:14px"></div>
@@ -113,7 +160,7 @@
       <!-- GALERI -->
       <div class="tab-panel" data-panel="galeri">
         <div class="small">Galeri foto per bulan (UI siap, fitur upload bisa ditambah nanti).</div>
-        <div class="grid grid-3" style="margin-top:12px">
+        <div class="grid grid-3" style="margin-top:12px" id="galeriGrid">
           <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
           <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
           <div class="card">📷 Bulan 3<br><span class="small">Belum ada foto</span></div>
@@ -126,10 +173,68 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- MODAL: TAMBAH ANAK -->
+  <div class="modal-backdrop" id="modalAnak">
+    <div class="modal">
+      <h3>Tambah Anak</h3>
+      <div class="small">Satu akun bisa input lebih dari satu anak. Data monitoring dipisah per anak.</div>
+      <div class="hr"></div>
 
-  <!-- IMPORTANT:
-       api.js harus diload sebelum auth.js/ui.js/app.js (karena mereka pakai api(), getToken(), dll) -->
+      <div id="modalMsg"></div>
+
+      <div class="grid grid-2">
+        <div style="grid-column:1 / -1">
+          <label>Nama Anak</label>
+          <input id="anakNama" type="text" placeholder="Mis: Aisyah" />
+        </div>
+
+        <!-- Opsional: kalau backend anak kamu punya field ini, kamu bisa kirim juga -->
+        <div>
+          <label>Tanggal Lahir (opsional)</label>
+          <input id="anakTglLahir" type="date" />
+        </div>
+        <div>
+          <label>Jenis Kelamin (opsional)</label>
+          <select id="anakJK">
+            <option value="">- pilih -</option>
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px; justify-content:flex-end">
+        <button class="btn secondary" type="button" id="btnBatalModal">Batal</button>
+        <button class="btn" type="button" id="btnSimpanAnak">Simpan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT AREA (untuk PDF) -->
+  <div id="reportArea" style="position:absolute; left:-99999px; top:0; width:900px;">
+    <div class="card">
+      <h2 style="margin:0 0 6px;">Laporan Monitoring</h2>
+      <div class="small" id="reportMeta"></div>
+      <div class="hr"></div>
+
+      <div id="reportRiwayat"></div>
+
+      <div style="height:14px"></div>
+      <canvas id="reportChartBB" height="180"></canvas>
+      <div style="height:14px"></div>
+      <canvas id="reportChartTB" height="180"></canvas>
+
+      <div style="height:14px"></div>
+      <div class="small" style="margin-bottom:8px;">Galeri</div>
+      <div id="reportGaleri" class="grid grid-3"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <!-- IMPORTANT: api.js dulu -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/ui.js"></script>
@@ -139,10 +244,7 @@
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // tabs
     setupTabs("tabsRoot");
-
-    // set tanggal hari ini
     document.getElementById("tanggal").value = toISODate(new Date());
 
     // logout
@@ -156,6 +258,7 @@
     const anakSelect = document.getElementById("anakSelect");
     const riwayatBody = document.getElementById("riwayatBody");
     const msg = document.getElementById("msg");
+    const chartHint = document.getElementById("chartHint");
 
     let chartBB = null;
     let chartTB = null;
@@ -164,33 +267,41 @@
       msg.innerHTML = `<div class="badge ${kind==="ok" ? "green" : "red"}" style="margin-bottom:10px">${text}</div>`;
     }
 
-    async function renderRiwayatAndCharts(anakId){
-      riwayatBody.innerHTML = `<tr><td colspan="3" class="small">Memuat...</td></tr>`;
+    function normalizeList(res){
+      return Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+    }
 
-      const list = await loadMonitoringByAnak(anakId);
+    async function renderRiwayatAndCharts(anakId){
+      riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Memuat...</td></tr>`;
+      chartHint.textContent = "";
+
+      const list = await loadMonitoringByAnak(anakId); // backend sudah ASC (kalau kamu ikuti controller yang saya kasih)
 
       if(!list.length){
-        riwayatBody.innerHTML = `<tr><td colspan="3" class="small">Belum ada data monitoring.</td></tr>`;
-        document.getElementById("chartHint").textContent = "Belum ada data untuk digrafikkan.";
+        riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Belum ada data monitoring.</td></tr>`;
+        chartHint.textContent = "Belum ada data untuk digrafikkan.";
+        if(chartBB) chartBB.destroy();
+        if(chartTB) chartTB.destroy();
         return;
       }
 
-      // riwayat
+      // riwayat: tampilkan terbaru di atas
       riwayatBody.innerHTML = list.slice().reverse().map(x => `
         <tr>
-          <td>${(x.tanggal ?? "").toString().slice(0,10) || "-"}</td>
-          <td>${x.berat_badan ?? x.bb ?? "-"}</td>
-          <td>${x.tinggi_badan ?? x.tb ?? "-"}</td>
+          <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
+          <td>${x.berat_badan ?? "-"}</td>
+          <td>${x.tinggi_badan ?? "-"}</td>
+          <td>${(x.catatan ?? "").toString().slice(0,60) || "-"}</td>
         </tr>
       `).join("");
 
-      // grafik
-      const labels = list.map(x => (x.tanggal ?? "").toString().slice(0,10) || "—");
-      const weights = list.map(x => Number(x.berat_badan ?? x.bb ?? 0));
-      const heights = list.map(x => Number(x.tinggi_badan ?? x.tb ?? 0));
+      // grafik: kronologis
+      const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
+      const weights = list.map(x => Number(x.berat_badan ?? 0));
+      const heights = list.map(x => Number(x.tinggi_badan ?? 0));
 
       if(typeof Chart === "undefined"){
-        document.getElementById("chartHint").textContent = "Chart.js tidak tersedia (offline).";
+        chartHint.textContent = "Chart.js tidak tersedia (offline).";
         return;
       }
 
@@ -209,9 +320,10 @@
         options:{ responsive:true, plugins:{ legend:{display:false} } }
       });
 
-      document.getElementById("chartHint").textContent = "Tip: klik titik grafik (fitur detail bisa ditambah tahap lanjut).";
+      chartHint.textContent = "Grafik otomatis mengikuti data input (entry pertama sampai terakhir).";
     }
 
+    // Init dropdown anak
     (async () => {
       await loadAnakList("anakSelect");
 
@@ -228,7 +340,7 @@
       }
     })();
 
-    // simpan monitoring
+    // Simpan monitoring
     document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.innerHTML = "";
@@ -240,17 +352,209 @@
       }
 
       const payload = {
-        tanggal: document.getElementById("tanggal").value || null,
+        tanggal_ukur: document.getElementById("tanggal").value || null,
         berat_badan: Number(document.getElementById("berat_badan").value),
         tinggi_badan: Number(document.getElementById("tinggi_badan").value),
+        catatan: document.getElementById("catatan").value?.trim() || null,
       };
 
       try{
         await api(`/anak/${anakId}/monitoring`, { method:"POST", body:payload, auth:true });
         showMsg("Data berhasil disimpan.", "ok");
+
+        // reset input angka/catatan
+        document.getElementById("berat_badan").value = "";
+        document.getElementById("tinggi_badan").value = "";
+        document.getElementById("catatan").value = "";
+
         await renderRiwayatAndCharts(anakId);
       }catch(err){
-        showMsg("Gagal menyimpan. Cek validasi backend/field yang wajib.", "err");
+        const errors = err?.payload?.errors;
+        const detail = errors
+          ? Object.entries(errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(", "):v}`).join(" | ")
+          : "";
+        showMsg(detail || err.message || "Gagal menyimpan.", "err");
+        console.error(err);
+      }
+    });
+
+    // ===== Modal Tambah Anak =====
+    const modal = document.getElementById("modalAnak");
+    const modalMsg = document.getElementById("modalMsg");
+    const anakNama = document.getElementById("anakNama");
+    const anakTglLahir = document.getElementById("anakTglLahir");
+    const anakJK = document.getElementById("anakJK");
+
+    function openModal(){
+      modalMsg.innerHTML = "";
+      anakNama.value = "";
+      anakTglLahir.value = "";
+      anakJK.value = "";
+      modal.style.display = "flex";
+      setTimeout(() => anakNama.focus(), 10);
+    }
+    function closeModal(){
+      modal.style.display = "none";
+    }
+    function showModalError(text){
+      modalMsg.innerHTML = `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
+    }
+
+    document.getElementById("btnTambahAnak").addEventListener("click", openModal);
+    document.getElementById("btnBatalModal").addEventListener("click", closeModal);
+
+    document.getElementById("btnSimpanAnak").addEventListener("click", async () => {
+      const nama = anakNama.value.trim();
+      if(!nama){
+        showModalError("Nama anak wajib diisi.");
+        return;
+      }
+
+      // Kirim field minimal: nama
+      // Kalau backend anak kamu mendukung tgl_lahir/jk, kamu bisa aktifkan juga.
+      const body = { nama };
+
+      // Optional (aktifkan kalau backend AnakController kamu punya field ini)
+      // if(anakTglLahir.value) body.tanggal_lahir = anakTglLahir.value;
+      // if(anakJK.value) body.jenis_kelamin = anakJK.value;
+
+      try{
+        const created = await api("/anak", { method:"POST", auth:true, body });
+        closeModal();
+
+        showMsg("Anak berhasil ditambahkan.", "ok");
+
+        await loadAnakList("anakSelect");
+
+        // coba pakai id dari response (bisa {data:{id}} atau {id})
+        const newId = created?.data?.id || created?.id;
+        if(newId){
+          anakSelect.value = String(newId);
+        }else{
+          anakSelect.selectedIndex = anakSelect.options.length - 1;
+        }
+
+        await renderRiwayatAndCharts(anakSelect.value);
+      }catch(err){
+        const errors = err?.payload?.errors;
+        const detail = errors
+          ? Object.entries(errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(", "):v}`).join(" | ")
+          : "";
+        showModalError(detail || err.message || "Gagal menambahkan anak.");
+        console.error(err);
+      }
+    });
+
+    // klik backdrop untuk tutup
+    modal.addEventListener("click", (e) => {
+      if(e.target === modal) closeModal();
+    });
+
+    // ===== PDF Export =====
+    async function exportPdfForSelectedAnak(){
+      const anakId = anakSelect.value;
+      if(!anakId){
+        showMsg("Pilih anak dulu sebelum unduh PDF.", "err");
+        return;
+      }
+
+      const anakName = anakSelect.options[anakSelect.selectedIndex]?.textContent || "anak";
+      const list = await loadMonitoringByAnak(anakId);
+
+      if(!list.length){
+        showMsg("Belum ada data monitoring untuk dibuat PDF.", "err");
+        return;
+      }
+
+      // Pastikan kronologis (jaga-jaga kalau backend belum kamu ubah)
+      list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
+
+      // Isi meta
+      document.getElementById("reportMeta").textContent =
+        `${anakName} • diekspor: ${toISODate(new Date())} • total data: ${list.length}`;
+
+      // Isi tabel riwayat
+      document.getElementById("reportRiwayat").innerHTML = `
+        <table class="table">
+          <thead><tr><th>Tanggal</th><th>BB</th><th>TB</th><th>Catatan</th></tr></thead>
+          <tbody>
+            ${list.slice().reverse().map(x => `
+              <tr>
+                <td>${String(x.tanggal_ukur ?? "").slice(0,10)}</td>
+                <td>${x.berat_badan ?? "-"}</td>
+                <td>${x.tinggi_badan ?? "-"}</td>
+                <td>${(x.catatan ?? "").toString().slice(0,80) || "-"}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+
+      // Galeri placeholder
+      document.getElementById("reportGaleri").innerHTML = `
+        <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
+        <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
+        <div class="card">📷 Bulan 3<br><span class="small">Belum ada foto</span></div>
+      `;
+
+      // Render chart khusus report
+      const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
+      const weights = list.map(x => Number(x.berat_badan ?? 0));
+      const heights = list.map(x => Number(x.tinggi_badan ?? 0));
+
+      if(window.__reportChartBB) window.__reportChartBB.destroy();
+      if(window.__reportChartTB) window.__reportChartTB.destroy();
+
+      window.__reportChartBB = new Chart(document.getElementById("reportChartBB"), {
+        type:"line",
+        data:{ labels, datasets:[{ label:"BB (kg)", data:weights, tension:.35 }] },
+        options:{ responsive:false, plugins:{ legend:{display:false} } }
+      });
+
+      window.__reportChartTB = new Chart(document.getElementById("reportChartTB"), {
+        type:"line",
+        data:{ labels, datasets:[{ label:"TB (cm)", data:heights, tension:.35 }] },
+        options:{ responsive:false, plugins:{ legend:{display:false} } }
+      });
+
+      // tunggu render canvas
+      await new Promise(r => setTimeout(r, 300));
+
+      // Capture -> PDF multipage
+      const report = document.getElementById("reportArea");
+      const canvas = await html2canvas(report, { scale: 2, useCORS: true });
+      const imgData = canvas.toDataURL("image/png");
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let y = 0;
+      let heightLeft = imgHeight;
+
+      pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      while(heightLeft > 0){
+        pdf.addPage();
+        y = heightLeft - imgHeight;
+        pdf.addImage(imgData, "PNG", 0, y, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const safeName = anakName.replace(/[^\w\-]+/g, "-").toLowerCase();
+      pdf.save(`laporan-monitoring-${safeName}.pdf`);
+    }
+
+    document.getElementById("btnUnduhPdf").addEventListener("click", async () => {
+      try{
+        await exportPdfForSelectedAnak();
+      }catch(err){
+        showMsg(err.message || "Gagal membuat PDF.", "err");
         console.error(err);
       }
     });
