@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="css/styles.css" />
 
   <style>
+    /* Tambahan kecil tanpa edit styles.css */
     textarea{
       width:100%;
       padding:10px 12px;
@@ -20,6 +21,56 @@
       resize:vertical;
       background:#fff;
     }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:700;
+    }
+    .brand img{
+      width:34px;
+      height:34px;
+      object-fit:contain;
+      border-radius:10px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.08);
+    }
+
+    .nav-right{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .btn-dashboard{
+      background:#2563eb;
+      color:#fff;
+      border:none;
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn-dashboard:hover{ filter:brightness(.95); }
+
+    .btn-back{
+      background:#fff;
+      color:#111;
+      border:1px solid rgba(0,0,0,.14);
+      padding:10px 14px;
+      border-radius:12px;
+      font-weight:700;
+      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+    .btn-back:hover{ filter:brightness(.98); }
+
     .modal-backdrop{
       position:fixed; inset:0;
       background:rgba(0,0,0,.45);
@@ -30,55 +81,59 @@
       z-index:9999;
     }
     .modal{
-      width:min(520px, 100%);
+      width:min(560px, 100%);
       background:#fff;
       border-radius:16px;
       padding:16px;
       box-shadow:0 18px 60px rgba(0,0,0,.18);
     }
+    .modal h3{ margin:0 0 10px; }
     .hr{ height:1px; background:rgba(0,0,0,.08); margin:12px 0; }
+
+    .row-gap{ gap:8px; flex-wrap:wrap; }
   </style>
 </head>
 
 <body>
   <div class="nav">
     <div class="nav-inner">
+      <!-- BRAND: logo innoviyup + teks iYup Care -->
       <div class="brand">
-        <div class="logo"></div>
+        <!-- UBAH src jika lokasi file logo beda -->
+        <img src="assets/innoviyup.png" alt="innoviyup" />
         <div>iYup Care</div>
       </div>
 
-      <div class="nav-links">
-        <a href="dashboard.html">Dashboard</a>
-        <a href="monitoring.html">Monitoring</a>
-        <a href="produk.html">Produk</a>
-        <a href="kalkulator.html">Kalkulator</a>
-        <a href="konsultasi.html">Konsultasi</a>
-      </div>
-
-      <div class="row">
-        <a href="#" id="logoutLink" class="btn">Logout</a>
+      <!-- HANYA Dashboard di kanan atas -->
+      <div class="nav-right">
+        <a class="btn-dashboard" href="dashboard.html">Dashboard</a>
       </div>
     </div>
   </div>
 
   <div class="container">
+    <!-- Title + tombol kembali -->
     <div class="row" style="justify-content:space-between; align-items:flex-end; gap:12px;">
       <div>
         <h1>Monitoring Pertumbuhan</h1>
         <div class="small">Catat dan visualisasi BB/TB secara rutin.</div>
       </div>
 
-      <div class="row" style="gap:10px; align-items:flex-end; flex-wrap:wrap;">
-        <div class="card" style="padding:12px 14px">
-          <label>Pilih Anak</label>
-          <select id="anakSelect"></select>
-        </div>
+      <div class="row row-gap" style="align-items:flex-end;">
+        <a class="btn-back" href="dashboard.html">Kembali</a>
+      </div>
+    </div>
 
-        <div class="row" style="gap:8px">
-          <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
-          <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
-        </div>
+    <!-- Pilih anak + tombol tambah anak + pdf -->
+    <div class="row" style="justify-content:flex-end; align-items:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
+      <div class="card" style="padding:12px 14px">
+        <label>Pilih Anak</label>
+        <select id="anakSelect"></select>
+      </div>
+
+      <div class="row row-gap">
+        <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
+        <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
       </div>
     </div>
 
@@ -115,9 +170,9 @@
             <textarea id="catatan" rows="3" placeholder="Mis: anak kurang nafsu makan, baru imunisasi, dll."></textarea>
           </div>
 
-          <div class="row" style="margin-top:12px">
+          <div class="row" style="margin-top:12px; gap:10px;">
             <button class="btn" type="submit">Simpan Data</button>
-            <button class="btn secondary" type="button" onclick="location.href='dashboard.html'">Kembali</button>
+            <a class="btn secondary" href="dashboard.html" style="text-decoration:none; display:inline-flex; align-items:center;">Kembali</a>
           </div>
         </form>
       </div>
@@ -144,7 +199,7 @@
 
       <!-- GRAFIK -->
       <div class="tab-panel" data-panel="grafik">
-        <div class="small">Grafik BB/TB akan otomatis mengikuti data input.</div>
+        <div class="small">Grafik BB/TB otomatis mengikuti data input.</div>
         <div style="margin-top:12px">
           <canvas id="chartBB" height="130"></canvas>
           <div style="height:14px"></div>
@@ -155,7 +210,7 @@
 
       <!-- GALERI -->
       <div class="tab-panel" data-panel="galeri">
-        <div class="small">Galeri foto per bulan (UI siap, fitur upload bisa ditambah nanti).</div>
+        <div class="small">Galeri foto per bulan (UI siap, fitur upload ditambah tahap lanjut).</div>
         <div class="grid grid-3" style="margin-top:12px" id="galeriGrid">
           <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
           <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
@@ -172,8 +227,7 @@
   <!-- MODAL: TAMBAH ANAK -->
   <div class="modal-backdrop" id="modalAnak">
     <div class="modal">
-      <h3 style="margin:0 0 6px;">Tambah Anak</h3>
-      <div class="small">Backend kamu mewajibkan: nama_anak, tanggal_lahir, jenis_kelamin.</div>
+      <h3>Tambah Anak</h3>
       <div class="hr"></div>
 
       <div id="modalMsg"></div>
@@ -181,7 +235,7 @@
       <div class="grid grid-2">
         <div style="grid-column:1 / -1">
           <label>Nama Anak</label>
-          <input id="anakNama" type="text" placeholder="Mis: Aisyah" />
+          <input id="anakNama" type="text" placeholder="Mis: Caca" />
         </div>
 
         <div>
@@ -191,10 +245,11 @@
 
         <div>
           <label>Jenis Kelamin</label>
+          <!-- INI PENTING: value dikirim sebagai string, bukan 'P'/'L' -->
           <select id="anakJK">
             <option value="">- pilih -</option>
-            <option value="L">Laki-laki</option>
-            <option value="P">Perempuan</option>
+            <option value="Laki-laki">Laki-laki</option>
+            <option value="Perempuan">Perempuan</option>
           </select>
         </div>
       </div>
@@ -226,10 +281,12 @@
     </div>
   </div>
 
+  <!-- libs -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
+  <!-- app -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/ui.js"></script>
@@ -241,14 +298,6 @@
     setupTabs("tabsRoot");
     document.getElementById("tanggal").value = toISODate(new Date());
 
-    // logout
-    document.getElementById("logoutLink").addEventListener("click", async (e) => {
-      e.preventDefault();
-      try { await api("/auth/logout", { method:"POST", auth:true }); } catch {}
-      clearToken();
-      location.href = "login.html";
-    });
-
     const anakSelect = document.getElementById("anakSelect");
     const riwayatBody = document.getElementById("riwayatBody");
     const msg = document.getElementById("msg");
@@ -259,6 +308,10 @@
 
     function showMsg(text, kind="ok"){
       msg.innerHTML = `<div class="badge ${kind==="ok" ? "green" : "red"}" style="margin-bottom:10px">${text}</div>`;
+    }
+    function showModalError(text){
+      document.getElementById("modalMsg").innerHTML =
+        `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
     }
 
     async function renderRiwayatAndCharts(anakId){
@@ -275,10 +328,10 @@
         return;
       }
 
-      // Pastikan urut kronologis (jaga-jaga)
+      // Pastikan kronologis untuk grafik
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // Riwayat tampil terbaru di atas
+      // Riwayat (terbaru di atas)
       riwayatBody.innerHTML = list.slice().reverse().map(x => `
         <tr>
           <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
@@ -288,7 +341,6 @@
         </tr>
       `).join("");
 
-      // Chart kronologis
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
       const weights = list.map(x => Number(x.berat_badan ?? 0));
       const heights = list.map(x => Number(x.tinggi_badan ?? 0));
@@ -366,54 +418,64 @@
 
     // ===== Modal Tambah Anak =====
     const modal = document.getElementById("modalAnak");
-    const modalMsg = document.getElementById("modalMsg");
     const anakNama = document.getElementById("anakNama");
     const anakTglLahir = document.getElementById("anakTglLahir");
     const anakJK = document.getElementById("anakJK");
 
     function openModal(){
-      modalMsg.innerHTML = "";
+      document.getElementById("modalMsg").innerHTML = "";
       anakNama.value = "";
       anakTglLahir.value = "";
       anakJK.value = "";
       modal.style.display = "flex";
       setTimeout(() => anakNama.focus(), 10);
     }
-    function closeModal(){
-      modal.style.display = "none";
-    }
-    function showModalError(text){
-      modalMsg.innerHTML = `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
-    }
+    function closeModal(){ modal.style.display = "none"; }
 
     document.getElementById("btnTambahAnak").addEventListener("click", openModal);
     document.getElementById("btnBatalModal").addEventListener("click", closeModal);
+    modal.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
+
+    // Normalisasi gender agar tidak kirim "P/L" yang ditolak backend
+    function normalizeGender(v){
+      const s = String(v || "").trim();
+      // sudah sesuai target
+      if(s === "Laki-laki" || s === "Perempuan") return s;
+
+      // fallback mapping jika suatu saat value berubah
+      const lower = s.toLowerCase();
+      if(lower === "l" || lower === "lk" || lower === "laki" || lower === "laki-laki" || lower === "male") return "Laki-laki";
+      if(lower === "p" || lower === "pr" || lower === "perempuan" || lower === "female") return "Perempuan";
+
+      return s;
+    }
 
     document.getElementById("btnSimpanAnak").addEventListener("click", async () => {
       const nama = anakNama.value.trim();
       const tgl  = anakTglLahir.value;
-      const jk   = anakJK.value;
+      const jkRaw = anakJK.value;
+      const jk = normalizeGender(jkRaw);
 
       if(!nama){ showModalError("Nama anak wajib diisi."); return; }
       if(!tgl){ showModalError("Tanggal lahir wajib diisi."); return; }
       if(!jk){ showModalError("Jenis kelamin wajib dipilih."); return; }
 
-      const body = { nama_anak: nama, tanggal_lahir: tgl, jenis_kelamin: jk };
+      const body = {
+        nama_anak: nama,
+        tanggal_lahir: tgl,
+        jenis_kelamin: jk
+      };
 
       try{
         const created = await api("/anak", { method:"POST", auth:true, body });
         closeModal();
-
         showMsg("Anak berhasil ditambahkan.", "ok");
 
         await loadAnakList("anakSelect");
 
         const newId = created?.data?.id || created?.id;
-        if(newId){
-          anakSelect.value = String(newId);
-        }else{
-          anakSelect.selectedIndex = anakSelect.options.length - 1;
-        }
+        if(newId) anakSelect.value = String(newId);
+        else anakSelect.selectedIndex = anakSelect.options.length - 1;
 
         await renderRiwayatAndCharts(anakSelect.value);
       }catch(err){
@@ -426,25 +488,15 @@
       }
     });
 
-    modal.addEventListener("click", (e) => {
-      if(e.target === modal) closeModal();
-    });
-
     // ===== PDF Export =====
     async function exportPdfForSelectedAnak(){
       const anakId = anakSelect.value;
-      if(!anakId){
-        showMsg("Pilih anak dulu sebelum unduh PDF.", "err");
-        return;
-      }
+      if(!anakId){ showMsg("Pilih anak dulu sebelum unduh PDF.", "err"); return; }
 
       const anakName = anakSelect.options[anakSelect.selectedIndex]?.textContent || "anak";
       const list = await loadMonitoringByAnak(anakId);
 
-      if(!list.length){
-        showMsg("Belum ada data monitoring untuk dibuat PDF.", "err");
-        return;
-      }
+      if(!list.length){ showMsg("Belum ada data monitoring untuk dibuat PDF.", "err"); return; }
 
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
@@ -494,8 +546,7 @@
 
       await new Promise(r => setTimeout(r, 300));
 
-      const report = document.getElementById("reportArea");
-      const canvas = await html2canvas(report, { scale: 2, useCORS: true });
+      const canvas = await html2canvas(document.getElementById("reportArea"), { scale: 2, useCORS: true });
       const imgData = canvas.toDataURL("image/png");
 
       const { jsPDF } = window.jspdf;
@@ -524,12 +575,8 @@
     }
 
     document.getElementById("btnUnduhPdf").addEventListener("click", async () => {
-      try{
-        await exportPdfForSelectedAnak();
-      }catch(err){
-        showMsg(err.message || "Gagal membuat PDF.", "err");
-        console.error(err);
-      }
+      try{ await exportPdfForSelectedAnak(); }
+      catch(err){ showMsg(err.message || "Gagal membuat PDF.", "err"); console.error(err); }
     });
   </script>
 </body>

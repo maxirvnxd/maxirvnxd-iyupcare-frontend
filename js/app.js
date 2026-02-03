@@ -33,11 +33,13 @@ async function loadAnakList(selectId){
   try{
     const res = await api("/anak", { auth:true });
     const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+
     sel.innerHTML = `<option value="">- pilih anak -</option>` + list.map(a => {
-      // IMPORTANT: backend kamu pakai nama_anak (bukan nama)
+      // backend kamu pakai nama_anak
       const label = a.nama_anak ?? a.nama ?? ("Anak #" + a.id);
       return `<option value="${a.id}">${label}</option>`;
     }).join("");
+
     return list;
   }catch(e){
     sel.innerHTML = `<option value="">Gagal memuat anak</option>`;
@@ -49,7 +51,6 @@ async function loadMonitoringByAnak(anakId){
   if(!anakId) return [];
   try{
     const res = await api(`/anak/${anakId}/monitoring`, { auth:true });
-    // response: bisa {data:[...]} atau [...]
     const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
     return list;
   }catch(e){
