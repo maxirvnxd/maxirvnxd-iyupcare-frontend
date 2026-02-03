@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="css/styles.css" />
 
   <style>
-    /* Tambahan kecil tanpa edit styles.css */
+    /* Inline patch agar cepat (tidak perlu ubah styles.css) */
     textarea{
       width:100%;
       padding:10px 12px;
@@ -42,7 +42,6 @@
       align-items:center;
       gap:10px;
     }
-
     .btn-dashboard{
       background:#2563eb;
       color:#fff;
@@ -71,6 +70,35 @@
     }
     .btn-back:hover{ filter:brightness(.98); }
 
+    /* Layout header tools */
+    .header-tools{
+      margin-top:12px;
+      display:flex;
+      gap:12px;
+      align-items:stretch;
+      flex-wrap:wrap;
+    }
+    .child-card{
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+      padding:12px 14px;
+      flex:1;
+      min-width: 280px;
+    }
+    .child-card .field{
+      flex:1;
+      min-width:220px;
+    }
+    .child-card label{ display:block; }
+    .child-card select{ width:100%; }
+
+    .right-tools{
+      display:flex;
+      align-items:flex-end;
+    }
+
+    /* Modal */
     .modal-backdrop{
       position:fixed; inset:0;
       background:rgba(0,0,0,.45);
@@ -90,21 +118,48 @@
     .modal h3{ margin:0 0 10px; }
     .hr{ height:1px; background:rgba(0,0,0,.08); margin:12px 0; }
 
-    .row-gap{ gap:8px; flex-wrap:wrap; }
+    /* Loading spinner (button) */
+    .btn[disabled]{ opacity:.7; cursor:not-allowed; }
+    .spinner{
+      width:16px; height:16px;
+      border:2px solid rgba(255,255,255,.5);
+      border-top-color:#fff;
+      border-radius:50%;
+      display:inline-block;
+      animation:spin .75s linear infinite;
+      vertical-align:middle;
+    }
+    .spinner.dark{
+      border:2px solid rgba(0,0,0,.2);
+      border-top-color:#111;
+    }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+
+    /* Input toggle area */
+    .input-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin: 2px 0 10px;
+    }
+    .hidden{ display:none !important; }
+
+    /* DB-like table */
+    .dbwrap{ margin-top:14px; overflow:auto; }
+    .small-muted{ opacity:.85; }
   </style>
 </head>
 
 <body>
   <div class="nav">
     <div class="nav-inner">
-      <!-- BRAND: logo innoviyup + teks iYup Care -->
       <div class="brand">
-        <!-- UBAH src jika lokasi file logo beda -->
-        <img src="assets/innoviyup.png" alt="innoviyup" />
+        <!-- logo file sesuai permintaan -->
+        <img src="assets/logo-innoviyup.png" alt="innoviyup" />
         <div>iYup Care</div>
       </div>
 
-      <!-- HANYA Dashboard di kanan atas -->
       <div class="nav-right">
         <a class="btn-dashboard" href="dashboard.html">Dashboard</a>
       </div>
@@ -112,28 +167,28 @@
   </div>
 
   <div class="container">
-    <!-- Title + tombol kembali -->
-    <div class="row" style="justify-content:space-between; align-items:flex-end; gap:12px;">
-      <div>
-        <h1>Monitoring Pertumbuhan</h1>
-        <div class="small">Catat dan visualisasi BB/TB secara rutin.</div>
-      </div>
-
-      <div class="row row-gap" style="align-items:flex-end;">
-        <a class="btn-back" href="dashboard.html">Kembali</a>
-      </div>
+    <!-- Tombol kembali di atas judul, kiri -->
+    <div style="margin-top:2px;">
+      <a class="btn-back" href="dashboard.html">← Kembali</a>
     </div>
 
-    <!-- Pilih anak + tombol tambah anak + pdf -->
-    <div class="row" style="justify-content:flex-end; align-items:flex-end; gap:10px; margin-top:10px; flex-wrap:wrap;">
-      <div class="card" style="padding:12px 14px">
-        <label>Pilih Anak</label>
-        <select id="anakSelect"></select>
-      </div>
+    <div style="margin-top:14px;">
+      <h1 style="margin-bottom:6px;">Monitoring Pertumbuhan</h1>
+      <div class="small">Catat dan visualisasi BB/TB secara rutin.</div>
 
-      <div class="row row-gap">
-        <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
-        <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
+      <!-- Tools row: card (select + tambah anak) di kiri, unduh pdf di kanan -->
+      <div class="header-tools">
+        <div class="card child-card">
+          <div class="field">
+            <label>Pilih Anak</label>
+            <select id="anakSelect"></select>
+          </div>
+          <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
+        </div>
+
+        <div class="right-tools">
+          <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
+        </div>
       </div>
     </div>
 
@@ -149,7 +204,12 @@
       <div class="tab-panel" data-panel="input">
         <div id="msg"></div>
 
-        <form id="formMonitoring">
+        <div class="input-actions">
+          <button class="btn secondary" type="button" id="btnToggleInput">+ Input Data Anak</button>
+          <div class="small small-muted" id="inputHint">Klik untuk membuka form input.</div>
+        </div>
+
+        <form id="formMonitoring" class="hidden">
           <div class="grid grid-2">
             <div>
               <label>Tanggal</label>
@@ -171,10 +231,32 @@
           </div>
 
           <div class="row" style="margin-top:12px; gap:10px;">
-            <button class="btn" type="submit">Simpan Data</button>
-            <a class="btn secondary" href="dashboard.html" style="text-decoration:none; display:inline-flex; align-items:center;">Kembali</a>
+            <button class="btn" type="submit" id="btnSimpanMonitoring">Simpan Data</button>
+            <button class="btn secondary" type="button" id="btnBatalInput">Tutup</button>
           </div>
         </form>
+
+        <!-- Tabel “format DB” setelah input -->
+        <div class="dbwrap">
+          <div class="small" style="margin-bottom:8px;">Data tersimpan (format tabel monitoring)</div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>anak_id</th>
+                <th>tanggal_ukur</th>
+                <th>berat_badan</th>
+                <th>tinggi_badan</th>
+                <th>catatan</th>
+                <th>created_at</th>
+                <th>updated_at</th>
+              </tr>
+            </thead>
+            <tbody id="dbBody">
+              <tr><td colspan="8" class="small">Pilih anak, lalu input data untuk melihat baris tersimpan.</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- RIWAYAT -->
@@ -245,7 +327,6 @@
 
         <div>
           <label>Jenis Kelamin</label>
-          <!-- INI PENTING: value dikirim sebagai string, bukan 'P'/'L' -->
           <select id="anakJK">
             <option value="">- pilih -</option>
             <option value="Laki-laki">Laki-laki</option>
@@ -256,7 +337,12 @@
 
       <div class="row" style="margin-top:12px; justify-content:flex-end; gap:8px;">
         <button class="btn secondary" type="button" id="btnBatalModal">Batal</button>
-        <button class="btn" type="button" id="btnSimpanAnak">Simpan</button>
+
+        <!-- tombol simpan dengan spinner -->
+        <button class="btn" type="button" id="btnSimpanAnak">
+          <span id="btnSimpanAnakText">Simpan</span>
+          <span id="btnSimpanAnakSpin" class="spinner" style="display:none;"></span>
+        </button>
       </div>
     </div>
   </div>
@@ -296,16 +382,17 @@
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
     setupTabs("tabsRoot");
-    document.getElementById("tanggal").value = toISODate(new Date());
 
     const anakSelect = document.getElementById("anakSelect");
     const riwayatBody = document.getElementById("riwayatBody");
+    const dbBody = document.getElementById("dbBody");
     const msg = document.getElementById("msg");
     const chartHint = document.getElementById("chartHint");
 
     let chartBB = null;
     let chartTB = null;
 
+    // ===== helper msg =====
     function showMsg(text, kind="ok"){
       msg.innerHTML = `<div class="badge ${kind==="ok" ? "green" : "red"}" style="margin-bottom:10px">${text}</div>`;
     }
@@ -314,24 +401,72 @@
         `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
     }
 
+    // ===== input toggle =====
+    const btnToggleInput = document.getElementById("btnToggleInput");
+    const formMonitoring = document.getElementById("formMonitoring");
+    const inputHint = document.getElementById("inputHint");
+    const btnBatalInput = document.getElementById("btnBatalInput");
+
+    function openInput(){
+      formMonitoring.classList.remove("hidden");
+      inputHint.textContent = "Isi data, lalu klik Simpan Data.";
+      // set default tanggal hari ini setiap buka
+      const tanggal = document.getElementById("tanggal");
+      tanggal.value = toISODate(new Date());
+      document.getElementById("berat_badan").focus();
+    }
+    function closeInput(){
+      formMonitoring.classList.add("hidden");
+      inputHint.textContent = "Klik untuk membuka form input.";
+    }
+    btnToggleInput.addEventListener("click", () => {
+      if(formMonitoring.classList.contains("hidden")) openInput();
+      else closeInput();
+    });
+    btnBatalInput.addEventListener("click", closeInput);
+
+    // ===== rendering =====
+    function renderDbTable(list){
+      if(!list.length){
+        dbBody.innerHTML = `<tr><td colspan="8" class="small">Belum ada data monitoring untuk anak ini.</td></tr>`;
+        return;
+      }
+      // tampil terbaru di atas untuk tabel DB
+      const rows = list.slice().reverse().map(x => `
+        <tr>
+          <td>${x.id ?? "-"}</td>
+          <td>${x.anak_id ?? "-"}</td>
+          <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
+          <td>${x.berat_badan ?? "-"}</td>
+          <td>${x.tinggi_badan ?? "-"}</td>
+          <td>${(x.catatan ?? "").toString().slice(0,40) || "-"}</td>
+          <td>${x.created_at ? String(x.created_at).replace("T"," ").slice(0,19) : "-"}</td>
+          <td>${x.updated_at ? String(x.updated_at).replace("T"," ").slice(0,19) : "-"}</td>
+        </tr>
+      `).join("");
+      dbBody.innerHTML = rows;
+    }
+
     async function renderRiwayatAndCharts(anakId){
       riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Memuat...</td></tr>`;
+      dbBody.innerHTML = `<tr><td colspan="8" class="small">Memuat...</td></tr>`;
       chartHint.textContent = "";
 
       const list = await loadMonitoringByAnak(anakId);
 
       if(!list.length){
         riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Belum ada data monitoring.</td></tr>`;
+        renderDbTable([]);
         chartHint.textContent = "Belum ada data untuk digrafikkan.";
         if(chartBB) chartBB.destroy();
         if(chartTB) chartTB.destroy();
         return;
       }
 
-      // Pastikan kronologis untuk grafik
+      // untuk grafik: kronologis
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // Riwayat (terbaru di atas)
+      // tabel riwayat (terbaru di atas)
       riwayatBody.innerHTML = list.slice().reverse().map(x => `
         <tr>
           <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
@@ -340,6 +475,9 @@
           <td>${(x.catatan ?? "").toString().slice(0,60) || "-"}</td>
         </tr>
       `).join("");
+
+      // tabel DB
+      renderDbTable(list);
 
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
       const weights = list.map(x => Number(x.berat_badan ?? 0));
@@ -363,7 +501,7 @@
       chartHint.textContent = "Grafik otomatis mengikuti data input (entry pertama sampai terakhir).";
     }
 
-    // Init dropdown anak
+    // ===== init dropdown anak =====
     (async () => {
       await loadAnakList("anakSelect");
 
@@ -373,13 +511,14 @@
         await renderRiwayatAndCharts(id);
       });
 
+      // auto pilih anak pertama jika ada
       if(anakSelect.options.length > 1){
         anakSelect.selectedIndex = 1;
         await renderRiwayatAndCharts(anakSelect.value);
       }
     })();
 
-    // Simpan monitoring
+    // ===== simpan monitoring =====
     document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.innerHTML = "";
@@ -401,11 +540,14 @@
         await api(`/anak/${anakId}/monitoring`, { method:"POST", body:payload, auth:true });
         showMsg("Data berhasil disimpan.", "ok");
 
+        // reset input
         document.getElementById("berat_badan").value = "";
         document.getElementById("tinggi_badan").value = "";
         document.getElementById("catatan").value = "";
 
+        // refresh data + tutup form biar rapi
         await renderRiwayatAndCharts(anakId);
+        closeInput();
       }catch(err){
         const errors = err?.payload?.errors;
         const detail = errors
@@ -416,11 +558,23 @@
       }
     });
 
-    // ===== Modal Tambah Anak =====
+    // ===== Modal Tambah Anak + Loading =====
     const modal = document.getElementById("modalAnak");
     const anakNama = document.getElementById("anakNama");
     const anakTglLahir = document.getElementById("anakTglLahir");
     const anakJK = document.getElementById("anakJK");
+
+    const btnSimpanAnak = document.getElementById("btnSimpanAnak");
+    const btnSimpanAnakText = document.getElementById("btnSimpanAnakText");
+    const btnSimpanAnakSpin = document.getElementById("btnSimpanAnakSpin");
+
+    function setChildSaveLoading(isLoading){
+      btnSimpanAnak.disabled = isLoading;
+      document.getElementById("btnBatalModal").disabled = isLoading;
+
+      btnSimpanAnakSpin.style.display = isLoading ? "inline-block" : "none";
+      btnSimpanAnakText.textContent = isLoading ? "Menyimpan" : "Simpan";
+    }
 
     function openModal(){
       document.getElementById("modalMsg").innerHTML = "";
@@ -428,29 +582,30 @@
       anakTglLahir.value = "";
       anakJK.value = "";
       modal.style.display = "flex";
+      setChildSaveLoading(false);
       setTimeout(() => anakNama.focus(), 10);
     }
     function closeModal(){ modal.style.display = "none"; }
 
     document.getElementById("btnTambahAnak").addEventListener("click", openModal);
-    document.getElementById("btnBatalModal").addEventListener("click", closeModal);
-    modal.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
+    document.getElementById("btnBatalModal").addEventListener("click", () => {
+      if(btnSimpanAnak.disabled) return;
+      closeModal();
+    });
+    modal.addEventListener("click", (e) => {
+      if(e.target === modal && !btnSimpanAnak.disabled) closeModal();
+    });
 
-    // Normalisasi gender agar tidak kirim "P/L" yang ditolak backend
     function normalizeGender(v){
       const s = String(v || "").trim();
-      // sudah sesuai target
       if(s === "Laki-laki" || s === "Perempuan") return s;
-
-      // fallback mapping jika suatu saat value berubah
       const lower = s.toLowerCase();
       if(lower === "l" || lower === "lk" || lower === "laki" || lower === "laki-laki" || lower === "male") return "Laki-laki";
       if(lower === "p" || lower === "pr" || lower === "perempuan" || lower === "female") return "Perempuan";
-
       return s;
     }
 
-    document.getElementById("btnSimpanAnak").addEventListener("click", async () => {
+    btnSimpanAnak.addEventListener("click", async () => {
       const nama = anakNama.value.trim();
       const tgl  = anakTglLahir.value;
       const jkRaw = anakJK.value;
@@ -460,14 +615,12 @@
       if(!tgl){ showModalError("Tanggal lahir wajib diisi."); return; }
       if(!jk){ showModalError("Jenis kelamin wajib dipilih."); return; }
 
-      const body = {
-        nama_anak: nama,
-        tanggal_lahir: tgl,
-        jenis_kelamin: jk
-      };
+      const body = { nama_anak: nama, tanggal_lahir: tgl, jenis_kelamin: jk };
 
       try{
+        setChildSaveLoading(true);
         const created = await api("/anak", { method:"POST", auth:true, body });
+
         closeModal();
         showMsg("Anak berhasil ditambahkan.", "ok");
 
@@ -485,6 +638,8 @@
           : "";
         showModalError(detail || err.message || "Gagal menambahkan anak.");
         console.error(err);
+      }finally{
+        setChildSaveLoading(false);
       }
     });
 
