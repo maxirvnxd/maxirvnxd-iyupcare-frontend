@@ -59,7 +59,7 @@
       flex-wrap: wrap;
     }
 
-    /* BRAND (logo InnoviYup + teks) */
+    /* BRAND */
     .brand{
       display:flex;
       align-items:center;
@@ -226,7 +226,6 @@
     }
     .tag.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
     .tag.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
-    .tag.blue{ border-color: rgba(30,99,214,.22); background: rgba(30,99,214,.10); }
 
     .title2{
       margin: 10px 0 4px;
@@ -288,7 +287,7 @@
       background: rgba(31,157,85,.10);
     }
 
-    /* Dropdown style selaras */
+    /* Dropdown */
     .select2{
       padding: 11px 12px;
       border-radius: 14px;
@@ -361,9 +360,6 @@
       font-size: 20px;
       flex: 0 0 auto;
     }
-    .tile.blue .ico{ background: rgba(30,99,214,.12); }
-    .tile.orange .ico{ background: rgba(242,153,74,.14); }
-    .tile.green .ico{ background: rgba(31,157,85,.12); }
     .tile .t{ font-weight: 950; }
     .tile .d{ margin-top: 3px; color: var(--muted); font-size: 13px; line-height: 1.5; }
 
@@ -446,7 +442,6 @@
 
           <div class="divider"></div>
 
-          <!-- Dropdown pilih anak + status -->
           <div class="row2" style="align-items:flex-start;">
             <div style="min-width:260px; flex:1;">
               <div class="muted">Pilih anak</div>
@@ -499,7 +494,7 @@
       </div>
 
       <div class="grid">
-        <div class="tile green" onclick="location.href='monitoring.html'">
+        <div class="tile" onclick="location.href='monitoring.html'">
           <div class="ico">📝</div>
           <div>
             <div class="t">Input Data (Monitoring)</div>
@@ -507,7 +502,7 @@
           </div>
         </div>
 
-        <div class="tile blue" onclick="location.href='kalkulator.html'">
+        <div class="tile" onclick="location.href='kalkulator.html'">
           <div class="ico">🧮</div>
           <div>
             <div class="t">Cek Kalori (Kalkulator)</div>
@@ -515,7 +510,7 @@
           </div>
         </div>
 
-        <div class="tile orange" onclick="location.href='produk.html'">
+        <div class="tile" onclick="location.href='produk.html'">
           <div class="ico">🥗</div>
           <div>
             <div class="t">Resep Sehat / Produk</div>
@@ -531,7 +526,7 @@
           </div>
         </div>
 
-        <div class="tile green" onclick="window.open('https://chat.whatsapp.com/HRE7XG4BCwaKQupmKujhIv','_blank','noopener')">
+        <div class="tile" onclick="window.open('https://chat.whatsapp.com/Gmc2iHYZanH1FDRe7ogfho','_blank','noopener')">
           <div class="ico">👥</div>
           <div>
             <div class="t">Komunitas</div>
@@ -556,7 +551,6 @@
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // greeting user
     loadMeAndRender("greeting");
 
     document.getElementById("bellBtn").addEventListener("click", () => {
@@ -584,6 +578,39 @@
       return [];
     }
 
+    function pick(obj, keys){
+      for(const k of keys){
+        const v = obj?.[k];
+        if(v !== undefined && v !== null && String(v).trim() !== "") return v;
+      }
+      return null;
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function getAnakId(a){
+      return pick(a, ["id","anak_id","child_id","id_anak"]);
+    }
+
+    function getAnakName(a){
+      const name = pick(a, ["nama","name","nama_anak","anak_nama","child_name","full_name"]);
+      const id = getAnakId(a);
+      if(name) return String(name).trim();
+      // kalau backend memang tidak kirim nama, minimal beda-beda by ID biar kamu tahu datanya kosong
+      return id ? `Anak (ID: ${id})` : "Anak";
+    }
+
+    function getBirthdate(a){
+      return pick(a, ["tanggal_lahir","tgl_lahir","birthdate","tanggalLahir"]);
+    }
+
     function setStatus(hasData){
       const status = document.getElementById("statusLabel");
       if(hasData){
@@ -602,23 +629,38 @@
       }
     }
 
-    async function renderForAnak(anak){
-      if(!anak) return;
+    function getMonDate(x){
+      // dukung beberapa kemungkinan key tanggal monitoring
+      return pick(x, ["tanggal_ukur","tanggal","date","created_at","updated_at"]) ?? "";
+    }
 
-      // profil
-      document.getElementById("anakNama").textContent = anak.nama ?? "Anak";
-      document.getElementById("anakUsia").textContent = anak.tanggal_lahir
-        ? ageTextFromBirthdate(anak.tanggal_lahir)
-        : "—";
+    function getMonWeight(x){
+      return Number(pick(x, ["berat_badan","bb","berat","weight"]) ?? 0);
+    }
 
-      // monitoring anak terpilih
-      const monResp = await loadMonitoringByAnak(anak.id);
-      const mon = normalizeArray(monResp);
+    async function renderForAnak(anakRaw){
+      if(!anakRaw) return;
 
-      // sort kronologis berdasarkan tanggal_ukur (selaras dengan monitoring.html)
-      mon.sort((a,b) => String(a.tanggal_ukur ?? "").localeCompare(String(b.tanggal_ukur ?? "")));
+      const nama = getAnakName(anakRaw);
+      const tgl = getBirthdate(anakRaw);
+
+      document.getElementById("anakNama").textContent = nama;
+      document.getElementById("anakUsia").textContent = tgl ? ageTextFromBirthdate(tgl) : "—";
 
       const hintEl = document.getElementById("miniChartHint");
+
+      const anakId = getAnakId(anakRaw);
+      if(!anakId){
+        setStatus(false);
+        hintEl.textContent = "Data anak tidak punya ID yang terbaca. Periksa respon API /anak.";
+        destroyMiniChart();
+        return;
+      }
+
+      const monResp = await loadMonitoringByAnak(anakId);
+      const mon = normalizeArray(monResp);
+
+      mon.sort((a,b) => String(getMonDate(a)).localeCompare(String(getMonDate(b))));
 
       if(!mon.length){
         setStatus(false);
@@ -630,8 +672,8 @@
       setStatus(true);
 
       const last3 = mon.slice(-3);
-      const labels = last3.map(x => String(x.tanggal_ukur ?? "").slice(0,10) || "—");
-      const weights = last3.map(x => Number(x.berat_badan ?? 0));
+      const labels = last3.map(x => String(getMonDate(x)).slice(0,10) || "—");
+      const weights = last3.map(x => getMonWeight(x));
 
       if(typeof Chart === "undefined"){
         hintEl.textContent = "Chart.js tidak tersedia. Data BB: " + weights.join(", ");
@@ -676,31 +718,36 @@
         return;
       }
 
+      // buat options dengan nama yang benar (multi-key)
       anakPick.innerHTML =
         `<option value="">- pilih -</option>` +
-        list.map(a => `<option value="${a.id}">${a.nama ?? "Anak"}</option>`).join("");
+        list.map(a => {
+          const id = getAnakId(a);
+          const nm = getAnakName(a);
+          // kalau id null, tetap tampilkan tapi value kosong (biar kelihatan ada problem data)
+          return `<option value="${escapeHtml(id ?? "")}">${escapeHtml(nm)}</option>`;
+        }).join("");
 
-      // default: localStorage -> kalau tidak valid, pakai anak pertama
+      // default: localStorage -> kalau tidak valid, pakai anak pertama yang punya ID
       const savedId = localStorage.getItem(STORAGE_KEY);
-      const defaultId =
-        (savedId && list.some(a => String(a.id) === String(savedId)))
-          ? String(savedId)
-          : String(list[0].id);
+      const firstWithId = list.find(a => getAnakId(a) !== null) ?? list[0];
+
+      const savedValid = savedId && list.some(a => String(getAnakId(a)) === String(savedId));
+      const defaultId = savedValid ? String(savedId) : String(getAnakId(firstWithId) ?? "");
 
       anakPick.value = defaultId;
 
-      const selected = list.find(a => String(a.id) === String(anakPick.value));
+      const selected = list.find(a => String(getAnakId(a)) === String(anakPick.value)) ?? firstWithId;
       await renderForAnak(selected);
 
       anakPick.addEventListener("change", async () => {
         const id = anakPick.value;
         if(!id) return;
         localStorage.setItem(STORAGE_KEY, String(id));
-        const chosen = list.find(a => String(a.id) === String(id));
+        const chosen = list.find(a => String(getAnakId(a)) === String(id));
         await renderForAnak(chosen);
       });
 
-      // simpan pilihan saat pindah ke monitoring
       btnInputData.addEventListener("click", () => {
         const id = anakPick.value;
         if(id) localStorage.setItem(STORAGE_KEY, String(id));
