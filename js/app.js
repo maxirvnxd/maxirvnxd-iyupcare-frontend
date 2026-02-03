@@ -34,7 +34,9 @@ async function loadAnakList(selectId){
     const res = await api("/anak", { auth:true });
     const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
     sel.innerHTML = `<option value="">- pilih anak -</option>` + list.map(a => {
-      return `<option value="${a.id}">${a.nama ?? ("Anak #" + a.id)}</option>`;
+      // IMPORTANT: backend kamu pakai nama_anak (bukan nama)
+      const label = a.nama_anak ?? a.nama ?? ("Anak #" + a.id);
+      return `<option value="${a.id}">${label}</option>`;
     }).join("");
     return list;
   }catch(e){
@@ -47,7 +49,7 @@ async function loadMonitoringByAnak(anakId){
   if(!anakId) return [];
   try{
     const res = await api(`/anak/${anakId}/monitoring`, { auth:true });
-    // sesuaikan bentuk response: bisa {data:[...]} atau [...]
+    // response: bisa {data:[...]} atau [...]
     const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
     return list;
   }catch(e){
