@@ -11,10 +11,6 @@
   <link rel="stylesheet" href="css/styles.css" />
 
   <style>
-    /* ============================
-      TOPBAR STYLE (selaras produk.html)
-      NOTE: pakai class khusus (.pbtn) supaya TIDAK merusak .btn di styles.css
-    ============================ */
     :root{
       --p-bg:#f6f9ff;
       --p-ink:#0b1b3a;
@@ -106,7 +102,6 @@
     }
     .pbtn.primary:hover{ filter: brightness(.98); }
 
-    /* back row ala produk.html */
     .back-row{
       display:flex;
       align-items:center;
@@ -115,9 +110,6 @@
       flex-wrap:wrap;
     }
 
-    /* ============================
-      Monitoring page patches
-    ============================ */
     textarea{
       width:100%;
       padding:10px 12px;
@@ -140,7 +132,6 @@
 
     .right-tools{display:flex;align-items:flex-end;}
 
-    /* Modal */
     .modal-backdrop{
       position:fixed; inset:0;background:rgba(0,0,0,.45);
       display:none;align-items:center;justify-content:center;padding:18px;z-index:9999;
@@ -164,7 +155,6 @@
       display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin: 8px 0 10px;
     }
     .hidden{display:none !important;}
-
     .dbwrap{margin-top:14px;overflow:auto;}
     .small-muted{opacity:.85;}
 
@@ -176,7 +166,6 @@
       .pbrand{ min-width: 0; }
     }
 
-    /* Galeri helpers */
     .galeri-item{ padding:12px; }
     .galeri-item img{
       width:100%;
@@ -205,7 +194,6 @@
       white-space:nowrap;
     }
 
-    /* Report images */
     .report-img{
       width:100%;
       height:180px;
@@ -254,7 +242,11 @@
         </div>
 
         <div class="right-tools">
-          <button class="btn" type="button" id="btnUnduhPdf">Unduh PDF</button>
+          <!-- Tombol PDF + spinner -->
+          <button class="btn" type="button" id="btnUnduhPdf">
+            <span id="btnPdfText">Unduh PDF</span>
+            <span id="btnPdfSpin" class="spinner" style="display:none;"></span>
+          </button>
         </div>
       </div>
     </div>
@@ -467,9 +459,8 @@
     // ===========================
     // CONFIG
     // ===========================
-    // Mode produksi (disarankan): PDF pakai image proxy dari backend HF
-    // Endpoint yang dibutuhkan: GET /api/galeri/{id}/image  (auth)
-    const USE_PROXY_IMAGE_FOR_PDF = true;
+    const USE_PROXY_IMAGE_FOR_PDF = true; // butuh GET /api/galeri/{id}/image (auth)
+    const MAX_PDF_IMAGES = 6;
 
     // ===========================
     // Auth + year
@@ -576,6 +567,10 @@
     const btnUploadGaleri = document.getElementById("btnUploadGaleri");
     const galeriMsg = document.getElementById("galeriMsg");
 
+    const btnUnduhPdf = document.getElementById("btnUnduhPdf");
+    const btnPdfText = document.getElementById("btnPdfText");
+    const btnPdfSpin = document.getElementById("btnPdfSpin");
+
     let chartBB = null;
     let chartTB = null;
 
@@ -592,6 +587,12 @@
         : "";
     }
 
+    function setPdfLoading(isLoading){
+      btnUnduhPdf.disabled = isLoading;
+      btnPdfSpin.style.display = isLoading ? "inline-block" : "none";
+      btnPdfText.textContent = isLoading ? "Memproses..." : "Unduh PDF";
+    }
+
     // ===========================
     // Helpers: escape + age
     // ===========================
@@ -600,7 +601,6 @@
     }
 
     function calcAgeYMD(birthDateStr){
-      // "YYYY-MM-DD"
       const b = new Date(birthDateStr + "T00:00:00");
       const now = new Date();
 
@@ -743,7 +743,6 @@
 
       try{
         await apiMultipart(`/anak/${anakId}/galeri`, fd);
-
         galeriFile.value = "";
         galeriCaption.value = "";
 
@@ -975,18 +974,37 @@
     });
 
     // ===========================
-    // PDF Export (include galeri + identitas)
+    // PDF helpers (AUTH fetch -> dataURL)
     // ===========================
-    async function loadImage(url){
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "anonymous";
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = url;
+    async function fetchImageAsDataUrl(url, token){
+      const r = await fetch(url, {
+        method: "GET",
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      if(!r.ok) throw new Error(`Gagal ambil gambar (${r.status})`);
+      const blob = await r.blob();
+      return await new Promise((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onload = () => resolve(fr.result);
+        fr.onerror = reject;
+        fr.readAsDataURL(blob);
       });
     }
 
+    function waitImagesLoaded(rootEl){
+      const imgs = Array.from(rootEl.querySelectorAll("img"));
+      return Promise.all(imgs.map(img => {
+        if(img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise(res => {
+          img.onload = () => res();
+          img.onerror = () => res();
+        });
+      }));
+    }
+
+    // ===========================
+    // PDF Export (include galeri + identitas)
+    // ===========================
     async function exportPdfForSelectedAnak(){
       const anakId = anakSelect.value;
       if(!anakId){ showMsg("Pilih anak dulu sebelum unduh PDF.", "err"); return; }
@@ -997,7 +1015,7 @@
 
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // ---- ambil user + detail anak (untuk identitas)
+      // ---- ambil user + detail anak (identitas)
       let me = null;
       let anakDetail = null;
 
@@ -1028,7 +1046,7 @@
         `JK: <b>${escHtml(jkAnak)}</b> &nbsp;|&nbsp; ` +
         `Umur: <b>${escHtml(umurText)}</b>`;
 
-      // ---- riwayat table
+      // ---- riwayat
       document.getElementById("reportRiwayat").innerHTML = `
         <table class="table">
           <thead><tr><th>Tanggal</th><th>BB</th><th>TB</th><th>Catatan</th></tr></thead>
@@ -1044,61 +1062,6 @@
           </tbody>
         </table>
       `;
-
-      // ---- galeri list (max 6)
-      let galeriList = [];
-      try{
-        const g = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
-        galeriList = g?.data || [];
-      }catch(e){
-        galeriList = [];
-      }
-      galeriList = galeriList.slice(0, 6);
-
-      const base = getApiBase();
-
-      if(!galeriList.length){
-        document.getElementById("reportGaleri").innerHTML =
-          `<div class="card">📷 Tidak ada foto galeri</div>`;
-      } else {
-        // render dulu skeleton html (biar layout fixed)
-        document.getElementById("reportGaleri").innerHTML = galeriList.map(it => {
-          const title = escHtml((it.caption || it.original_name || "Foto").toString());
-          const dt = it.created_at ? String(it.created_at).replace("T"," ").slice(0,16) : "";
-
-          // URL gambar untuk PDF:
-          // - produksi: proxy backend (stabil untuk canvas)
-          // - fallback: thumbnail drive (sering blank di canvas)
-          let imgUrl = "";
-          if(USE_PROXY_IMAGE_FOR_PDF){
-            imgUrl = `${base}/galeri/${it.id}/image`;
-          } else {
-            const fid = it.drive_file_id || "";
-            imgUrl = fid ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fid)}&sz=w1200` : (it.public_url || "");
-          }
-
-          return `
-            <div class="card" style="padding:10px;">
-              <img class="report-img" src="${imgUrl}" crossorigin="anonymous" />
-              <div style="margin-top:8px;">
-                <div style="font-weight:800;font-size:12px;line-height:1.2;">${title}</div>
-                <div class="small small-muted">${escHtml(dt)}</div>
-              </div>
-            </div>
-          `;
-        }).join("");
-
-        // paksa tunggu gambar benar-benar ter-load sebelum html2canvas
-        // (kalau tidak, PDF bisa keburu “screenshot” sebelum gambar masuk)
-        const imgEls = Array.from(document.querySelectorAll("#reportGaleri img"));
-        await Promise.all(imgEls.map(img => {
-          if(img.complete && img.naturalWidth > 0) return Promise.resolve();
-          return new Promise((resolve) => {
-            img.onload = () => resolve();
-            img.onerror = () => resolve(); // jangan block total; jika gagal, tetap jalan
-          });
-        }));
-      }
 
       // ---- chart data
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
@@ -1120,14 +1083,75 @@
         options:{ responsive:false, plugins:{ legend:{display:false} } }
       });
 
-      // beri waktu chart render + layout settle
-      await new Promise(r => setTimeout(r, 500));
+      // ---- ambil list galeri
+      let galeriList = [];
+      try{
+        const g = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
+        galeriList = g?.data || [];
+      }catch(e){
+        galeriList = [];
+      }
+      const galTop = galeriList.slice(0, MAX_PDF_IMAGES);
+
+      const token = mustToken();
+      const base = getApiBase();
+
+      // ---- render galeri ke report (img diisi via dataURL)
+      if(!galTop.length){
+        document.getElementById("reportGaleri").innerHTML =
+          `<div class="card">📷 Tidak ada foto galeri</div>`;
+      } else {
+        document.getElementById("reportGaleri").innerHTML = galTop.map((it, idx) => {
+          const title = escHtml((it.caption || it.original_name || "Foto").toString().slice(0,60));
+          const dt = it.created_at ? String(it.created_at).replace("T"," ").slice(0,16) : "";
+          return `
+            <div class="card" style="padding:10px;">
+              <img id="rgal-img-${idx}" class="report-img" alt="foto" />
+              <div style="margin-top:8px;">
+                <div style="font-weight:800;font-size:12px;line-height:1.2;">${title}</div>
+                <div class="small small-muted">${escHtml(dt)}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // isi src gambar (WAJIB via fetch + token)
+        await Promise.all(galTop.map(async (it, idx) => {
+          const imgEl = document.getElementById(`rgal-img-${idx}`);
+          if(!imgEl) return;
+
+          try{
+            let imgUrl = "";
+            if(USE_PROXY_IMAGE_FOR_PDF){
+              imgUrl = `${base}/galeri/${encodeURIComponent(it.id)}/image`;
+            } else {
+              // fallback (tidak stabil untuk PDF)
+              const fid = it.drive_file_id || "";
+              imgUrl = fid
+                ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fid)}&sz=w1200`
+                : (it.public_url || "");
+            }
+
+            if(USE_PROXY_IMAGE_FOR_PDF){
+              const dataUrl = await fetchImageAsDataUrl(imgUrl, token);
+              imgEl.src = dataUrl;
+            } else {
+              imgEl.src = imgUrl;
+            }
+          }catch(e){
+            console.warn("Gagal isi gambar PDF:", e);
+          }
+        }));
+
+        await waitImagesLoaded(document.getElementById("reportGaleri"));
+      }
+
+      // beri waktu chart render settle
+      await new Promise(r => setTimeout(r, 300));
 
       // ---- html2canvas -> jsPDF
       const canvas = await html2canvas(document.getElementById("reportArea"), {
         scale: 2,
-        useCORS: true,
-        allowTaint: false,
         backgroundColor: "#ffffff"
       });
       const imgData = canvas.toDataURL("image/png");
@@ -1157,9 +1181,16 @@
       pdf.save(`laporan-monitoring-${safeName}.pdf`);
     }
 
-    document.getElementById("btnUnduhPdf").addEventListener("click", async () => {
-      try{ await exportPdfForSelectedAnak(); }
-      catch(err){ showMsg(err.message || "Gagal membuat PDF.", "err"); console.error(err); }
+    btnUnduhPdf.addEventListener("click", async () => {
+      setPdfLoading(true);
+      try{
+        await exportPdfForSelectedAnak();
+      }catch(err){
+        showMsg(err.message || "Gagal membuat PDF.", "err");
+        console.error(err);
+      }finally{
+        setPdfLoading(false);
+      }
     });
   </script>
 </body>
