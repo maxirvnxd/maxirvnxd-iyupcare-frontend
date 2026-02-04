@@ -354,7 +354,7 @@
         </div>
       </div>
 
-      <!-- GALERI (UPDATED sesuai instruksi kamu) -->
+      <!-- GALERI -->
       <div class="tab-panel" data-panel="galeri">
         <div class="small">Upload foto untuk anak yang dipilih. Foto disimpan di Google Drive dan tampil di sini.</div>
 
@@ -617,26 +617,40 @@
     }
 
     // ===== Galeri: load + render =====
+    function escHtml(s){
+      return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
+
     function renderGaleriGrid(items){
       if(!items || !items.length){
         galeriGrid.innerHTML = `<div class="card">📷 Belum ada foto<br><span class="small">Upload foto pertama untuk anak ini.</span></div>`;
         return;
       }
 
+      // ✅ Integrasi thumbnail Google Drive (sesuai instruksi)
       galeriGrid.innerHTML = items.map(it => {
-        const url = it.public_url || "";
-        const cap = (it.caption || "Tanpa caption").toString();
+        const fid = it.drive_file_id || "";
+        const thumbUrl = fid
+          ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fid)}&sz=w1000`
+          : (it.public_url || "");
+
+        const openUrl = it.public_url || "#";
+
+        const titleRaw = it.caption ? it.caption : (it.original_name || "Foto");
+        const title = escHtml(titleRaw);
+
         const dt = it.created_at ? String(it.created_at).replace("T"," ").slice(0,16) : "";
-        const safeCap = cap.replaceAll("<","&lt;").replaceAll(">","&gt;");
+        const original = it.original_name ? escHtml(String(it.original_name).slice(0,40)) : "";
+
         return `
           <div class="card galeri-item">
-            <a href="${url}" target="_blank" rel="noreferrer">
-              <img src="${url}" alt="${safeCap}" loading="lazy" />
+            <a href="${openUrl}" target="_blank" rel="noreferrer">
+              <img src="${thumbUrl}" alt="${title}" loading="lazy" />
             </a>
             <div class="galeri-meta">
               <div>
-                <div class="galeri-caption">${safeCap}</div>
-                <div class="small small-muted">${it.original_name ? String(it.original_name).slice(0,40) : ""}</div>
+                <div class="galeri-caption">${title}</div>
+                <div class="small small-muted">${original}</div>
               </div>
               <div class="galeri-date">${dt}</div>
             </div>
@@ -709,9 +723,6 @@
         setGaleriMsg("Upload sukses. Memuat ulang galeri...", "ok");
         await loadGaleriByAnak(anakId);
         setGaleriMsg("Upload sukses.", "ok");
-
-        // Optional: tampilkan url paling baru
-        // console.log(out);
 
       }catch(err){
         console.error(err);
@@ -795,7 +806,7 @@
         const id = anakSelect.value;
         if(!id) return;
         await renderRiwayatAndCharts(id);
-        await loadGaleriByAnak(id); // <-- penting: galeri ikut reload saat ganti anak
+        await loadGaleriByAnak(id);
       });
 
       if(anakSelect.options.length > 1){
@@ -804,7 +815,6 @@
         await renderRiwayatAndCharts(id);
         await loadGaleriByAnak(id);
       } else {
-        // belum ada anak
         renderGaleriGrid([]);
       }
     })();
@@ -960,7 +970,6 @@
         </table>
       `;
 
-      // (opsional) nanti bisa kamu upgrade: isi report galeri dari API juga.
       document.getElementById("reportGaleri").innerHTML = `
         <div class="card">📷 Galeri<br><span class="small">Lihat tab Galeri untuk foto terbaru.</span></div>
       `;
