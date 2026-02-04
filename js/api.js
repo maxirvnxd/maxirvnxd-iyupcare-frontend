@@ -150,26 +150,51 @@
     return msg;
   }
 
+  function isFormDataBody(body) {
+    // aman untuk browser modern
+    return typeof FormData !== "undefined" && body instanceof FormData;
+  }
+
   // -------------------- MAIN API FUNCTION --------------------
   /**
+   * JSON:
    * api("/auth/login", { method:"POST", body:{...} })
    * api("/kalkulator", { method:"POST", body:{...}, auth:true })
+   *
+   * Multipart:
+   * api(`/anak/${id}/galeri`, { method:"POST", auth:true, body: fd, isFormData:true })
+   * atau cukup body: fd (auto-detect)
    */
   window.api = async function api(
     path,
-    { method = "GET", body = null, auth = false, headers: extraHeaders = {}, signal = undefined } = {}
+    {
+      method = "GET",
+      body = null,
+      auth = false,
+      headers: extraHeaders = {},
+      signal = undefined,
+      isFormData = false, // <--- baru (opsional)
+    } = {}
   ) {
     const cleanPath = String(path || "");
     const finalPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+
+    const m = String(method || "GET").toUpperCase();
+    const hasBody = body !== null && body !== undefined && m !== "GET";
+
+    const bodyIsFD = isFormData === true || isFormDataBody(body);
 
     const headers = {
       Accept: "application/json",
       ...extraHeaders,
     };
 
-    const m = String(method || "GET").toUpperCase();
-    const hasBody = body !== null && body !== undefined && m !== "GET";
-    if (hasBody) headers["Content-Type"] = "application/json";
+    // Kalau request punya body:
+    // - JSON: set Content-Type application/json dan stringify
+    // - FormData: JANGAN set Content-Type (biar boundary otomatis)
+    if (hasBody && !bodyIsFD) {
+      headers["Content-Type"] = "application/json";
+    }
 
     if (auth) {
       const token = window.getToken();
@@ -182,12 +207,17 @@
       headers["Authorization"] = `Bearer ${token}`;
     }
 
+    let fetchBody = null;
+    if (hasBody) {
+      fetchBody = bodyIsFD ? body : JSON.stringify(body);
+    }
+
     let res;
     try {
       res = await fetch(`${API_BASE}${finalPath}`, {
         method: m,
         headers,
-        body: hasBody ? JSON.stringify(body) : null,
+        body: fetchBody,
         signal,
       });
     } catch (netErr) {

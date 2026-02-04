@@ -26,8 +26,6 @@
       --p-max:1100px;
     }
     body{
-      /* biar lebih nyambung feel-nya, tapi tetap aman.
-         kalau kamu mau background lama dari styles.css, hapus block body ini. */
       background:
         radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.16), transparent 60%),
         radial-gradient(800px 520px at 90% 0%, rgba(31,157,85,.12), transparent 58%),
@@ -163,7 +161,7 @@
       border-top-color:#fff;border-radius:50%;display:inline-block;
       animation:spin .75s linear infinite;vertical-align:middle;margin-left:8px;
     }
-    @keyframes spin{to{transform:rotate(360deg);}}
+    @keyframes spin{to{transform:rotate(360deg);} }
 
     /* Input toggle area */
     .input-actions{
@@ -183,6 +181,34 @@
     @media (max-width: 980px){
       .topbar-inner{ gap: 10px; }
       .pbrand{ min-width: 0; }
+    }
+
+    /* Galeri helpers */
+    .galeri-item img{
+      width:100%;
+      height:240px;
+      object-fit:cover;
+      border-radius:14px;
+      display:block;
+      background: rgba(0,0,0,.04);
+      border:1px solid rgba(0,0,0,.08);
+    }
+    .galeri-meta{
+      margin-top:8px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .galeri-caption{
+      font-weight:700;
+      font-size:12px;
+      line-height:1.2;
+    }
+    .galeri-date{
+      font-size:12px;
+      opacity:.85;
+      white-space:nowrap;
     }
   </style>
 </head>
@@ -328,13 +354,33 @@
         </div>
       </div>
 
-      <!-- GALERI -->
+      <!-- GALERI (UPDATED sesuai instruksi kamu) -->
       <div class="tab-panel" data-panel="galeri">
-        <div class="small">Galeri foto per bulan (UI siap, fitur upload ditambah tahap lanjut).</div>
+        <div class="small">Upload foto untuk anak yang dipilih. Foto disimpan di Google Drive dan tampil di sini.</div>
+
+        <div class="card" style="margin-top:12px; padding:14px;">
+          <div class="grid grid-2">
+            <div>
+              <label>Pilih Foto</label>
+              <input id="galeriFile" type="file" accept="image/*" />
+              <div class="small small-muted">Format: JPG/PNG/WEBP, maks 5MB.</div>
+            </div>
+
+            <div>
+              <label>Caption (opsional)</label>
+              <input id="galeriCaption" type="text" placeholder="mis: bulan 1" />
+              <div class="small small-muted">Max 200 karakter.</div>
+            </div>
+          </div>
+
+          <div class="row" style="margin-top:12px; gap:10px;">
+            <button class="btn" type="button" id="btnUploadGaleri">Upload Foto</button>
+            <div class="small" id="galeriMsg"></div>
+          </div>
+        </div>
+
         <div class="grid grid-3" style="margin-top:12px" id="galeriGrid">
-          <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
-          <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
-          <div class="card">📷 Bulan 3<br><span class="small">Belum ada foto</span></div>
+          <div class="card">📷 Belum ada foto<br><span class="small">Upload foto pertama untuk anak ini.</span></div>
         </div>
       </div>
     </div>
@@ -419,6 +465,45 @@
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // ===== Helpers: api base + token =====
+    function getApiBase(){
+      const meta = document.querySelector('meta[name="api-base"]');
+      const base = meta?.getAttribute("content") || "";
+      return base.replace(/\/+$/,"");
+    }
+    function mustToken(){
+      const t = (typeof window.getToken === "function") ? window.getToken() : null;
+      if(!t) throw new Error("Token login tidak ditemukan. Silakan login ulang.");
+      return t;
+    }
+    async function apiMultipart(path, formData){
+      const base = getApiBase();
+      const url = `${base}${path.startsWith("/") ? "" : "/"}${path}`;
+      const token = mustToken();
+
+      const resp = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Accept": "application/json",
+          // JANGAN set Content-Type untuk multipart (biar browser set boundary)
+        },
+        body: formData
+      });
+
+      let payload = null;
+      try { payload = await resp.json(); } catch(e){}
+
+      if(!resp.ok){
+        const msg = payload?.message || `Request gagal (${resp.status})`;
+        const err = new Error(msg);
+        err.status = resp.status;
+        err.payload = payload;
+        throw err;
+      }
+      return payload;
+    }
+
     // ===== Fallback toISODate (kalau ui.js gagal) =====
     if(typeof window.toISODate !== "function"){
       window.toISODate = function(d){
@@ -466,6 +551,13 @@
     const msg = document.getElementById("msg");
     const chartHint = document.getElementById("chartHint");
 
+    // Galeri elements
+    const galeriGrid = document.getElementById("galeriGrid");
+    const galeriFile = document.getElementById("galeriFile");
+    const galeriCaption = document.getElementById("galeriCaption");
+    const btnUploadGaleri = document.getElementById("btnUploadGaleri");
+    const galeriMsg = document.getElementById("galeriMsg");
+
     let chartBB = null;
     let chartTB = null;
 
@@ -475,6 +567,11 @@
     function showModalError(text){
       document.getElementById("modalMsg").innerHTML =
         `<div class="badge red" style="margin-bottom:10px">${text}</div>`;
+    }
+    function setGaleriMsg(text, kind="ok"){
+      galeriMsg.innerHTML = text
+        ? `<span class="badge ${kind==="ok" ? "green" : "red"}">${text}</span>`
+        : "";
     }
 
     // ===== Input toggle =====
@@ -518,6 +615,120 @@
         </tr>
       `).join("");
     }
+
+    // ===== Galeri: load + render =====
+    function renderGaleriGrid(items){
+      if(!items || !items.length){
+        galeriGrid.innerHTML = `<div class="card">📷 Belum ada foto<br><span class="small">Upload foto pertama untuk anak ini.</span></div>`;
+        return;
+      }
+
+      galeriGrid.innerHTML = items.map(it => {
+        const url = it.public_url || "";
+        const cap = (it.caption || "Tanpa caption").toString();
+        const dt = it.created_at ? String(it.created_at).replace("T"," ").slice(0,16) : "";
+        const safeCap = cap.replaceAll("<","&lt;").replaceAll(">","&gt;");
+        return `
+          <div class="card galeri-item">
+            <a href="${url}" target="_blank" rel="noreferrer">
+              <img src="${url}" alt="${safeCap}" loading="lazy" />
+            </a>
+            <div class="galeri-meta">
+              <div>
+                <div class="galeri-caption">${safeCap}</div>
+                <div class="small small-muted">${it.original_name ? String(it.original_name).slice(0,40) : ""}</div>
+              </div>
+              <div class="galeri-date">${dt}</div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadGaleriByAnak(anakId){
+      if(!anakId) return [];
+      setGaleriMsg("Memuat galeri...", "ok");
+      try{
+        const res = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
+        const items = res?.data || [];
+        renderGaleriGrid(items);
+        setGaleriMsg("", "ok");
+        return items;
+      }catch(err){
+        console.error(err);
+        setGaleriMsg(err?.payload?.message || err.message || "Gagal memuat galeri.", "err");
+        renderGaleriGrid([]);
+        return [];
+      }
+    }
+
+    async function uploadGaleriForAnak(anakId){
+      const f = galeriFile.files?.[0];
+      const cap = (galeriCaption.value || "").trim();
+
+      if(!anakId){
+        setGaleriMsg("Pilih anak dulu.", "err");
+        return;
+      }
+      if(!f){
+        setGaleriMsg("Pilih file foto dulu.", "err");
+        return;
+      }
+
+      // Validasi client-side biar errornya cepat
+      const allowed = ["image/jpeg","image/png","image/webp"];
+      if(!allowed.includes(f.type)){
+        setGaleriMsg("Format harus JPG/PNG/WEBP.", "err");
+        return;
+      }
+      const max = 5 * 1024 * 1024;
+      if(f.size > max){
+        setGaleriMsg("Ukuran file maksimal 5MB.", "err");
+        return;
+      }
+      if(cap.length > 200){
+        setGaleriMsg("Caption maksimal 200 karakter.", "err");
+        return;
+      }
+
+      const fd = new FormData();
+      fd.append("file", f);
+      if(cap) fd.append("caption", cap);
+
+      btnUploadGaleri.disabled = true;
+      setGaleriMsg("Mengupload...", "ok");
+
+      try{
+        // pakai multipart khusus (tidak lewat api() JSON)
+        const out = await apiMultipart(`/anak/${anakId}/galeri`, fd);
+
+        // Reset input
+        galeriFile.value = "";
+        galeriCaption.value = "";
+
+        setGaleriMsg("Upload sukses. Memuat ulang galeri...", "ok");
+        await loadGaleriByAnak(anakId);
+        setGaleriMsg("Upload sukses.", "ok");
+
+        // Optional: tampilkan url paling baru
+        // console.log(out);
+
+      }catch(err){
+        console.error(err);
+        const errors = err?.payload?.errors;
+        const detail = errors
+          ? Object.entries(errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(", "):v}`).join(" | ")
+          : "";
+        setGaleriMsg(detail || err?.payload?.message || err.message || "Upload gagal.", "err");
+      }finally{
+        btnUploadGaleri.disabled = false;
+      }
+    }
+
+    btnUploadGaleri.addEventListener("click", async () => {
+      const anakId = anakSelect.value;
+      await uploadGaleriForAnak(anakId);
+    });
 
     // ===== Render riwayat + grafik =====
     async function renderRiwayatAndCharts(anakId){
@@ -584,11 +795,17 @@
         const id = anakSelect.value;
         if(!id) return;
         await renderRiwayatAndCharts(id);
+        await loadGaleriByAnak(id); // <-- penting: galeri ikut reload saat ganti anak
       });
 
       if(anakSelect.options.length > 1){
         anakSelect.selectedIndex = 1;
-        await renderRiwayatAndCharts(anakSelect.value);
+        const id = anakSelect.value;
+        await renderRiwayatAndCharts(id);
+        await loadGaleriByAnak(id);
+      } else {
+        // belum ada anak
+        renderGaleriGrid([]);
       }
     })();
 
@@ -700,6 +917,7 @@
         else anakSelect.selectedIndex = anakSelect.options.length - 1;
 
         await renderRiwayatAndCharts(anakSelect.value);
+        await loadGaleriByAnak(anakSelect.value);
       }catch(err){
         const errors = err?.payload?.errors;
         const detail = errors
@@ -742,10 +960,9 @@
         </table>
       `;
 
+      // (opsional) nanti bisa kamu upgrade: isi report galeri dari API juga.
       document.getElementById("reportGaleri").innerHTML = `
-        <div class="card">📷 Bulan 1<br><span class="small">Belum ada foto</span></div>
-        <div class="card">📷 Bulan 2<br><span class="small">Belum ada foto</span></div>
-        <div class="card">📷 Bulan 3<br><span class="small">Belum ada foto</span></div>
+        <div class="card">📷 Galeri<br><span class="small">Lihat tab Galeri untuk foto terbaru.</span></div>
       `;
 
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
