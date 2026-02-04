@@ -116,9 +116,8 @@
     }
 
     /* ============================
-      Monitoring page patches (existing)
+      Monitoring page patches
     ============================ */
-
     textarea{
       width:100%;
       padding:10px 12px;
@@ -129,7 +128,6 @@
       background:#fff;
     }
 
-    /* Layout header tools */
     .header-tools{
       margin-top:12px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;
     }
@@ -154,7 +152,6 @@
     .modal h3{margin:0 0 10px;}
     .hr{height:1px;background:rgba(0,0,0,.08);margin:12px 0;}
 
-    /* Loading spinner (button) */
     .btn[disabled]{opacity:.7;cursor:not-allowed;}
     .spinner{
       width:16px;height:16px;border:2px solid rgba(255,255,255,.5);
@@ -163,27 +160,24 @@
     }
     @keyframes spin{to{transform:rotate(360deg);} }
 
-    /* Input toggle area */
     .input-actions{
       display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin: 8px 0 10px;
     }
     .hidden{display:none !important;}
 
-    /* DB-like table */
     .dbwrap{margin-top:14px;overflow:auto;}
     .small-muted{opacity:.85;}
 
-    /* Fallback tabs: pastikan panel tampil/hilang */
     .tab-panel{display:none;}
     .tab-panel.active{display:block;}
 
-    /* Mobile tweak for topbar */
     @media (max-width: 980px){
       .topbar-inner{ gap: 10px; }
       .pbrand{ min-width: 0; }
     }
 
     /* Galeri helpers */
+    .galeri-item{ padding:12px; }
     .galeri-item img{
       width:100%;
       height:240px;
@@ -210,11 +204,21 @@
       opacity:.85;
       white-space:nowrap;
     }
+
+    /* Report images */
+    .report-img{
+      width:100%;
+      height:180px;
+      object-fit:cover;
+      border-radius:12px;
+      display:block;
+      border:1px solid rgba(0,0,0,.08);
+      background: rgba(0,0,0,.04);
+    }
   </style>
 </head>
 
 <body>
-  <!-- TOPBAR (selaras produk.html) -->
   <header class="topbar">
     <div class="topbar-inner">
       <div class="pbrand">
@@ -232,7 +236,6 @@
   </header>
 
   <div class="container">
-    <!-- Tombol kembali (selaras produk.html) -->
     <div class="back-row">
       <a class="pbtn" href="dashboard.html">← Kembali</a>
     </div>
@@ -241,7 +244,6 @@
       <h1 style="margin-bottom:6px;">Monitoring Pertumbuhan</h1>
       <div class="small">Catat dan visualisasi BB/TB secara rutin.</div>
 
-      <!-- Tools row: card (select + tambah anak) di kiri, unduh pdf di kanan -->
       <div class="header-tools">
         <div class="card child-card">
           <div class="field">
@@ -434,6 +436,7 @@
     <div class="card">
       <h2 style="margin:0 0 6px;">Laporan Monitoring</h2>
       <div class="small" id="reportMeta"></div>
+      <div class="small" id="reportIdentity" style="margin-top:6px;"></div>
       <div class="hr"></div>
 
       <div id="reportRiwayat"></div>
@@ -445,7 +448,7 @@
 
       <div style="height:14px"></div>
       <div class="small" style="margin-bottom:8px;">Galeri</div>
-      <div id="reportGaleri" class="grid grid-3" style="gap:10px;"></div>
+      <div id="reportGaleri" class="grid grid-3"></div>
     </div>
   </div>
 
@@ -461,11 +464,22 @@
   <script src="js/app.js"></script>
 
   <script>
-    // ===== Auth + year =====
+    // ===========================
+    // CONFIG
+    // ===========================
+    // Mode produksi (disarankan): PDF pakai image proxy dari backend HF
+    // Endpoint yang dibutuhkan: GET /api/galeri/{id}/image  (auth)
+    const USE_PROXY_IMAGE_FOR_PDF = true;
+
+    // ===========================
+    // Auth + year
+    // ===========================
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // ===== Helpers: api base + token =====
+    // ===========================
+    // Helpers: api base + token
+    // ===========================
     function getApiBase(){
       const meta = document.querySelector('meta[name="api-base"]');
       const base = meta?.getAttribute("content") || "";
@@ -486,7 +500,6 @@
         headers: {
           "Authorization": `Bearer ${token}`,
           "Accept": "application/json",
-          // JANGAN set Content-Type untuk multipart (biar browser set boundary)
         },
         body: formData
       });
@@ -504,7 +517,9 @@
       return payload;
     }
 
-    // ===== Fallback toISODate (kalau ui.js gagal) =====
+    // ===========================
+    // Fallback toISODate
+    // ===========================
     if(typeof window.toISODate !== "function"){
       window.toISODate = function(d){
         const yyyy = d.getFullYear();
@@ -514,7 +529,9 @@
       }
     }
 
-    // ===== Fallback setupTabs (kalau ui.js gagal / tidak toggle panel) =====
+    // ===========================
+    // Tabs fallback
+    // ===========================
     function setupTabsSafe(rootId){
       if(typeof window.setupTabs === "function"){
         window.setupTabs(rootId);
@@ -544,14 +561,15 @@
     }
     setupTabsSafe("tabsRoot");
 
-    // ===== Elements =====
+    // ===========================
+    // Elements
+    // ===========================
     const anakSelect = document.getElementById("anakSelect");
     const riwayatBody = document.getElementById("riwayatBody");
     const dbBody = document.getElementById("dbBody");
     const msg = document.getElementById("msg");
     const chartHint = document.getElementById("chartHint");
 
-    // Galeri elements
     const galeriGrid = document.getElementById("galeriGrid");
     const galeriFile = document.getElementById("galeriFile");
     const galeriCaption = document.getElementById("galeriCaption");
@@ -574,7 +592,37 @@
         : "";
     }
 
-    // ===== Input toggle =====
+    // ===========================
+    // Helpers: escape + age
+    // ===========================
+    function escHtml(s){
+      return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
+
+    function calcAgeYMD(birthDateStr){
+      // "YYYY-MM-DD"
+      const b = new Date(birthDateStr + "T00:00:00");
+      const now = new Date();
+
+      let y = now.getFullYear() - b.getFullYear();
+      let m = now.getMonth() - b.getMonth();
+      let d = now.getDate() - b.getDate();
+
+      if(d < 0){
+        const prevMonthDays = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+        d += prevMonthDays;
+        m -= 1;
+      }
+      if(m < 0){
+        m += 12;
+        y -= 1;
+      }
+      return { y, m, d };
+    }
+
+    // ===========================
+    // Input toggle
+    // ===========================
     const btnToggleInput = document.getElementById("btnToggleInput");
     const formMonitoring = document.getElementById("formMonitoring");
     const inputHint = document.getElementById("inputHint");
@@ -596,7 +644,9 @@
     });
     btnBatalInput.addEventListener("click", closeInput);
 
-    // ===== Render DB table =====
+    // ===========================
+    // Render DB table
+    // ===========================
     function renderDbTable(list){
       if(!list.length){
         dbBody.innerHTML = `<tr><td colspan="8" class="small">Belum ada data monitoring untuk anak ini.</td></tr>`;
@@ -609,25 +659,22 @@
           <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
           <td>${x.berat_badan ?? "-"}</td>
           <td>${x.tinggi_badan ?? "-"}</td>
-          <td>${(x.catatan ?? "").toString().slice(0,40) || "-"}</td>
+          <td>${escHtml((x.catatan ?? "").toString().slice(0,40) || "-")}</td>
           <td>${x.created_at ? String(x.created_at).replace("T"," ").slice(0,19) : "-"}</td>
           <td>${x.updated_at ? String(x.updated_at).replace("T"," ").slice(0,19) : "-"}</td>
         </tr>
       `).join("");
     }
 
-    // ===== Galeri: load + render =====
-    function escHtml(s){
-      return String(s ?? "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-    }
-
+    // ===========================
+    // Galeri: render + load + upload
+    // ===========================
     function renderGaleriGrid(items){
       if(!items || !items.length){
         galeriGrid.innerHTML = `<div class="card">📷 Belum ada foto<br><span class="small">Upload foto pertama untuk anak ini.</span></div>`;
         return;
       }
 
-      // ✅ Integrasi thumbnail Google Drive (sesuai instruksi)
       galeriGrid.innerHTML = items.map(it => {
         const fid = it.drive_file_id || "";
         const thumbUrl = fid
@@ -635,10 +682,8 @@
           : (it.public_url || "");
 
         const openUrl = it.public_url || "#";
-
         const titleRaw = it.caption ? it.caption : (it.original_name || "Foto");
         const title = escHtml(titleRaw);
-
         const dt = it.created_at ? String(it.created_at).replace("T"," ").slice(0,16) : "";
         const original = it.original_name ? escHtml(String(it.original_name).slice(0,40)) : "";
 
@@ -680,30 +725,14 @@
       const f = galeriFile.files?.[0];
       const cap = (galeriCaption.value || "").trim();
 
-      if(!anakId){
-        setGaleriMsg("Pilih anak dulu.", "err");
-        return;
-      }
-      if(!f){
-        setGaleriMsg("Pilih file foto dulu.", "err");
-        return;
-      }
+      if(!anakId){ setGaleriMsg("Pilih anak dulu.", "err"); return; }
+      if(!f){ setGaleriMsg("Pilih file foto dulu.", "err"); return; }
 
-      // Validasi client-side biar errornya cepat
       const allowed = ["image/jpeg","image/png","image/webp"];
-      if(!allowed.includes(f.type)){
-        setGaleriMsg("Format harus JPG/PNG/WEBP.", "err");
-        return;
-      }
+      if(!allowed.includes(f.type)){ setGaleriMsg("Format harus JPG/PNG/WEBP.", "err"); return; }
       const max = 5 * 1024 * 1024;
-      if(f.size > max){
-        setGaleriMsg("Ukuran file maksimal 5MB.", "err");
-        return;
-      }
-      if(cap.length > 200){
-        setGaleriMsg("Caption maksimal 200 karakter.", "err");
-        return;
-      }
+      if(f.size > max){ setGaleriMsg("Ukuran file maksimal 5MB.", "err"); return; }
+      if(cap.length > 200){ setGaleriMsg("Caption maksimal 200 karakter.", "err"); return; }
 
       const fd = new FormData();
       fd.append("file", f);
@@ -713,17 +742,14 @@
       setGaleriMsg("Mengupload...", "ok");
 
       try{
-        // pakai multipart khusus (tidak lewat api() JSON)
-        const out = await apiMultipart(`/anak/${anakId}/galeri`, fd);
+        await apiMultipart(`/anak/${anakId}/galeri`, fd);
 
-        // Reset input
         galeriFile.value = "";
         galeriCaption.value = "";
 
         setGaleriMsg("Upload sukses. Memuat ulang galeri...", "ok");
         await loadGaleriByAnak(anakId);
         setGaleriMsg("Upload sukses.", "ok");
-
       }catch(err){
         console.error(err);
         const errors = err?.payload?.errors;
@@ -741,7 +767,9 @@
       await uploadGaleriForAnak(anakId);
     });
 
-    // ===== Render riwayat + grafik =====
+    // ===========================
+    // Render riwayat + grafik
+    // ===========================
     async function renderRiwayatAndCharts(anakId){
       riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Memuat...</td></tr>`;
       dbBody.innerHTML = `<tr><td colspan="8" class="small">Memuat...</td></tr>`;
@@ -765,7 +793,7 @@
           <td>${String(x.tanggal_ukur ?? "").slice(0,10) || "-"}</td>
           <td>${x.berat_badan ?? "-"}</td>
           <td>${x.tinggi_badan ?? "-"}</td>
-          <td>${(x.catatan ?? "").toString().slice(0,60) || "-"}</td>
+          <td>${escHtml((x.catatan ?? "").toString().slice(0,60) || "-")}</td>
         </tr>
       `).join("");
 
@@ -798,7 +826,9 @@
       chartHint.textContent = "Grafik otomatis mengikuti data input (entry pertama sampai terakhir).";
     }
 
-    // ===== Init anak dropdown =====
+    // ===========================
+    // Init anak dropdown
+    // ===========================
     (async () => {
       await loadAnakList("anakSelect");
 
@@ -819,7 +849,9 @@
       }
     })();
 
-    // ===== Submit monitoring =====
+    // ===========================
+    // Submit monitoring
+    // ===========================
     document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.innerHTML = "";
@@ -857,7 +889,9 @@
       }
     });
 
-    // ===== Modal tambah anak + loading =====
+    // ===========================
+    // Modal tambah anak + loading
+    // ===========================
     const modal = document.getElementById("modalAnak");
     const anakNama = document.getElementById("anakNama");
     const anakTglLahir = document.getElementById("anakTglLahir");
@@ -940,165 +974,61 @@
       }
     });
 
-    // ===== Helpers untuk PDF meta + galeri =====
-    function pick(obj, paths, fallback = null){
-      for(const p of paths){
-        const parts = p.split(".");
-        let cur = obj;
-        let ok = true;
-        for(const part of parts){
-          if(cur && Object.prototype.hasOwnProperty.call(cur, part)) cur = cur[part];
-          else { ok = false; break; }
-        }
-        if(ok && cur !== undefined && cur !== null && String(cur).trim() !== "") return cur;
-      }
-      return fallback;
+    // ===========================
+    // PDF Export (include galeri + identitas)
+    // ===========================
+    async function loadImage(url){
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
     }
 
-    function calcAgeText(birthISO){
-      if(!birthISO) return "-";
-      const b = new Date(String(birthISO).slice(0,10));
-      if(Number.isNaN(b.getTime())) return "-";
-
-      const now = new Date();
-      let years = now.getFullYear() - b.getFullYear();
-      let months = now.getMonth() - b.getMonth();
-      let days = now.getDate() - b.getDate();
-
-      if(days < 0){
-        months -= 1;
-        // hari di bulan sebelumnya
-        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-        days = prevMonth + days;
-      }
-      if(months < 0){
-        years -= 1;
-        months += 12;
-      }
-      years = Math.max(0, years);
-      months = Math.max(0, months);
-
-      // format ringkas, cukup tahun + bulan
-      if(years === 0) return `${months} bulan`;
-      if(months === 0) return `${years} tahun`;
-      return `${years} tahun ${months} bulan`;
-    }
-
-    async function getUserNameForPdf(){
-      // route kamu ada /api/me dan /api/user (keduanya auth)
-      try{
-        const me = await api("/me", { method:"GET", auth:true });
-        const name1 = pick(me, ["data.name","name","data.user.name","user.name"], null);
-        if(name1) return name1;
-      }catch(e){}
-
-      try{
-        const u = await api("/user", { method:"GET", auth:true });
-        const name2 = pick(u, ["data.name","name","data.user.name","user.name"], null);
-        if(name2) return name2;
-      }catch(e){}
-
-      return "—";
-    }
-
-    async function getAnakDetailForPdf(anakId){
-      // route ada: GET api/anak/{anak}
-      const res = await api(`/anak/${anakId}`, { method:"GET", auth:true });
-      const anak = res?.data || res || {};
-
-      // normalisasi field umum
-      const nama = pick(anak, ["nama_anak","name","nama"], "—");
-      const jk   = pick(anak, ["jenis_kelamin","jk","gender"], "—");
-      const tgl  = pick(anak, ["tanggal_lahir","tgl_lahir","birth_date"], null);
-
-      return { nama, jk, tanggal_lahir: tgl };
-    }
-
-    function renderReportGaleri(items){
-      const wrap = document.getElementById("reportGaleri");
-
-      if(!items || !items.length){
-        wrap.innerHTML = `
-          <div class="card" style="padding:10px;">
-            <b>Galeri</b><br>
-            <span class="small">Tidak ada foto.</span>
-          </div>
-        `;
-        return;
-      }
-
-      wrap.innerHTML = items.slice(0, 9).map(it => {
-        const fid = it.drive_file_id || "";
-        const thumb = fid
-          ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fid)}&sz=w800`
-          : (it.public_url || "");
-
-        const cap = (it.caption || it.original_name || "Foto").toString();
-        const safeCap = cap.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-
-        // penting untuk html2canvas: coba minta CORS anon
-        return `
-          <div class="card" style="padding:8px;">
-            <img
-              src="${thumb}"
-              alt="${safeCap}"
-              crossorigin="anonymous"
-              style="width:100%; height:160px; object-fit:cover; border-radius:12px; border:1px solid rgba(0,0,0,.10); background:rgba(0,0,0,.04); display:block;"
-              loading="lazy"
-            />
-            <div class="small" style="margin-top:6px; font-weight:700; font-size:11px; line-height:1.2;">
-              ${safeCap}
-            </div>
-          </div>
-        `;
-      }).join("");
-    }
-
-    // ===== PDF Export (dengan meta + galeri) =====
     async function exportPdfForSelectedAnak(){
       const anakId = anakSelect.value;
       if(!anakId){ showMsg("Pilih anak dulu sebelum unduh PDF.", "err"); return; }
 
-      // ambil data anak + user
-      let ibuName = "—";
-      let anakDetail = { nama:"—", jk:"—", tanggal_lahir:null };
-
-      try{
-        ibuName = await getUserNameForPdf();
-      }catch(e){ ibuName = "—"; }
-
-      try{
-        anakDetail = await getAnakDetailForPdf(anakId);
-      }catch(e){
-        // fallback minimal dari dropdown
-        anakDetail.nama = anakSelect.options[anakSelect.selectedIndex]?.textContent || "anak";
-      }
-
-      const umurText = calcAgeText(anakDetail.tanggal_lahir);
-
-      // ambil monitoring
+      const anakName = anakSelect.options[anakSelect.selectedIndex]?.textContent || "anak";
       const list = await loadMonitoringByAnak(anakId);
-      if(!list.length){
-        showMsg("Belum ada data monitoring untuk dibuat PDF.", "err");
-        return;
-      }
+      if(!list.length){ showMsg("Belum ada data monitoring untuk dibuat PDF.", "err"); return; }
+
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // ambil galeri (untuk ditampilkan di PDF)
-      let galeriItems = [];
+      // ---- ambil user + detail anak (untuk identitas)
+      let me = null;
+      let anakDetail = null;
+
+      try{ me = await api("/me", { method:"GET", auth:true }); } catch(e){}
       try{
-        const g = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
-        galeriItems = g?.data || [];
-      }catch(e){
-        galeriItems = [];
+        const a = await api(`/anak/${anakId}`, { method:"GET", auth:true });
+        anakDetail = a?.data || null;
+      }catch(e){}
+
+      const namaIbu = (me?.name || me?.username || me?.email || "-");
+      const namaAnak = (anakDetail?.nama_anak || anakName || "-");
+      const jkAnak = (anakDetail?.jenis_kelamin || "-");
+      const tglLahir = (anakDetail?.tanggal_lahir || null);
+
+      let umurText = "-";
+      if(tglLahir){
+        const { y, m, d } = calcAgeYMD(tglLahir);
+        umurText = `${y} tahun ${m} bulan ${d} hari`;
       }
 
-      // isi meta laporan
-      const exportedAt = toISODate(new Date());
+      // ---- header meta + identitas
       document.getElementById("reportMeta").textContent =
-        `Ibu/User: ${ibuName} • Anak: ${anakDetail.nama} • JK: ${anakDetail.jk} • Umur: ${umurText} • Diekspor: ${exportedAt} • Total data: ${list.length}`;
+        `${namaAnak} • diekspor: ${toISODate(new Date())} • total data: ${list.length}`;
 
-      // tabel riwayat
+      document.getElementById("reportIdentity").innerHTML =
+        `Nama Ibu/User: <b>${escHtml(namaIbu)}</b> &nbsp;|&nbsp; ` +
+        `Nama Anak: <b>${escHtml(namaAnak)}</b> &nbsp;|&nbsp; ` +
+        `JK: <b>${escHtml(jkAnak)}</b> &nbsp;|&nbsp; ` +
+        `Umur: <b>${escHtml(umurText)}</b>`;
+
+      // ---- riwayat table
       document.getElementById("reportRiwayat").innerHTML = `
         <table class="table">
           <thead><tr><th>Tanggal</th><th>BB</th><th>TB</th><th>Catatan</th></tr></thead>
@@ -1108,17 +1038,69 @@
                 <td>${String(x.tanggal_ukur ?? "").slice(0,10)}</td>
                 <td>${x.berat_badan ?? "-"}</td>
                 <td>${x.tinggi_badan ?? "-"}</td>
-                <td>${(x.catatan ?? "").toString().slice(0,80) || "-"}</td>
+                <td>${escHtml((x.catatan ?? "").toString().slice(0,80) || "-")}</td>
               </tr>
             `).join("")}
           </tbody>
         </table>
       `;
 
-      // render galeri di report
-      renderReportGaleri(galeriItems);
+      // ---- galeri list (max 6)
+      let galeriList = [];
+      try{
+        const g = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
+        galeriList = g?.data || [];
+      }catch(e){
+        galeriList = [];
+      }
+      galeriList = galeriList.slice(0, 6);
 
-      // chart
+      const base = getApiBase();
+
+      if(!galeriList.length){
+        document.getElementById("reportGaleri").innerHTML =
+          `<div class="card">📷 Tidak ada foto galeri</div>`;
+      } else {
+        // render dulu skeleton html (biar layout fixed)
+        document.getElementById("reportGaleri").innerHTML = galeriList.map(it => {
+          const title = escHtml((it.caption || it.original_name || "Foto").toString());
+          const dt = it.created_at ? String(it.created_at).replace("T"," ").slice(0,16) : "";
+
+          // URL gambar untuk PDF:
+          // - produksi: proxy backend (stabil untuk canvas)
+          // - fallback: thumbnail drive (sering blank di canvas)
+          let imgUrl = "";
+          if(USE_PROXY_IMAGE_FOR_PDF){
+            imgUrl = `${base}/galeri/${it.id}/image`;
+          } else {
+            const fid = it.drive_file_id || "";
+            imgUrl = fid ? `https://drive.google.com/thumbnail?id=${encodeURIComponent(fid)}&sz=w1200` : (it.public_url || "");
+          }
+
+          return `
+            <div class="card" style="padding:10px;">
+              <img class="report-img" src="${imgUrl}" crossorigin="anonymous" />
+              <div style="margin-top:8px;">
+                <div style="font-weight:800;font-size:12px;line-height:1.2;">${title}</div>
+                <div class="small small-muted">${escHtml(dt)}</div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        // paksa tunggu gambar benar-benar ter-load sebelum html2canvas
+        // (kalau tidak, PDF bisa keburu “screenshot” sebelum gambar masuk)
+        const imgEls = Array.from(document.querySelectorAll("#reportGaleri img"));
+        await Promise.all(imgEls.map(img => {
+          if(img.complete && img.naturalWidth > 0) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = () => resolve();
+            img.onerror = () => resolve(); // jangan block total; jika gagal, tetap jalan
+          });
+        }));
+      }
+
+      // ---- chart data
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
       const weights = list.map(x => Number(x.berat_badan ?? 0));
       const heights = list.map(x => Number(x.tinggi_badan ?? 0));
@@ -1138,54 +1120,16 @@
         options:{ responsive:false, plugins:{ legend:{display:false} } }
       });
 
-      // tunggu chart + gambar siap
-      await new Promise(r => setTimeout(r, 800));
+      // beri waktu chart render + layout settle
+      await new Promise(r => setTimeout(r, 500));
 
-      // bikin canvas (catatan: galeri bisa gagal karena CORS)
-      let canvas;
-      try{
-        canvas = await html2canvas(document.getElementById("reportArea"), {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: "#ffffff"
-        });
-      }catch(err){
-        console.error(err);
-
-        // fallback: kalau gagal karena gambar, coba kosongkan galeri jadi link saja, lalu render ulang
-        const wrap = document.getElementById("reportGaleri");
-        wrap.innerHTML = (galeriItems && galeriItems.length)
-          ? `
-              <div class="card" style="padding:10px;">
-                <b>Galeri</b><br>
-                <span class="small">Gambar tidak bisa di-embed (CORS). Berikut link:</span>
-                <ol class="small" style="margin:8px 0 0 18px;">
-                  ${galeriItems.slice(0,10).map(it => {
-                    const u = it.public_url || "";
-                    const t = (it.caption || it.original_name || "Foto").toString()
-                      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
-                    return `<li>${t}: ${u}</li>`;
-                  }).join("")}
-                </ol>
-              </div>
-            `
-          : `
-              <div class="card" style="padding:10px;">
-                <b>Galeri</b><br>
-                <span class="small">Tidak ada foto.</span>
-              </div>
-            `;
-
-        await new Promise(r => setTimeout(r, 300));
-        canvas = await html2canvas(document.getElementById("reportArea"), {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: "#ffffff"
-        });
-      }
-
+      // ---- html2canvas -> jsPDF
+      const canvas = await html2canvas(document.getElementById("reportArea"), {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: "#ffffff"
+      });
       const imgData = canvas.toDataURL("image/png");
 
       const { jsPDF } = window.jspdf;
@@ -1209,7 +1153,7 @@
         heightLeft -= pageHeight;
       }
 
-      const safeName = String(anakDetail.nama || "anak").replace(/[^\w\-]+/g, "-").toLowerCase();
+      const safeName = String(namaAnak || anakName).replace(/[^\w\-]+/g, "-").toLowerCase();
       pdf.save(`laporan-monitoring-${safeName}.pdf`);
     }
 
