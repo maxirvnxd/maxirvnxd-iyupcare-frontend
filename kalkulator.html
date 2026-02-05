@@ -7,166 +7,1367 @@
   <!-- API BASE (HF) -->
   <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
 
-  <title>Kalkulator</title>
+  <title>Kalkulator Gizi — iYup Care</title>
   <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    :root{
+      --bg:#f6f9ff;
+      --card:#ffffff;
+      --ink:#0b1b3a;
+      --muted:#5b6b80;
+      --line: rgba(15,23,42,.10);
+      --shadow2: 0 12px 30px rgba(15,23,42,.08);
+      --primary:#1e63d6;
+      --green:#1f9d55;
+      --orange:#f2994a;
+      --red:#e5484d;
+      --radius:18px;
+      --max:1100px;
+    }
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.16), transparent 60%),
+        radial-gradient(800px 520px at 90% 0%, rgba(31,157,85,.12), transparent 58%),
+        radial-gradient(800px 520px at 90% 90%, rgba(242,153,74,.10), transparent 55%),
+        var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue";
+    }
+    a{ color:inherit; text-decoration:none; }
+    .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
+
+    /* Topbar */
+    .topbar{
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(255,255,255,.72);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .topbar-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 220px;
+    }
+    .brand img{
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      object-fit: cover;
+      background:#fff;
+      border: 1px solid rgba(15,23,42,.10);
+      box-shadow: 0 10px 20px rgba(15,23,42,.12);
+      display:block;
+    }
+    .brand .b1{ font-weight: 950; letter-spacing:.2px; }
+    .brand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
+
+    .actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.80);
+      font-weight: 950;
+      font-size: 13px;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+      white-space: nowrap;
+      cursor:pointer;
+    }
+    .btn:hover{
+      border-color: rgba(30,99,214,.25);
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+    }
+    .btn.primary{
+      background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
+      border-color: rgba(30,99,214,.0);
+      color:#fff;
+    }
+    .btn.primary:hover{ filter: brightness(.98); }
+    .btn.secondary{
+      background: rgba(255,255,255,.72);
+    }
+    .btn:disabled{ opacity:.7; cursor:not-allowed; transform:none; box-shadow:none; }
+
+    /* Hero */
+    .hero{
+      margin-top: 16px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: calc(var(--radius) + 8px);
+      background: rgba(255,255,255,.78);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .hero-inner{
+      padding: 18px;
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      align-items:center;
+    }
+    .back-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 10px;
+      flex-wrap:wrap;
+    }
+    .hero h1{
+      margin:0;
+      font-size: clamp(22px, 3.2vw, 34px);
+      letter-spacing: -.3px;
+      line-height: 1.08;
+    }
+    .hero p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+      max-width: 70ch;
+    }
+    .chips{ margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size: 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.72);
+    }
+    .chip.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
+    .chip.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
+
+    .hero-media{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      padding: 12px;
+      box-shadow: var(--shadow2);
+    }
+    .hero-media .mini{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 14px;
+      padding: 12px;
+      background:#fff;
+    }
+    .hero-media .mini .k{ font-size:12px; color:var(--muted); }
+    .hero-media .mini .v{ font-size:18px; font-weight:950; margin-top:4px; }
+
+    /* Main cards */
+    .section{
+      margin-top: 16px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .card{
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(8px);
+      border-radius: calc(var(--radius) + 6px);
+      box-shadow: var(--shadow2);
+      overflow:hidden;
+    }
+    .card-inner{ padding: 16px; }
+
+    .title{
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: -.1px;
+    }
+    .desc{
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+    }
+
+    /* Form */
+    label{ display:block; font-weight:800; font-size:12px; margin-bottom:6px; }
+    input, select{
+      width:100%;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(15,23,42,.14);
+      background:#fff;
+      outline:none;
+    }
+    input:focus, select:focus{
+      border-color: rgba(30,99,214,.35);
+      box-shadow: 0 0 0 4px rgba(30,99,214,.10);
+    }
+    .form-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .small{ font-size:12px; color:var(--muted); }
+    .small-muted{ font-size:12px; color:var(--muted); opacity:.9; }
+
+    /* Alerts compatible dengan api.js */
+    .alert{
+      border-radius: 14px;
+      padding: 10px 12px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.85);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .alert.ok{ border-color: rgba(31,157,85,.28); background: rgba(31,157,85,.10); }
+    .alert.err{ border-color: rgba(229,72,77,.28); background: rgba(229,72,77,.10); }
+
+    /* Summary boxes */
+    .meta{
+      margin-top: 12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .box{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 14px;
+      background: rgba(255,255,255,.78);
+      padding: 12px;
+    }
+    .box .k{ font-size:11px; color:var(--muted); }
+    .box .v{ font-size:18px; font-weight:950; margin-top:2px; }
+
+    /* History table */
+    .tablewrap{ margin-top: 12px; overflow:auto; }
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      overflow:hidden;
+      background:#fff;
+      min-width: 720px;
+    }
+    thead th{
+      background: rgba(30,99,214,.08);
+      color: var(--ink);
+      font-size:11px;
+      font-weight:900;
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(15,23,42,.10);
+      white-space:nowrap;
+    }
+    tbody td{
+      font-size:11px;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(15,23,42,.08);
+      vertical-align:top;
+      color: rgba(11,27,58,.92);
+    }
+    tbody tr:last-child td{ border-bottom:none; }
+    tbody tr:hover td{ background: rgba(246,249,255,.85); cursor:pointer; }
+
+    /* Spinner */
+    .spinner{
+      width:16px;height:16px;border:2px solid rgba(255,255,255,.55);
+      border-top-color:#fff;border-radius:50%;display:inline-block;
+      animation:spin .75s linear infinite;
+    }
+    .spinner.dark{
+      border-color: rgba(15,23,42,.20);
+      border-top-color: rgba(15,23,42,.75);
+    }
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    /* PDF sheet */
+    .pdf-sheet{
+      position:absolute;
+      left:-99999px;
+      top:0;
+      width:794px;
+      height:1123px;
+      padding:26px;
+      box-sizing:border-box;
+      background:#ffffff;
+    }
+    .pdf-card{
+      height:100%;
+      border-radius:18px;
+      border:1px solid rgba(15,23,42,.10);
+      box-shadow:0 10px 30px rgba(15,23,42,.08);
+      padding:18px;
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .pdf-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .pdf-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+    .pdf-logo{
+      width:44px;height:44px;border-radius:14px;object-fit:cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      display:block;
+    }
+    .pdf-title{
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:.2px;
+      line-height:1.1;
+      margin:0;
+    }
+    .pdf-sub{
+      font-size:12px;
+      color: var(--muted);
+      margin-top:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:520px;
+    }
+    .pdf-meta-right{
+      text-align:right;
+      font-size:11px;
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .pdf-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:2px;
+    }
+    .pdf-chip{
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(246,249,255,.75);
+      padding:7px 10px;
+      border-radius:14px;
+      font-size:11px;
+      line-height:1.2;
+    }
+    .pdf-chip span{ display:block; color: var(--muted); font-size:10px; }
+    .pdf-chip b{ display:block; font-weight:900; color: var(--ink); margin-top:2px; }
+
+    .pdf-summary{
+      display:grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap:10px;
+    }
+    .psum{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px;
+      padding:10px 12px;
+      background:#fff;
+    }
+    .psum .k{ font-size:10px; color: var(--muted); }
+    .psum .v{ font-size:16px; font-weight:950; margin-top:2px; }
+    .psum .s{ font-size:10px; color: var(--muted); margin-top:2px; }
+
+    .rtable{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .rtable thead th{
+      background: rgba(30,99,214,.08);
+      color: var(--ink);
+      font-size:11px;
+      font-weight:900;
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(15,23,42,.10);
+    }
+    .rtable tbody td{
+      font-size:11px;
+      padding:10px 10px;
+      vertical-align:top;
+      border-bottom:1px solid rgba(15,23,42,.08);
+    }
+    .rtable tbody tr:last-child td{ border-bottom:none; }
+
+    .pdf-footer{
+      margin-top:auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      font-size:10px;
+      color: var(--muted);
+      padding-top:8px;
+      border-top:1px solid rgba(15,23,42,.08);
+    }
+
+    /* Mobile */
+    @media (max-width: 980px){
+      .hero-inner{ grid-template-columns: 1fr; }
+      .section{ grid-template-columns: 1fr; }
+      .meta{ grid-template-columns: 1fr; }
+      .topbar-inner{ gap: 10px; }
+      .brand{ min-width: 0; }
+      table{ min-width: 640px; }
+    }
+  </style>
 </head>
+
 <body>
-  <div class="nav">
-    <div class="brand">Gizi Anak</div>
-    <div class="links">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="#" id="logoutLink">Logout</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup" />
+        <div>
+          <div class="b1">iYup Care</div>
+          <div class="b2">Kalkulator Gizi</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <a class="btn primary" href="dashboard.html">Dashboard</a>
+      </div>
     </div>
-  </div>
+  </header>
 
-  <div class="container grid">
-    <div class="card">
-      <h1>Kalkulator Gizi</h1>
-      <p class="small">Ini contoh panggil endpoint <b>/api/kalkulator</b> (protected).</p>
-      <div id="msg"></div>
-
-      <!-- FORM: semua input + tombol hitung dibungkus di sini -->
-      <form id="formKalkulator">
-        <div class="grid grid-2">
-          <div>
-            <label>Nama Anak</label>
-            <input id="nama" type="text" placeholder="Anak Contoh" />
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-inner">
+        <div>
+          <div class="back-row">
+            <a class="btn" href="dashboard.html">← Kembali</a>
           </div>
 
-          <div>
-            <label>Tanggal</label>
-            <input id="tanggal" type="date" />
-          </div>
+          <h1>Kalkulator Gizi (Manual) berbasis data anak</h1>
+          <p>
+            Pilih anak dari data yang sudah kamu input di halaman Monitoring, lalu isi BB/TB dan aktivitas.
+            Sistem akan memanggil endpoint <b>/api/kalkulator</b> (protected), menyimpan hasil, dan menampilkan riwayat per anak.
+          </p>
 
-          <div>
-            <label>Berat Badan (kg)</label>
-            <input id="berat_badan" type="number" step="0.1" min="1" placeholder="12.5" />
-          </div>
-
-          <div>
-            <label>Tinggi Badan (cm)</label>
-            <input id="tinggi_badan" type="number" step="0.1" min="30" placeholder="89" />
-          </div>
-
-          <div>
-            <label>Usia (bulan)</label>
-            <input id="usia_bulan" type="number" step="1" min="0" placeholder="24" />
-          </div>
-
-          <div>
-            <label>Jenis Kelamin</label>
-            <select id="jenis_kelamin">
-              <option value="">- pilih -</option>
-              <option value="L">L</option>
-              <option value="P">P</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Aktivitas</label>
-            <select id="aktivitas">
-              <option value="">- pilih -</option>
-              <option value="Ringan">Ringan</option>
-              <option value="Sedang">Sedang</option>
-              <option value="Berat">Berat</option>
-            </select>
+          <div class="chips">
+            <div class="chip green">Auto isi JK & usia (jika tersedia)</div>
+            <div class="chip orange">Unduh PDF hasil + riwayat</div>
           </div>
         </div>
 
-        <div style="margin-top:12px" class="row">
-          <button type="submit">Hitung</button>
-          <button class="secondary" type="button" onclick="location.href='dashboard.html'">Kembali</button>
+        <div class="hero-media">
+          <div class="mini">
+            <div class="k">Status</div>
+            <div class="v" id="miniStatus">—</div>
+            <div class="small" id="miniSub" style="margin-top:6px;">Pilih anak untuk mulai.</div>
+          </div>
         </div>
-      </form>
-    </div>
+      </div>
+    </section>
 
-    <div class="card">
-      <h3>Hasil</h3>
-      <!-- result -> hasil -->
-      <pre id="hasil" style="white-space:pre-wrap;margin:0"></pre>
+    <section class="section" aria-label="Kalkulator">
+      <!-- FORM -->
+      <article class="card">
+        <div class="card-inner">
+          <h2 class="title">Input Perhitungan</h2>
+          <div class="desc">Field wajib: BB, TB, Usia (bulan), JK (L/P), Aktivitas. Nama diambil dari anak yang dipilih.</div>
+
+          <div id="msg" style="margin-top:12px;"></div>
+
+          <form id="formKalkulator" style="margin-top:12px;">
+            <div class="form-grid">
+              <div>
+                <label>Pilih Anak</label>
+                <select id="anak_id">
+                  <option value="">Memuat...</option>
+                </select>
+                <div class="small-muted" id="anakHint" style="margin-top:6px;">—</div>
+              </div>
+
+              <div>
+                <label>Tanggal</label>
+                <input id="tanggal" type="date" />
+                <div class="small-muted" style="margin-top:6px;">Default: hari ini.</div>
+              </div>
+
+              <div>
+                <label>Berat Badan (kg)</label>
+                <input id="berat_badan" type="number" step="0.1" min="1" placeholder="12.5" />
+              </div>
+
+              <div>
+                <label>Tinggi Badan (cm)</label>
+                <input id="tinggi_badan" type="number" step="0.1" min="30" placeholder="89" />
+              </div>
+
+              <div>
+                <label>Usia (bulan)</label>
+                <input id="usia_bulan" type="number" step="1" min="0" placeholder="24" />
+                <div class="small-muted" style="margin-top:6px;">Otomatis terisi jika anak punya tanggal lahir.</div>
+              </div>
+
+              <div>
+                <label>Jenis Kelamin (L/P)</label>
+                <select id="jenis_kelamin">
+                  <option value="">- pilih -</option>
+                  <option value="L">L</option>
+                  <option value="P">P</option>
+                </select>
+                <div class="small-muted" style="margin-top:6px;">Otomatis terisi jika anak punya jenis kelamin.</div>
+              </div>
+
+              <div style="grid-column:1 / -1">
+                <label>Aktivitas</label>
+                <select id="aktivitas">
+                  <option value="">- pilih -</option>
+                  <option value="Ringan">Ringan</option>
+                  <option value="Sedang">Sedang</option>
+                  <option value="Berat">Berat</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <button class="btn primary" type="submit" id="btnHitung">
+                <span id="btnHitungText">Hitung</span>
+                <span id="btnHitungSpin" class="spinner" style="display:none;"></span>
+              </button>
+
+              <button class="btn secondary" type="button" id="btnReset">Reset</button>
+
+              <button class="btn" type="button" id="btnPdf">
+                <span id="btnPdfText">Unduh PDF</span>
+                <span id="btnPdfSpin" class="spinner dark" style="display:none;"></span>
+              </button>
+
+              <div class="small" id="saveHint">—</div>
+            </div>
+          </form>
+        </div>
+      </article>
+
+      <!-- HASIL + RIWAYAT -->
+      <article class="card">
+        <div class="card-inner">
+          <h2 class="title">Hasil & Riwayat</h2>
+          <div class="desc">Klik salah satu baris riwayat untuk melihat detail respons JSON.</div>
+
+          <div class="meta" aria-label="Ringkasan hasil">
+            <div class="box">
+              <div class="k">IMT (BMI)</div>
+              <div class="v" id="sumBmi">—</div>
+            </div>
+            <div class="box">
+              <div class="k">Z-score</div>
+              <div class="v" id="sumZ">—</div>
+            </div>
+            <div class="box">
+              <div class="k">Status</div>
+              <div class="v" id="sumStatus">—</div>
+            </div>
+            <div class="box">
+              <div class="k">Energi / Kalori</div>
+              <div class="v" id="sumEnergi">—</div>
+            </div>
+          </div>
+
+          <div class="tablewrap">
+            <table aria-label="Riwayat kalkulator" id="histTable">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Tanggal</th>
+                  <th>BB</th>
+                  <th>TB</th>
+                  <th>Usia</th>
+                  <th>JK</th>
+                  <th>Aktivitas</th>
+                  <th>IMT</th>
+                  <th>Z</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="histBody">
+                <tr><td colspan="10" class="small">Pilih anak untuk memuat riwayat.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="margin-top:12px;">
+            <div class="small" style="margin-bottom:6px;">Detail JSON (baris terpilih)</div>
+            <pre id="rawResp" style="white-space:pre-wrap;margin:0;border:1px solid rgba(15,23,42,.10);border-radius:14px;background:#fff;padding:12px;max-height:280px;overflow:auto;">—</pre>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <!-- PDF SHEET (A4 RATIO) -->
+  <div id="pdfPage" class="pdf-sheet" aria-hidden="true">
+    <div class="pdf-card">
+      <div class="pdf-header">
+        <div class="pdf-brand">
+          <img class="pdf-logo" id="pdfLogo" src="assets/logo-innoviyup.png" alt="Logo" />
+          <div style="min-width:0">
+            <h2 class="pdf-title">Laporan Kalkulator Gizi</h2>
+            <div class="pdf-sub" id="pdfMeta">—</div>
+          </div>
+        </div>
+        <div class="pdf-meta-right" id="pdfRight">—</div>
+      </div>
+
+      <div class="pdf-chips" id="pdfChips"></div>
+
+      <div class="pdf-summary" id="pdfSummary"></div>
+
+      <div style="font-size:12px;font-weight:900;margin:2px 0 -2px;">Riwayat Perhitungan</div>
+      <div id="pdfTableWrap"></div>
+
+      <div class="pdf-footer">
+        <div>iYup Care • InnoviYup</div>
+        <div id="pdfFooterRight">—</div>
+      </div>
     </div>
   </div>
 
-  <!-- IMPORTANT: api.js harus sebelum auth.js karena auth.js biasanya pakai api()/token helpers -->
+  <!-- libs untuk PDF -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <!-- app -->
   <script src="js/api.js"></script>
   <script src="js/auth.js"></script>
+
   <script>
+    // =========================
+    // Auth
+    // =========================
     requireAuthOrRedirect();
 
-    // set tanggal hari ini otomatis
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const dd = String(today.getDate()).padStart(2, "0");
-    document.getElementById("tanggal").value = `${yyyy}-${mm}-${dd}`;
-
+    // =========================
+    // DOM refs
+    // =========================
     const msg = document.getElementById("msg");
-    const hasil = document.getElementById("hasil");
+    const anakSelect = document.getElementById("anak_id");
+    const anakHint = document.getElementById("anakHint");
+    const tanggalEl = document.getElementById("tanggal");
+    const bbEl = document.getElementById("berat_badan");
+    const tbEl = document.getElementById("tinggi_badan");
+    const usiaEl = document.getElementById("usia_bulan");
+    const jkEl = document.getElementById("jenis_kelamin");
+    const aktEl = document.getElementById("aktivitas");
 
-    function readText(id) {
-      const el = document.getElementById(id);
-      return el ? el.value.trim() : "";
+    const btnHitung = document.getElementById("btnHitung");
+    const btnHitungText = document.getElementById("btnHitungText");
+    const btnHitungSpin = document.getElementById("btnHitungSpin");
+
+    const btnReset = document.getElementById("btnReset");
+    const btnPdf = document.getElementById("btnPdf");
+    const btnPdfText = document.getElementById("btnPdfText");
+    const btnPdfSpin = document.getElementById("btnPdfSpin");
+
+    const saveHint = document.getElementById("saveHint");
+
+    const histBody = document.getElementById("histBody");
+    const rawResp = document.getElementById("rawResp");
+
+    const miniStatus = document.getElementById("miniStatus");
+    const miniSub = document.getElementById("miniSub");
+
+    const sumBmi = document.getElementById("sumBmi");
+    const sumZ = document.getElementById("sumZ");
+    const sumStatus = document.getElementById("sumStatus");
+    const sumEnergi = document.getElementById("sumEnergi");
+
+    // PDF elements
+    const pdfPage = document.getElementById("pdfPage");
+    const pdfMeta = document.getElementById("pdfMeta");
+    const pdfRight = document.getElementById("pdfRight");
+    const pdfChips = document.getElementById("pdfChips");
+    const pdfSummary = document.getElementById("pdfSummary");
+    const pdfTableWrap = document.getElementById("pdfTableWrap");
+    const pdfFooterRight = document.getElementById("pdfFooterRight");
+
+    // =========================
+    // State
+    // =========================
+    let anakList = [];
+    let selectedAnak = null;
+    let history = []; // per anak terpilih
+    let selectedHistoryIndex = -1;
+
+    // =========================
+    // Helpers
+    // =========================
+    function esc(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
-    function readNumberRequired(id, label) {
-      const el = document.getElementById(id);
-      const raw = el ? el.value : "";
-      if (raw === "" || raw === null || raw === undefined) {
-        throw new Error(`${label} wajib diisi`);
+    function toISODate(d){
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function monthsBetween(d1, d2){
+      const y = d2.getFullYear() - d1.getFullYear();
+      const m = d2.getMonth() - d1.getMonth();
+      return y*12 + m + (d2.getDate() >= d1.getDate() ? 0 : -1);
+    }
+
+    function normalizeGenderToLP(v){
+      const s = String(v || "").trim();
+      if (!s) return "";
+      if (s === "L" || s === "P") return s;
+      const lower = s.toLowerCase();
+      if (["laki-laki","laki","lk","male","m"].includes(lower)) return "L";
+      if (["perempuan","pr","female","f","p"].includes(lower)) return "P";
+      return "";
+    }
+
+    function pick(obj, keys, fallback = null){
+      for(const k of keys){
+        const parts = k.split(".");
+        let cur = obj;
+        let ok = true;
+        for(const p of parts){
+          if(cur && Object.prototype.hasOwnProperty.call(cur, p)) cur = cur[p];
+          else { ok = false; break; }
+        }
+        if(ok && cur !== undefined && cur !== null && String(cur).trim() !== "") return cur;
       }
+      return fallback;
+    }
+
+    function fmt(v, decimals = 1){
+      if(v === null || v === undefined || v === "") return "—";
+      const n = Number(v);
+      if(Number.isNaN(n)) return String(v);
+      const p = Math.pow(10, decimals);
+      return String(Math.round(n * p) / p);
+    }
+
+    function nowTime(){
+      const d = new Date();
+      const hh = String(d.getHours()).padStart(2,"0");
+      const mm = String(d.getMinutes()).padStart(2,"0");
+      const ss = String(d.getSeconds()).padStart(2,"0");
+      return `${hh}:${mm}:${ss}`;
+    }
+
+    function storageKey(anakId){
+      return `KALK_HIST_${String(anakId)}`;
+    }
+
+    function setCalcLoading(isLoading){
+      btnHitung.disabled = isLoading;
+      btnHitungSpin.style.display = isLoading ? "inline-block" : "none";
+      btnHitungText.textContent = isLoading ? "Menghitung..." : "Hitung";
+    }
+
+    function setPdfLoading(isLoading){
+      btnPdf.disabled = isLoading;
+      btnPdfSpin.style.display = isLoading ? "inline-block" : "none";
+      btnPdfText.textContent = isLoading ? "Menyiapkan..." : "Unduh PDF";
+    }
+
+    function setMini(statusText, subText){
+      miniStatus.textContent = statusText || "—";
+      miniSub.textContent = subText || "—";
+    }
+
+    // =========================
+    // Form readers (strict)
+    // =========================
+    function readNumberRequired(el, label){
+      const raw = el.value;
+      if(raw === "" || raw === null || raw === undefined) throw new Error(`${label} wajib diisi`);
       const n = Number(raw);
-      if (!Number.isFinite(n)) {
-        throw new Error(`${label} harus angka`);
-      }
+      if(!Number.isFinite(n)) throw new Error(`${label} harus angka`);
       return n;
     }
-
-    function readSelectRequired(id, label) {
-      const el = document.getElementById(id);
-      const v = el ? el.value : "";
-      if (!v) throw new Error(`${label} wajib dipilih`);
+    function readSelectRequired(el, label){
+      const v = el.value;
+      if(!v) throw new Error(`${label} wajib dipilih`);
       return v;
     }
 
-    // Submit form (ganti dari btnHitung click)
-    document.getElementById("formKalkulator").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    // =========================
+    // Anak loader
+    // =========================
+    async function loadAnak(){
+      anakSelect.innerHTML = `<option value="">Memuat...</option>`;
+      const res = await api("/anak", { auth:true });
+      const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+      anakList = list;
 
-      msg.textContent = "";
-      hasil.textContent = "";
+      anakSelect.innerHTML =
+        `<option value="">- pilih anak -</option>` +
+        list.map(a => {
+          const label = a.nama_anak ?? a.nama ?? a.name ?? ("Anak #" + a.id);
+          return `<option value="${a.id}">${esc(label)}</option>`;
+        }).join("");
 
-      try {
+      return list;
+    }
+
+    function setSelectedAnakById(id){
+      selectedAnak = anakList.find(a => String(a.id) === String(id)) || null;
+
+      if(!selectedAnak){
+        anakHint.textContent = "—";
+        setMini("—", "Pilih anak untuk mulai.");
+        return;
+      }
+
+      const nama = selectedAnak.nama_anak ?? selectedAnak.nama ?? selectedAnak.name ?? "—";
+      const tglLahir = String(selectedAnak.tanggal_lahir ?? selectedAnak.tgl_lahir ?? selectedAnak.birth_date ?? "").slice(0,10);
+      const jkRaw = selectedAnak.jenis_kelamin ?? selectedAnak.jk ?? selectedAnak.gender ?? "";
+      const jkLP = normalizeGenderToLP(jkRaw);
+
+      // hint
+      const hintParts = [];
+      hintParts.push(`Nama: ${nama}`);
+      if(tglLahir) hintParts.push(`Lahir: ${tglLahir}`);
+      if(jkLP) hintParts.push(`JK: ${jkLP}`);
+      anakHint.textContent = hintParts.join(" • ");
+
+      // auto fill usia (bulan) jika punya tanggal lahir
+      if(tglLahir){
+        const b = new Date(tglLahir + "T00:00:00");
+        if(!Number.isNaN(b.getTime())){
+          const m = Math.max(0, monthsBetween(b, new Date()));
+          usiaEl.value = String(m);
+        }
+      }
+
+      // auto fill JK jika bisa dipetakan
+      if(jkLP) jkEl.value = jkLP;
+
+      setMini("Siap dihitung", `Anak terpilih: ${nama}`);
+    }
+
+    // =========================
+    // History: normalize entry
+    // =========================
+    function normalizeEntry(resp, payload){
+      const r = resp?.data ?? resp ?? {};
+
+      const bmi = pick(r, ["bmi","imt","hasil.bmi","hasil.imt"], null);
+      const z = pick(r, ["zscore","z_score","hasil.zscore","hasil.z_score","result.zscore"], null);
+      const status = pick(r, ["status","status_gizi","hasil.status","hasil.status_gizi","kategori"], null);
+      const energi = pick(r, ["energi","kalori","kebutuhan_energi","kebutuhan_kalori","hasil.energi","hasil.kalori"], null);
+
+      return {
+        created_time: nowTime(),
+        tanggal: payload?.tanggal || null,
+        berat_badan: payload?.berat_badan,
+        tinggi_badan: payload?.tinggi_badan,
+        usia_bulan: payload?.usia_bulan,
+        jenis_kelamin: payload?.jenis_kelamin,
+        aktivitas: payload?.aktivitas,
+        nama: payload?.nama,
+        bmi,
+        zscore: z,
+        status,
+        energi,
+        raw: resp
+      };
+    }
+
+    function saveHistoryToLocal(anakId, items){
+      try{
+        localStorage.setItem(storageKey(anakId), JSON.stringify(items));
+      }catch{}
+    }
+
+    function loadHistoryFromLocal(anakId){
+      try{
+        const s = localStorage.getItem(storageKey(anakId));
+        if(!s) return [];
+        const parsed = JSON.parse(s);
+        return Array.isArray(parsed) ? parsed : [];
+      }catch{
+        return [];
+      }
+    }
+
+    // Coba beberapa endpoint umum (kalau backend kamu punya salah satunya)
+    async function tryFetchHistoryFromBackend(anakId){
+      const candidates = [
+        `/anak/${anakId}/kalkulator`,
+        `/kalkulator?anak_id=${encodeURIComponent(anakId)}`,
+        `/kalkulator?child_id=${encodeURIComponent(anakId)}`,
+        `/kalkulator/history?anak_id=${encodeURIComponent(anakId)}`,
+        `/kalkulator`
+      ];
+
+      let lastErr = null;
+      for(const path of candidates){
+        try{
+          const res = await api(path, { auth:true });
+          const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
+          if(!list.length) {
+            // kalau GET /kalkulator return list semua user, filter bila ada anak_id
+            if(path === "/kalkulator"){
+              const filtered = list.filter(x => String(x.anak_id ?? x.child_id ?? "") === String(anakId));
+              return filtered;
+            }
+            return [];
+          }
+          // filter jika endpoint umum mengembalikan semua
+          const filtered = list.filter(x => {
+            const aid = x.anak_id ?? x.child_id ?? null;
+            if(aid == null) return true; // kalau tidak ada field anak_id, biarkan
+            return String(aid) === String(anakId);
+          });
+          return filtered;
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      // kalau tidak ada endpoint riwayat: kembalikan error supaya fallback ke local
+      throw lastErr || new Error("Riwayat backend tidak tersedia.");
+    }
+
+    // Convert backend rows -> entry style kita
+    function normalizeHistoryRows(rows){
+      // rows bisa punya field beda-beda; kita hanya ambil yang umum
+      return rows.map(x => {
+        const tanggal = String(x.tanggal ?? x.date ?? x.created_at ?? "").slice(0,10) || null;
+        const waktu = x.created_at ? String(x.created_at).replace("T"," ").slice(11,19) : "—";
+
         const payload = {
-          nama: readText("nama") || null,
-          tanggal: readText("tanggal") || null,
-
-          berat_badan: readNumberRequired("berat_badan", "Berat badan"),
-          tinggi_badan: readNumberRequired("tinggi_badan", "Tinggi badan"),
-
-          // kamu set WAJIB (sesuai kebutuhan WHO BMI/U)
-          usia_bulan: readNumberRequired("usia_bulan", "Usia (bulan)"),
-
-          jenis_kelamin: readSelectRequired("jenis_kelamin", "Jenis kelamin"),
-          aktivitas: readSelectRequired("aktivitas", "Aktivitas"),
+          nama: x.nama ?? x.name ?? null,
+          tanggal,
+          berat_badan: Number(x.berat_badan ?? x.bb ?? x.weight ?? 0) || null,
+          tinggi_badan: Number(x.tinggi_badan ?? x.tb ?? x.height ?? 0) || null,
+          usia_bulan: Number(x.usia_bulan ?? x.age_months ?? 0) || null,
+          jenis_kelamin: x.jenis_kelamin ?? x.gender ?? null,
+          aktivitas: x.aktivitas ?? null,
         };
 
-        // DEBUG: cek payload di F12 > Console
-        console.log("PAYLOAD KIRIM:", payload);
+        const respLike = { data: x };
+        const e = normalizeEntry(respLike, payload);
+        e.created_time = waktu || e.created_time;
+        return e;
+      });
+    }
 
-        const resp = await api("/kalkulator", { method: "POST", body: payload, auth: true });
+    function renderHistory(){
+      if(!history.length){
+        histBody.innerHTML = `<tr><td colspan="10" class="small">Belum ada riwayat untuk anak ini.</td></tr>`;
+        rawResp.textContent = "—";
+        selectedHistoryIndex = -1;
+        return;
+      }
 
-        showOk(msg, "Berhasil menghitung dan menyimpan ke database.");
-        hasil.textContent = JSON.stringify(resp, null, 2);
+      histBody.innerHTML = history.slice().reverse().map((h, idxFromEnd) => {
+        const idx = history.length - 1 - idxFromEnd; // index asli
+        return `
+          <tr data-idx="${idx}">
+            <td>${esc(h.created_time || "—")}</td>
+            <td>${esc(h.tanggal || "—")}</td>
+            <td>${esc(fmt(h.berat_badan,1))}</td>
+            <td>${esc(fmt(h.tinggi_badan,1))}</td>
+            <td>${esc(h.usia_bulan ?? "—")}</td>
+            <td>${esc(h.jenis_kelamin || "—")}</td>
+            <td>${esc(h.aktivitas || "—")}</td>
+            <td>${esc(fmt(h.bmi,2))}</td>
+            <td>${esc(fmt(h.zscore,2))}</td>
+            <td>${esc(h.status || "—")}</td>
+          </tr>
+        `;
+      }).join("");
+
+      // auto select latest
+      selectHistory(history.length - 1);
+    }
+
+    function applySummaryFromEntry(e){
+      sumBmi.textContent = fmt(e?.bmi, 2);
+      sumZ.textContent = fmt(e?.zscore, 2);
+      sumStatus.textContent = e?.status ? String(e.status) : "—";
+      sumEnergi.textContent = e?.energi ? String(e.energi) : "—";
+
+      setMini(e?.status ? String(e.status) : "Selesai", `Terakhir dihitung: ${e?.tanggal || "—"}`);
+    }
+
+    function selectHistory(index){
+      if(index < 0 || index >= history.length) return;
+      selectedHistoryIndex = index;
+      const e = history[index];
+      rawResp.textContent = JSON.stringify(e.raw, null, 2);
+      applySummaryFromEntry(e);
+    }
+
+    document.getElementById("histTable").addEventListener("click", (ev) => {
+      const tr = ev.target.closest("tr[data-idx]");
+      if(!tr) return;
+      const idx = Number(tr.getAttribute("data-idx"));
+      if(Number.isFinite(idx)) selectHistory(idx);
+    });
+
+    // =========================
+    // Init default date
+    // =========================
+    tanggalEl.value = toISODate(new Date());
+
+    // =========================
+    // On anak change: set + load history
+    // =========================
+    anakSelect.addEventListener("change", async () => {
+      const id = anakSelect.value;
+      setSelectedAnakById(id);
+
+      msg.innerHTML = "";
+      saveHint.textContent = "—";
+      history = [];
+      renderHistory();
+
+      if(!id){
+        setMini("—", "Pilih anak untuk mulai.");
+        sumBmi.textContent = "—";
+        sumZ.textContent = "—";
+        sumStatus.textContent = "—";
+        sumEnergi.textContent = "—";
+        return;
+      }
+
+      // Try backend history, fallback local
+      saveHint.textContent = "Memuat riwayat...";
+      try{
+        const rows = await tryFetchHistoryFromBackend(id);
+        // kalau backend mengembalikan row kalkulator, normalize jadi entry
+        history = normalizeHistoryRows(rows);
+        // simpan juga ke local agar stabil
+        saveHistoryToLocal(id, history);
+        saveHint.textContent = `Riwayat dimuat (${history.length}).`;
+      }catch(e){
+        history = loadHistoryFromLocal(id);
+        saveHint.textContent = history.length
+          ? `Riwayat lokal dimuat (${history.length}).`
+          : "Riwayat backend belum tersedia (fallback lokal).";
+      }
+      renderHistory();
+    });
+
+    // =========================
+    // Load anak list on start
+    // =========================
+    (async () => {
+      try{
+        await loadAnak();
+
+        // auto select first real child if exists
+        if(anakSelect.options.length > 1){
+          anakSelect.selectedIndex = 1;
+          anakSelect.dispatchEvent(new Event("change"));
+        }else{
+          anakHint.textContent = "Belum ada anak. Tambah dulu di Monitoring.";
+          setMini("Belum ada data anak", "Tambah anak dari Monitoring.");
+        }
+      }catch(err){
+        showError(msg, err);
+        anakSelect.innerHTML = `<option value="">Gagal memuat anak</option>`;
+        setMini("Error", "Gagal memuat daftar anak.");
+      }
+    })();
+
+    // =========================
+    // Reset button
+    // =========================
+    btnReset.addEventListener("click", () => {
+      bbEl.value = "";
+      tbEl.value = "";
+      aktEl.value = "";
+      // tanggal tetap
+      msg.innerHTML = "";
+    });
+
+    // =========================
+    // Submit Kalkulator
+    // =========================
+    document.getElementById("formKalkulator").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.innerHTML = "";
+
+      try{
+        const anakId = anakSelect.value;
+        if(!anakId) throw new Error("Pilih anak dulu.");
+
+        const anak = selectedAnak || anakList.find(a => String(a.id) === String(anakId));
+        const nama = (anak?.nama_anak ?? anak?.nama ?? anak?.name ?? "").toString().trim();
+        if(!nama) throw new Error("Nama anak tidak valid. Cek data anak di Monitoring.");
+
+        const payload = {
+          nama,
+          tanggal: tanggalEl.value || toISODate(new Date()),
+          berat_badan: readNumberRequired(bbEl, "Berat badan"),
+          tinggi_badan: readNumberRequired(tbEl, "Tinggi badan"),
+          usia_bulan: readNumberRequired(usiaEl, "Usia (bulan)"),
+          jenis_kelamin: readSelectRequired(jkEl, "Jenis kelamin"),
+          aktivitas: readSelectRequired(aktEl, "Aktivitas"),
+        };
+
+        setCalcLoading(true);
+        saveHint.textContent = "Mengirim perhitungan...";
+
+        const resp = await api("/kalkulator", { method:"POST", body: payload, auth:true });
+
+        showOk(msg, "Berhasil menghitung dan menyimpan.");
+        saveHint.textContent = "Tersimpan.";
+
+        const entry = normalizeEntry(resp, payload);
+
+        // push ke history (per anak)
+        history.push(entry);
+        saveHistoryToLocal(anakId, history);
+        renderHistory();
+
+        // auto select newest
+        selectHistory(history.length - 1);
+
       } catch (err) {
         showError(msg, err);
+        saveHint.textContent = "Gagal.";
+      } finally {
+        setCalcLoading(false);
       }
     });
 
-    document.getElementById("logoutLink").addEventListener("click", async (e) => {
-      e.preventDefault();
-      try { await api("/auth/logout", { method: "POST", auth: true }); } catch {}
-      clearToken();
-      location.href = "login.html";
+    // =========================
+    // PDF helpers
+    // =========================
+    function waitImagesLoaded(rootEl){
+      const imgs = Array.from(rootEl.querySelectorAll("img"));
+      return Promise.all(imgs.map(img => {
+        if(img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise(res => {
+          img.onload = () => res();
+          img.onerror = () => res();
+        });
+      }));
+    }
+
+    async function domToJpegData(el, scale = 1.25, quality = 0.78){
+      const canvas = await html2canvas(el, {
+        scale,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+      });
+      return {
+        dataUrl: canvas.toDataURL("image/jpeg", quality),
+        w: canvas.width,
+        h: canvas.height
+      };
+    }
+
+    function addJpegFitToPage(pdf, jpegObj){
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const imgRatio = jpegObj.w / jpegObj.h;
+
+      let w = pageW;
+      let h = w / imgRatio;
+      if(h > pageH){
+        h = pageH;
+        w = h * imgRatio;
+      }
+
+      const x = (pageW - w) / 2;
+      const y = (pageH - h) / 2;
+      pdf.addImage(jpegObj.dataUrl, "JPEG", x, y, w, h, undefined, "FAST");
+    }
+
+    function chunk(arr, size){
+      const out = [];
+      for(let i=0; i<arr.length; i+=size) out.push(arr.slice(i, i+size));
+      return out;
+    }
+
+    function renderPdfPageChunk(meta){
+      const { anakId, namaAnak, jk, usiaBulan, exportedAt, pageIndex, pageTotal, chunkRows } = meta;
+
+      pdfMeta.textContent = `${namaAnak} • diekspor: ${exportedAt} • halaman ${pageIndex}/${pageTotal}`;
+      pdfRight.textContent = `ID Anak: ${anakId}`;
+      pdfFooterRight.textContent = `Diekspor: ${exportedAt}`;
+
+      pdfChips.innerHTML = `
+        <div class="pdf-chip"><span>Nama Anak</span><b>${esc(namaAnak)}</b></div>
+        <div class="pdf-chip"><span>Jenis Kelamin</span><b>${esc(jk || "—")}</b></div>
+        <div class="pdf-chip"><span>Usia (bulan)</span><b>${esc(String(usiaBulan ?? "—"))}</b></div>
+        <div class="pdf-chip"><span>Total Riwayat</span><b>${esc(String(history.length))}</b></div>
+      `;
+
+      // summary pakai data terbaru (kalau ada)
+      const last = history.length ? history[history.length - 1] : null;
+      pdfSummary.innerHTML = `
+        <div class="psum">
+          <div class="k">Tanggal Terakhir</div>
+          <div class="v">${esc(last?.tanggal || "—")}</div>
+          <div class="s">entry terbaru</div>
+        </div>
+        <div class="psum">
+          <div class="k">IMT</div>
+          <div class="v">${esc(fmt(last?.bmi,2))}</div>
+          <div class="s">dari hasil</div>
+        </div>
+        <div class="psum">
+          <div class="k">Z-score</div>
+          <div class="v">${esc(fmt(last?.zscore,2))}</div>
+          <div class="s">dari hasil</div>
+        </div>
+        <div class="psum">
+          <div class="k">Status</div>
+          <div class="v">${esc(last?.status || "—")}</div>
+          <div class="s">kategori</div>
+        </div>
+      `;
+
+      pdfTableWrap.innerHTML = `
+        <table class="rtable">
+          <thead>
+            <tr>
+              <th style="width:88px">Waktu</th>
+              <th style="width:92px">Tanggal</th>
+              <th style="width:60px">BB</th>
+              <th style="width:60px">TB</th>
+              <th style="width:60px">Usia</th>
+              <th style="width:42px">JK</th>
+              <th style="width:84px">Akt</th>
+              <th style="width:60px">IMT</th>
+              <th style="width:60px">Z</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${chunkRows.map(r => `
+              <tr>
+                <td>${esc(r.created_time || "—")}</td>
+                <td>${esc(r.tanggal || "—")}</td>
+                <td>${esc(fmt(r.berat_badan,1))}</td>
+                <td>${esc(fmt(r.tinggi_badan,1))}</td>
+                <td>${esc(String(r.usia_bulan ?? "—"))}</td>
+                <td>${esc(r.jenis_kelamin || "—")}</td>
+                <td>${esc(r.aktivitas || "—")}</td>
+                <td>${esc(fmt(r.bmi,2))}</td>
+                <td>${esc(fmt(r.zscore,2))}</td>
+                <td>${esc(r.status || "—")}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    // =========================
+    // PDF download
+    // =========================
+    btnPdf.addEventListener("click", async () => {
+      msg.innerHTML = "";
+
+      const anakId = anakSelect.value;
+      if(!anakId){
+        showError(msg, new Error("Pilih anak dulu sebelum unduh PDF."));
+        return;
+      }
+      if(!history.length){
+        showError(msg, new Error("Belum ada riwayat perhitungan untuk dibuat PDF."));
+        return;
+      }
+
+      try{
+        setPdfLoading(true);
+
+        const anak = selectedAnak || anakList.find(a => String(a.id) === String(anakId)) || {};
+        const namaAnak = (anak.nama_anak ?? anak.nama ?? anak.name ?? "anak").toString().trim() || "anak";
+        const jk = jkEl.value || normalizeGenderToLP(anak.jenis_kelamin ?? anak.jk ?? anak.gender ?? "");
+        const usiaBulan = usiaEl.value || "";
+
+        const exportedAt = toISODate(new Date());
+
+        // chunk rows per page (fit A4)
+        const rowsNewestFirst = history.slice().reverse();
+        const chunks = chunk(rowsNewestFirst, 14); // 14 row aman untuk A4
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
+
+        for(let i=0; i<chunks.length; i++){
+          if(i > 0) pdf.addPage();
+
+          renderPdfPageChunk({
+            anakId,
+            namaAnak,
+            jk,
+            usiaBulan,
+            exportedAt,
+            pageIndex: i+1,
+            pageTotal: chunks.length,
+            chunkRows: chunks[i]
+          });
+
+          await waitImagesLoaded(pdfPage);
+          await new Promise(r => setTimeout(r, 120));
+
+          const jpg = await domToJpegData(pdfPage, 1.25, 0.78);
+          addJpegFitToPage(pdf, jpg);
+        }
+
+        const safeName = namaAnak.replace(/[^\w\-]+/g, "-").toLowerCase();
+        pdf.save(`laporan-kalkulator-${safeName}.pdf`);
+
+        showOk(msg, "PDF berhasil diunduh.");
+      }catch(err){
+        showError(msg, err);
+      }finally{
+        setPdfLoading(false);
+      }
     });
   </script>
 </body>
