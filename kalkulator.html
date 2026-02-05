@@ -144,7 +144,7 @@
       margin-bottom: 10px;
       flex-wrap:wrap;
     }
-    .btn.back{ color:#000; } /* ← Kembali hitam */
+    .btn.back{ color:#000; }
     .hero h1{
       margin:0;
       font-size: clamp(22px, 3.2vw, 34px);
@@ -262,7 +262,7 @@
     .box .k{ font-size:11px; color:var(--muted); }
     .box .v{ font-size:18px; font-weight:950; margin-top:2px; }
 
-    /* History table */
+    /* History table (UI) */
     .tablewrap{ margin-top: 12px; overflow:auto; }
     table{
       width:100%;
@@ -307,36 +307,42 @@
     @keyframes spin{ to{ transform:rotate(360deg);} }
 
     /* =========================
-       PDF (LANDSCAPE A4)
+       PDF (LANDSCAPE A4) - NO CROP + TEXT CLEAR
        ========================= */
 
-    /* A4 landscape @~96dpi: 1123 x 794 */
+    /* Render box benar-benar A4 landscape dengan unit mm */
     .pdf-sheet{
       position:absolute;
-      left:-99999px;
+      left:-10000px;
       top:0;
-      width:1123px;
-      height:794px;
-      padding:10px;              /* DIPERKETAT: ruang lebih besar untuk tabel */
+      width:297mm;
+      height:210mm;
+      padding:6mm;
       box-sizing:border-box;
       background:#ffffff;
     }
     .pdf-card{
       height:100%;
-      border-radius:16px;
+      border-radius:14px;
       border:1px solid rgba(15,23,42,.10);
-      box-shadow:0 10px 30px rgba(15,23,42,.08);
-      padding:10px;              /* DIPERKETAT */
+      /* Hilangkan shadow berat biar PNG lebih bersih & kecil */
+      box-shadow:none;
+      /* Extra right padding supaya kolom terakhir aman */
+      padding:5mm 7mm 5mm 5mm;
       box-sizing:border-box;
       display:flex;
       flex-direction:column;
-      gap:8px;                   /* rapatkan */
+      gap:3mm;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue";
+      color: var(--ink);
     }
+
     .pdf-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      min-width:0;
     }
     .pdf-brand{
       display:flex;
@@ -349,6 +355,7 @@
       border:1px solid rgba(15,23,42,.10);
       background:#fff;
       display:block;
+      flex:0 0 auto;
     }
     .pdf-title{
       font-size:18px;
@@ -364,13 +371,14 @@
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width:920px;
+      max-width:240mm;
     }
     .pdf-meta-right{
       text-align:right;
       font-size:10px;
       color: var(--muted);
       white-space:nowrap;
+      flex:0 0 auto;
     }
 
     .pdf-chips{
@@ -383,7 +391,7 @@
       border:1px solid rgba(15,23,42,.10);
       background: rgba(246,249,255,.75);
       padding:5px 8px;
-      border-radius:14px;
+      border-radius:12px;
       font-size:9px;
       line-height:1.2;
     }
@@ -397,10 +405,11 @@
     }
     .psum{
       border:1px solid rgba(15,23,42,.10);
-      border-radius:14px;
+      border-radius:12px;
       padding:7px 9px;
       background:#fff;
       overflow:hidden;
+      min-width:0;
     }
     .psum .k{ font-size:8px; color: var(--muted); }
     .psum .v{ font-size:13px; font-weight:950; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
@@ -409,43 +418,60 @@
     .pdfTableTitle{
       font-size:11px;
       font-weight:900;
-      margin:2px 0 -2px;
+      margin:0;
     }
 
-    /* Tabel PDF: dipaksa fit lebar, kolom TIDAK boleh overflow keluar */
+    /* Wrapper tabel: border & radius di wrapper (lebih aman, tidak nge-clip pixel) */
+    .rwrap{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:12px;
+      overflow:hidden;
+      background:#fff;
+      width:100%;
+    }
+
+    /* Table fixed layout + grid rapi */
     .rtable{
       width:100%;
-      max-width:100%;
-      table-layout:fixed;         /* WAJIB: browser patuh pembagian kolom */
-      border-collapse:separate;
-      border-spacing:0;
-      border:1px solid rgba(15,23,42,.10);
-      border-radius:14px;
-      overflow:hidden;
+      table-layout:fixed;
+      border-collapse:collapse;
       background:#fff;
     }
     .rtable thead th{
       background: rgba(30,99,214,.08);
       color: var(--ink);
-      font-size:8px;              /* kecilkan */
+      font-size:8.6px;
       font-weight:900;
       text-align:left;
-      padding:4px 4px;            /* RAPATKAN */
+      padding:3px 3px;
       border-bottom:1px solid rgba(15,23,42,.10);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
     .rtable tbody td{
-      font-size:8px;              /* kecilkan */
-      padding:4px 4px;            /* RAPATKAN */
-      vertical-align:top;
+      font-size:8.6px;
+      padding:3px 3px;
       border-bottom:1px solid rgba(15,23,42,.08);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
+      vertical-align:top;
     }
     .rtable tbody tr:last-child td{ border-bottom:none; }
+
+    /* garis vertical tipis biar kebaca tapi hemat ruang */
+    .rtable th:not(:last-child),
+    .rtable td:not(:last-child){
+      border-right:1px solid rgba(15,23,42,.06);
+    }
+
+    /* Status boleh wrap agar kolom tidak melebar */
+    .rtable th.col-status,
+    .rtable td.col-status{
+      white-space:normal;
+      line-height:1.15;
+    }
 
     .pdf-footer{
       margin-top:auto;
@@ -712,7 +738,6 @@
     const btnPdfSpin = document.getElementById("btnPdfSpin");
 
     const saveHint = document.getElementById("saveHint");
-
     const histBody = document.getElementById("histBody");
 
     const miniStatus = document.getElementById("miniStatus");
@@ -748,7 +773,9 @@
     }
     if(typeof window.showError !== "function"){
       window.showError = (el, err) => {
-        const t = (err && (err.message || err?.payload?.message)) ? (err.message || err.payload.message) : String(err || "Terjadi error");
+        const t = (err && (err.message || err?.payload?.message))
+          ? (err.message || err.payload.message)
+          : String(err || "Terjadi error");
         el.innerHTML = `<div class="alert err">${esc(t)}</div>`;
       };
     }
@@ -758,7 +785,7 @@
     // =========================
     let anakList = [];
     let selectedAnak = null;
-    let history = []; // per anak terpilih
+    let history = [];
 
     // =========================
     // Helpers
@@ -837,9 +864,6 @@
       miniSub.textContent = subText || "—";
     }
 
-    // =========================
-    // Form readers (strict)
-    // =========================
     function readNumberRequired(el, label){
       const raw = el.value;
       if(raw === "" || raw === null || raw === undefined) throw new Error(`${label} wajib diisi`);
@@ -915,14 +939,12 @@
       const z = pick(r, ["zscore","z_score","hasil.zscore","hasil.z_score","result.zscore","result.z_score"], null);
       const status = pick(r, ["status","status_gizi","hasil.status","hasil.status_gizi","kategori","result.status"], null);
 
-      // kalori/energi
       const kalori = pick(r, [
         "kebutuhan_kalori","kebutuhan_energi","kalori","energi",
         "hasil.kebutuhan_kalori","hasil.kebutuhan_energi","hasil.kalori","hasil.energi",
         "result.kalori","result.energi"
       ], null);
 
-      // BB ideal (range)
       let bbIdealMin = pick(r, [
         "bb_ideal_min","bbIdealMin","ideal_bb_min","ideal_weight_min",
         "hasil.bb_ideal_min","hasil.bb_ideal.min","hasil.ideal_weight_min",
@@ -985,7 +1007,6 @@
       }
     }
 
-    // Coba beberapa endpoint umum (kalau backend punya salah satu)
     async function tryFetchHistoryFromBackend(anakId){
       const candidates = [
         `/anak/${anakId}/kalkulator`,
@@ -1085,7 +1106,6 @@
         `;
       }).join("");
 
-      // auto select latest
       selectHistory(history.length - 1);
     }
 
@@ -1096,14 +1116,10 @@
       if(Number.isFinite(idx)) selectHistory(idx);
     });
 
-    // =========================
     // Init default date
-    // =========================
     tanggalEl.value = toISODate(new Date());
 
-    // =========================
     // On anak change: set + load history
-    // =========================
     anakSelect.addEventListener("change", async () => {
       const id = anakSelect.value;
       setSelectedAnakById(id);
@@ -1137,9 +1153,7 @@
       renderHistory();
     });
 
-    // =========================
     // Load anak list on start
-    // =========================
     (async () => {
       try{
         await loadAnak();
@@ -1158,9 +1172,7 @@
       }
     })();
 
-    // =========================
     // Reset button
-    // =========================
     btnReset.addEventListener("click", () => {
       bbEl.value = "";
       tbEl.value = "";
@@ -1168,9 +1180,7 @@
       msg.innerHTML = "";
     });
 
-    // =========================
     // Submit Kalkulator
-    // =========================
     document.getElementById("formKalkulator").addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.innerHTML = "";
@@ -1217,7 +1227,7 @@
     });
 
     // =========================
-    // PDF helpers
+    // PDF helpers (PNG + scale lebih tinggi biar teks jelas)
     // =========================
     function waitImagesLoaded(rootEl){
       const imgs = Array.from(rootEl.querySelectorAll("img"));
@@ -1230,34 +1240,64 @@
       }));
     }
 
-    async function domToJpegData(el, scale = 1.10, quality = 0.85){
-      const canvas = await html2canvas(el, {
-        scale,
-        useCORS: true,
-        backgroundColor: "#ffffff"
-      });
-      return {
-        dataUrl: canvas.toDataURL("image/jpeg", quality),
-        w: canvas.width,
-        h: canvas.height
-      };
+    async function domToPngData(el, scale = 2.0){
+      const rect = el.getBoundingClientRect();
+      const w = Math.ceil(rect.width);
+      const h = Math.ceil(rect.height);
+
+      try{
+        const canvas = await html2canvas(el, {
+          scale,
+          useCORS: true,
+          backgroundColor: "#ffffff",
+          width: w,
+          height: h,
+          windowWidth: w,
+          windowHeight: h,
+          scrollX: 0,
+          scrollY: 0
+        });
+        return { dataUrl: canvas.toDataURL("image/png"), w: canvas.width, h: canvas.height };
+      }catch(e){
+        // fallback kalau device low-mem: turunkan scale sedikit
+        if(scale > 1.6){
+          const canvas = await html2canvas(el, {
+            scale: 1.6,
+            useCORS: true,
+            backgroundColor: "#ffffff",
+            width: w,
+            height: h,
+            windowWidth: w,
+            windowHeight: h,
+            scrollX: 0,
+            scrollY: 0
+          });
+          return { dataUrl: canvas.toDataURL("image/png"), w: canvas.width, h: canvas.height };
+        }
+        throw e;
+      }
     }
 
-    function addJpegFitToPage(pdf, jpegObj){
+    function addImageFitToPage(pdf, imgObj, marginMm = 4){
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
-      const imgRatio = jpegObj.w / jpegObj.h;
 
-      let w = pageW;
+      const maxW = pageW - marginMm*2;
+      const maxH = pageH - marginMm*2;
+
+      const imgRatio = imgObj.w / imgObj.h;
+
+      let w = maxW;
       let h = w / imgRatio;
-      if(h > pageH){
-        h = pageH;
+      if(h > maxH){
+        h = maxH;
         w = h * imgRatio;
       }
 
       const x = (pageW - w) / 2;
       const y = (pageH - h) / 2;
-      pdf.addImage(jpegObj.dataUrl, "JPEG", x, y, w, h, undefined, "FAST");
+
+      pdf.addImage(imgObj.dataUrl, "PNG", x, y, w, h, undefined, "SLOW");
     }
 
     function chunk(arr, size){
@@ -1304,61 +1344,68 @@
         </div>
       `;
 
-      // KUNCI: colgroup (total 100%) + table-layout:fixed -> tidak ada kolom yang overflow/crop
+      /* Kunci anti-crop:
+         - wrapper rwrap (border/radius aman)
+         - table-layout:fixed
+         - colgroup total 100% (status dipersempit + status boleh wrap)
+         - label header disingkat biar hemat lebar
+      */
       pdfTableWrap.innerHTML = `
-        <table class="rtable">
-          <colgroup>
-            <col style="width:7%">
-            <col style="width:9%">
-            <col style="width:5%">
-            <col style="width:5%">
-            <col style="width:5%">
-            <col style="width:4%">
-            <col style="width:8%">
-            <col style="width:5%">
-            <col style="width:5%">
-            <col style="width:17%">
-            <col style="width:10%">
-            <col style="width:10%">
-            <col style="width:10%">
-          </colgroup>
-          <thead>
-            <tr>
-              <th>Waktu</th>
-              <th>Tanggal</th>
-              <th>BB</th>
-              <th>TB</th>
-              <th>Usia</th>
-              <th>JK</th>
-              <th>Akt</th>
-              <th>IMT</th>
-              <th>Z</th>
-              <th>Status</th>
-              <th>Kalori</th>
-              <th>BB min</th>
-              <th>BB max</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${chunkRows.map(r => `
+        <div class="rwrap">
+          <table class="rtable">
+            <colgroup>
+              <col style="width:7%">
+              <col style="width:9%">
+              <col style="width:5%">
+              <col style="width:5%">
+              <col style="width:5%">
+              <col style="width:4%">
+              <col style="width:7%">
+              <col style="width:5%">
+              <col style="width:4%">
+              <col style="width:10%">
+              <col style="width:8%">
+              <col style="width:15%">
+              <col style="width:16%">
+            </colgroup>
+            <thead>
               <tr>
-                <td>${esc(r.created_time || "—")}</td>
-                <td>${esc(r.tanggal || "—")}</td>
-                <td>${esc(fmt(r.berat_badan,1))}</td>
-                <td>${esc(fmt(r.tinggi_badan,1))}</td>
-                <td>${esc(String(r.usia_bulan ?? "—"))}</td>
-                <td>${esc(r.jenis_kelamin || "—")}</td>
-                <td>${esc(r.aktivitas || "—")}</td>
-                <td>${esc(fmt(r.bmi,2))}</td>
-                <td>${esc(fmt(r.zscore,2))}</td>
-                <td>${esc(r.status || "—")}</td>
-                <td>${esc(fmt(r.kalori,0))}</td>
-                <td>${esc(fmt(r.bb_ideal_min,1))}</td>
-                <td>${esc(fmt(r.bb_ideal_max,1))}</td>
+                <th>Waktu</th>
+                <th>Tgl</th>
+                <th>BB</th>
+                <th>TB</th>
+                <th>Usia</th>
+                <th>JK</th>
+                <th>Akt</th>
+                <th>IMT</th>
+                <th>Z</th>
+                <th class="col-status">Status</th>
+                <th>Kal</th>
+                <th>BB min</th>
+                <th>BB max</th>
               </tr>
-            `).join("")}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              ${chunkRows.map(r => `
+                <tr>
+                  <td>${esc(r.created_time || "—")}</td>
+                  <td>${esc(r.tanggal || "—")}</td>
+                  <td>${esc(fmt(r.berat_badan,1))}</td>
+                  <td>${esc(fmt(r.tinggi_badan,1))}</td>
+                  <td>${esc(String(r.usia_bulan ?? "—"))}</td>
+                  <td>${esc(r.jenis_kelamin || "—")}</td>
+                  <td>${esc(r.aktivitas || "—")}</td>
+                  <td>${esc(fmt(r.bmi,2))}</td>
+                  <td>${esc(fmt(r.zscore,2))}</td>
+                  <td class="col-status">${esc(r.status || "—")}</td>
+                  <td>${esc(fmt(r.kalori,0))}</td>
+                  <td>${esc(fmt(r.bb_ideal_min,1))}</td>
+                  <td>${esc(fmt(r.bb_ideal_max,1))}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
       `;
     }
 
@@ -1385,15 +1432,13 @@
         const namaAnak = (anak.nama_anak ?? anak.nama ?? anak.name ?? "anak").toString().trim() || "anak";
         const jk = jkEl.value || normalizeGenderToLP(anak.jenis_kelamin ?? anak.jk ?? anak.gender ?? "");
         const usiaBulan = usiaEl.value || "";
-
         const exportedAt = toISODate(new Date());
 
-        // landscape lebih pendek -> jangan kebanyakan row per halaman
         const rowsNewestFirst = history.slice().reverse();
         const chunks = chunk(rowsNewestFirst, 9);
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF("l", "mm", "a4");
+        const pdf = new jsPDF({ orientation:"landscape", unit:"mm", format:"a4", compress:true });
 
         for(let i=0; i<chunks.length; i++){
           if(i > 0) pdf.addPage();
@@ -1410,10 +1455,10 @@
           });
 
           await waitImagesLoaded(pdfPage);
-          await new Promise(r => setTimeout(r, 120));
+          await new Promise(r => setTimeout(r, 80));
 
-          const jpg = await domToJpegData(pdfPage, 1.10, 0.85);
-          addJpegFitToPage(pdf, jpg);
+          const img = await domToPngData(pdfPage, 2.0);
+          addImageFitToPage(pdf, img, 4);
         }
 
         const safeName = namaAnak.replace(/[^\w\-]+/g, "-").toLowerCase();
