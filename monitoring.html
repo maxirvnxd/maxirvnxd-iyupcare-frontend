@@ -131,7 +131,7 @@
       padding:12px 14px;
       flex:1;
       min-width:280px;
-      flex-wrap:wrap; /* supaya 3 tombol tetap rapi di layar kecil */
+      flex-wrap:wrap;
     }
     .child-card .field{flex:1;min-width:220px;}
     .child-card label{display:block;}
@@ -201,9 +201,30 @@
       white-space:nowrap;
     }
 
+    /* tombol aksi tabel (hapus) */
+    .icon-btn{
+      width:34px;height:34px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.9);
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+      user-select:none;
+    }
+    .icon-btn:hover{
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15,23,42,.08);
+      border-color: rgba(242, 153, 74, .45);
+    }
+    .icon-btn:disabled{opacity:.6;cursor:not-allowed;transform:none;box-shadow:none;}
+    .icon-btn .i{font-size:16px;line-height:1;}
+    .td-center{ text-align:center; }
+
     /* =========================================================
-       PDF SHEETS (A4 RATIO) — supaya tidak distorsi
-       A4 ratio ≈ 0.707. Pakai 794×1123 px (mendekati A4 @96dpi)
+       PDF SHEETS (A4 RATIO)
     ========================================================== */
     .pdf-sheet{
       position:absolute;
@@ -306,7 +327,6 @@
       margin: 2px 0 -2px;
     }
 
-    /* tabel khusus PDF: rapih, padat, tidak “kebesaran” */
     .rtable{
       width:100%;
       border-collapse:separate;
@@ -338,7 +358,6 @@
       margin-top:6px;
     }
 
-    /* chart cards di PDF */
     .pdf-chart-grid{
       display:flex;
       flex-direction:column;
@@ -414,7 +433,6 @@
             <select id="anakSelect"></select>
           </div>
 
-          <!-- ✅ 3 tombol: tambah / edit / hapus -->
           <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
           <button class="btn secondary" type="button" id="btnEditAnak">Edit Anak</button>
           <button class="btn secondary" type="button" id="btnHapusAnak">Hapus Anak</button>
@@ -489,12 +507,16 @@
                 <th>catatan</th>
                 <th>created_at</th>
                 <th>updated_at</th>
+                <th class="td-center">aksi</th>
               </tr>
             </thead>
             <tbody id="dbBody">
-              <tr><td colspan="8" class="small">Pilih anak, lalu input data untuk melihat baris tersimpan.</td></tr>
+              <tr><td colspan="9" class="small">Pilih anak, lalu input data untuk melihat baris tersimpan.</td></tr>
             </tbody>
           </table>
+          <div class="small small-muted" style="margin-top:10px;">
+            Tips: gunakan tombol 🗑 untuk menghapus baris monitoring tertentu.
+          </div>
         </div>
       </div>
 
@@ -948,14 +970,41 @@
     btnBatalInput.addEventListener("click", closeInput);
 
     // ===========================
-    // Render DB table
+    // Delete Monitoring (coba beberapa endpoint)
+    // ===========================
+    async function deleteMonitoringRow(anakId, monitoringId){
+      // karena pola backend bisa beda, kita coba beberapa rute yang umum.
+      const candidates = [
+        `/anak/${anakId}/monitoring/${monitoringId}`,
+        `/monitoring/${monitoringId}`,
+        `/anak/${anakId}/monitoring/${monitoringId}/delete`,
+      ];
+
+      let lastErr = null;
+      for(const path of candidates){
+        try{
+          await api(path, { method:"DELETE", auth:true });
+          return;
+        }catch(e){
+          lastErr = e;
+        }
+      }
+      throw lastErr || new Error("Gagal menghapus data monitoring.");
+    }
+
+    // ===========================
+    // Render DB table (dengan tombol hapus per baris)
     // ===========================
     function renderDbTable(list){
       if(!list.length){
-        dbBody.innerHTML = `<tr><td colspan="8" class="small">Belum ada data monitoring untuk anak ini.</td></tr>`;
+        dbBody.innerHTML = `<tr><td colspan="9" class="small">Belum ada data monitoring untuk anak ini.</td></tr>`;
         return;
       }
-      dbBody.innerHTML = list.slice().reverse().map(x => `
+
+      // tampil terbaru di atas
+      const rows = list.slice().reverse();
+
+      dbBody.innerHTML = rows.map(x => `
         <tr>
           <td>${x.id ?? "-"}</td>
           <td>${x.anak_id ?? "-"}</td>
@@ -965,9 +1014,49 @@
           <td>${escHtml((x.catatan ?? "").toString().slice(0,40) || "-")}</td>
           <td>${x.created_at ? String(x.created_at).replace("T"," ").slice(0,19) : "-"}</td>
           <td>${x.updated_at ? String(x.updated_at).replace("T"," ").slice(0,19) : "-"}</td>
+          <td class="td-center">
+            <button
+              class="icon-btn js-del-monitoring"
+              type="button"
+              data-mid="${x.id ?? ""}"
+              title="Hapus baris ini">
+              <span class="i">🗑</span>
+            </button>
+          </td>
         </tr>
       `).join("");
     }
+
+    // event delegation untuk tombol delete di tabel
+    dbBody.addEventListener("click", async (e) => {
+      const btn = e.target.closest(".js-del-monitoring");
+      if(!btn) return;
+
+      const anakId = anakSelect.value;
+      const monitoringId = btn.getAttribute("data-mid");
+
+      if(!anakId || !monitoringId){
+        showMsg("Tidak bisa menghapus: ID anak / ID monitoring tidak valid.", "err");
+        return;
+      }
+
+      const ok = confirm("Yakin ingin menghapus baris monitoring ini?");
+      if(!ok) return;
+
+      // lock tombol yang diklik
+      btn.disabled = true;
+
+      try{
+        await deleteMonitoringRow(anakId, monitoringId);
+        showMsg("Baris monitoring berhasil dihapus.", "ok");
+        await renderRiwayatAndCharts(anakId);
+      }catch(err){
+        console.error(err);
+        showMsg(err?.payload?.message || err.message || "Gagal menghapus baris.", "err");
+      }finally{
+        btn.disabled = false;
+      }
+    });
 
     // ===========================
     // Galeri: render + load + upload
@@ -1074,7 +1163,7 @@
     // ===========================
     async function renderRiwayatAndCharts(anakId){
       riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Memuat...</td></tr>`;
-      dbBody.innerHTML = `<tr><td colspan="8" class="small">Memuat...</td></tr>`;
+      dbBody.innerHTML = `<tr><td colspan="9" class="small">Memuat...</td></tr>`;
       chartHint.textContent = "";
 
       const list = await loadMonitoringByAnak(anakId);
@@ -1273,14 +1362,11 @@
       setTimeout(() => anakNama.focus(), 10);
     }
 
-    // tombol tambah anak -> create
     document.getElementById("btnTambahAnak").addEventListener("click", openModalCreate);
 
-    // tombol edit anak
     btnEditAnak.addEventListener("click", async () => {
       const anakId = anakSelect.value;
       if(!anakId){ showMsg("Pilih anak dulu.", "err"); return; }
-
       try{
         const res = await api(`/anak/${anakId}`, { method:"GET", auth:true });
         const anak = res?.data || res;
@@ -1291,7 +1377,6 @@
       }
     });
 
-    // tombol hapus anak
     btnHapusAnak.addEventListener("click", async () => {
       const anakId = anakSelect.value;
       if(!anakId){ showMsg("Pilih anak dulu.", "err"); return; }
@@ -1311,7 +1396,7 @@
           await loadGaleriByAnak(id);
         }else{
           riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Belum ada data.</td></tr>`;
-          renderDbTable([]);
+          dbBody.innerHTML = `<tr><td colspan="9" class="small">Belum ada data.</td></tr>`;
           renderGaleriGrid([]);
           chartHint.textContent = "";
           if(chartBB) chartBB.destroy();
@@ -1323,7 +1408,6 @@
       }
     });
 
-    // simpan anak (create/edit)
     btnSimpanAnak.addEventListener("click", async () => {
       const nama = anakNama.value.trim();
       const tgl  = anakTglLahir.value;
@@ -1400,7 +1484,7 @@
     }
 
     // ===========================
-    // PDF helpers: screenshot DOM -> JPEG (return dim)
+    // PDF helpers: screenshot DOM -> JPEG
     // ===========================
     async function domToJpegData(el){
       const canvas = await html2canvas(el, {
@@ -1415,7 +1499,6 @@
       };
     }
 
-    // Add image to page WITHOUT distorsi (fit)
     function addJpegFitToPage(pdf, jpegObj, margin = 0){
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
@@ -1517,7 +1600,7 @@
     }
 
     // ===========================
-    // PDF Export (layout rapi)
+    // PDF Export
     // ===========================
     async function exportPdfForSelectedAnak(){
       const anakId = anakSelect.value;
