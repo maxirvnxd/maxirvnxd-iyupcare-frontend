@@ -21,6 +21,7 @@
       --p-radius:18px;
       --p-max:1100px;
     }
+
     body{
       background:
         radial-gradient(900px 520px at 15% 10%, rgba(30,99,214,.16), transparent 60%),
@@ -64,7 +65,7 @@
       display:block;
     }
     .pbrand .b1{ font-weight: 950; letter-spacing:.2px; }
-    .pbrand .b2{ font-size: 12px; color: var(--muted); margin-top:2px; }
+    .pbrand .b2{ font-size: 12px; color: var(--p-muted); margin-top:2px; }
 
     .pactions{
       display:flex;
@@ -194,19 +195,182 @@
       white-space:nowrap;
     }
 
-    /* Report blocks untuk screenshot ringan (page 1 & 2) */
-    #reportPage1, #reportPage2{
+    /* =========================================================
+       PDF SHEETS (A4 RATIO) — supaya tidak distorsi
+       A4 ratio ≈ 0.707. Pakai 794×1123 px (mendekati A4 @96dpi)
+    ========================================================== */
+    .pdf-sheet{
       position:absolute;
       left:-99999px;
       top:0;
-      width:900px;
+      width:794px;
+      height:1123px;
+      padding:26px;
+      box-sizing:border-box;
+      background:#ffffff;
     }
-    .report-card{
-      background:#fff;
-      border-radius:16px;
-      padding:16px;
-      box-shadow:0 10px 30px rgba(15,23,42,.08);
+    .pdf-card{
+      height:100%;
+      border-radius:18px;
       border:1px solid rgba(15,23,42,.10);
+      box-shadow:0 10px 30px rgba(15,23,42,.08);
+      padding:18px;
+      box-sizing:border-box;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .pdf-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .pdf-brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 0;
+    }
+    .pdf-logo{
+      width:44px;height:44px;border-radius:14px;object-fit:cover;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      display:block;
+    }
+    .pdf-title{
+      font-size:22px;
+      font-weight:950;
+      letter-spacing:.2px;
+      line-height:1.1;
+      margin:0;
+    }
+    .pdf-sub{
+      font-size:12px;
+      color: var(--p-muted);
+      margin-top:4px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:520px;
+    }
+    .pdf-meta-right{
+      text-align:right;
+      font-size:11px;
+      color: var(--p-muted);
+      white-space:nowrap;
+    }
+
+    .pdf-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:2px;
+    }
+    .pdf-chip{
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(246,249,255,.75);
+      padding:7px 10px;
+      border-radius:14px;
+      font-size:11px;
+      line-height:1.2;
+    }
+    .pdf-chip span{ display:block; color: var(--p-muted); font-size:10px; }
+    .pdf-chip b{ display:block; font-weight:900; color: var(--p-ink); margin-top:2px; }
+
+    .pdf-summary{
+      display:grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap:10px;
+    }
+    .sum{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px;
+      padding:10px 12px;
+      background:#fff;
+    }
+    .sum .k{ font-size:10px; color: var(--p-muted); }
+    .sum .v{ font-size:18px; font-weight:950; margin-top:2px; }
+    .sum .s{ font-size:11px; color: var(--p-muted); margin-top:2px; }
+
+    .pdf-section-title{
+      font-size:12px;
+      font-weight:900;
+      color: var(--p-ink);
+      margin: 2px 0 -2px;
+    }
+
+    /* tabel khusus PDF: rapih, padat, tidak “kebesaran” */
+    .rtable{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px;
+      overflow:hidden;
+      background:#fff;
+    }
+    .rtable thead th{
+      background: rgba(30,99,214,.08);
+      color: var(--p-ink);
+      font-size:11px;
+      font-weight:900;
+      text-align:left;
+      padding:10px 10px;
+      border-bottom:1px solid rgba(15,23,42,.10);
+    }
+    .rtable tbody td{
+      font-size:11px;
+      padding:10px 10px;
+      vertical-align:top;
+      border-bottom:1px solid rgba(15,23,42,.08);
+    }
+    .rtable tbody tr:last-child td{ border-bottom:none; }
+    .rnote{
+      font-size:11px;
+      color: var(--p-muted);
+      margin-top:6px;
+    }
+
+    /* chart cards di PDF */
+    .pdf-chart-grid{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .chart-card{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:16px;
+      padding:12px;
+      background:#fff;
+    }
+    .chart-top{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .chart-top .t{
+      font-weight:950;
+      font-size:12px;
+    }
+    .chart-top .m{
+      font-size:11px;
+      color: var(--p-muted);
+      white-space:nowrap;
+    }
+
+    .pdf-footer{
+      margin-top:auto;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      font-size:10px;
+      color: var(--p-muted);
+      padding-top:8px;
+      border-top:1px solid rgba(15,23,42,.08);
     }
   </style>
 </head>
@@ -427,26 +591,76 @@
     </div>
   </div>
 
-  <!-- REPORT PAGE 1 (IDENTITAS + TABEL) -->
-  <div id="reportPage1">
-    <div class="report-card">
-      <h2 style="margin:0 0 6px;">Laporan Monitoring</h2>
-      <div class="small" id="reportMeta"></div>
-      <div class="small" id="reportIdentity" style="margin-top:6px;"></div>
-      <div class="hr"></div>
+  <!-- =========================================================
+       PDF PAGE 1 (A4 SHEET): IDENTITAS + SUMMARY + TABEL
+  ========================================================== -->
+  <div id="reportPage1" class="pdf-sheet" aria-hidden="true">
+    <div class="pdf-card">
+      <div class="pdf-header">
+        <div class="pdf-brand">
+          <img class="pdf-logo" id="pdfLogo1" src="assets/logo-innoviyup.png" alt="Logo" />
+          <div style="min-width:0">
+            <h2 class="pdf-title">Laporan Monitoring</h2>
+            <div class="pdf-sub" id="reportMeta">—</div>
+          </div>
+        </div>
+        <div class="pdf-meta-right" id="reportRightMeta">—</div>
+      </div>
+
+      <div class="pdf-chips" id="reportIdentityChips"></div>
+
+      <div class="pdf-summary" id="reportSummary"></div>
+
+      <div class="pdf-section-title">Riwayat Pengukuran</div>
       <div id="reportRiwayat"></div>
+      <div class="rnote" id="reportNote" style="display:none;"></div>
+
+      <div class="pdf-footer">
+        <div id="reportFooterLeft">iYup Care</div>
+        <div id="reportFooterRight">—</div>
+      </div>
     </div>
   </div>
 
-  <!-- REPORT PAGE 2 (GRAFIK) -->
-  <div id="reportPage2">
-    <div class="report-card">
-      <h2 style="margin:0 0 6px;">Grafik Pertumbuhan</h2>
-      <div class="small" id="reportChartMeta"></div>
-      <div class="hr"></div>
-      <canvas id="reportChartBB" height="180"></canvas>
-      <div style="height:14px"></div>
-      <canvas id="reportChartTB" height="180"></canvas>
+  <!-- =========================================================
+       PDF PAGE 2 (A4 SHEET): GRAFIK (FULL WIDTH)
+  ========================================================== -->
+  <div id="reportPage2" class="pdf-sheet" aria-hidden="true">
+    <div class="pdf-card">
+      <div class="pdf-header">
+        <div class="pdf-brand">
+          <img class="pdf-logo" id="pdfLogo2" src="assets/logo-innoviyup.png" alt="Logo" />
+          <div style="min-width:0">
+            <h2 class="pdf-title">Grafik Pertumbuhan</h2>
+            <div class="pdf-sub" id="reportChartMeta">—</div>
+          </div>
+        </div>
+        <div class="pdf-meta-right" id="reportChartRightMeta">—</div>
+      </div>
+
+      <div class="pdf-chart-grid">
+        <div class="chart-card">
+          <div class="chart-top">
+            <div class="t">Berat Badan (kg)</div>
+            <div class="m" id="reportBbMini">—</div>
+          </div>
+          <!-- width dibuat lebar supaya chart tidak “kecil di kiri” -->
+          <canvas id="reportChartBB" width="738" height="240"></canvas>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-top">
+            <div class="t">Tinggi Badan (cm)</div>
+            <div class="m" id="reportTbMini">—</div>
+          </div>
+          <canvas id="reportChartTB" width="738" height="240"></canvas>
+        </div>
+      </div>
+
+      <div class="pdf-footer">
+        <div>iYup Care</div>
+        <div id="reportFooterRight2">—</div>
+      </div>
     </div>
   </div>
 
@@ -465,10 +679,12 @@
     // ===========================
     // CONFIG (ukuran vs kualitas)
     // ===========================
-    const PDF_SCREENSHOT_SCALE = 1.2;      // dulu 2 (besar)
-    const PDF_JPEG_QUALITY = 0.72;         // 0.65–0.78 umumnya bagus
-    const GALERI_MAX_W = 900;              // 800–900 untuk target <10MB
-    const GALERI_JPEG_QUALITY = 0.70;      // turunkan ke 0.65 kalau masih besar
+    const PDF_SCREENSHOT_SCALE = 1.25;   // sedikit naik biar tajam, tetap aman ukuran
+    const PDF_JPEG_QUALITY = 0.78;       // lebih tajam untuk teks tabel; kalau size besar turunkan 0.72
+    const PDF_MAX_TABLE_ROWS = 10;       // biar page 1 tetap rapi (ubah kalau mau)
+
+    const GALERI_MAX_W = 900;            // 800–900 untuk target <10MB
+    const GALERI_JPEG_QUALITY = 0.70;    // turunkan ke 0.65 kalau masih besar
 
     // ===========================
     // Auth + year
@@ -644,6 +860,14 @@
         if(ok && cur !== undefined && cur !== null && String(cur).trim() !== "") return cur;
       }
       return fallback;
+    }
+
+    function fmtNum(v, decimals=1){
+      if(v === null || v === undefined || v === "") return "-";
+      const n = Number(v);
+      if(Number.isNaN(n)) return String(v);
+      const p = Math.pow(10, decimals);
+      return String(Math.round(n * p) / p);
     }
 
     async function getUserNameForPdf(){
@@ -1023,7 +1247,21 @@
     });
 
     // ===========================
-    // PDF helpers: screenshot DOM -> JPEG
+    // PDF helpers: tunggu img load (logo)
+    // ===========================
+    function waitImagesLoaded(rootEl){
+      const imgs = Array.from(rootEl.querySelectorAll("img"));
+      return Promise.all(imgs.map(img => {
+        if(img.complete && img.naturalWidth > 0) return Promise.resolve();
+        return new Promise(res => {
+          img.onload = () => res();
+          img.onerror = () => res();
+        });
+      }));
+    }
+
+    // ===========================
+    // PDF helpers: screenshot DOM -> JPEG (return dim)
     // ===========================
     async function domToJpegData(el){
       const canvas = await html2canvas(el, {
@@ -1031,7 +1269,33 @@
         useCORS: true,
         backgroundColor: "#ffffff"
       });
-      return canvas.toDataURL("image/jpeg", PDF_JPEG_QUALITY);
+      return {
+        dataUrl: canvas.toDataURL("image/jpeg", PDF_JPEG_QUALITY),
+        w: canvas.width,
+        h: canvas.height
+      };
+    }
+
+    // Add image to page WITHOUT distorsi (fit)
+    function addJpegFitToPage(pdf, jpegObj, margin = 0){
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+
+      const maxW = pageW - margin*2;
+      const maxH = pageH - margin*2;
+
+      const imgRatio = jpegObj.w / jpegObj.h;
+
+      let w = maxW;
+      let h = w / imgRatio;
+      if(h > maxH){
+        h = maxH;
+        w = h * imgRatio;
+      }
+
+      const x = (pageW - w) / 2;
+      const y = margin; // top margin
+      pdf.addImage(jpegObj.dataUrl, "JPEG", x, y, w, h, undefined, "FAST");
     }
 
     // ===========================
@@ -1039,9 +1303,7 @@
     // ===========================
     async function imgUrlToJpegData(url, maxW = GALERI_MAX_W, quality = GALERI_JPEG_QUALITY){
       const token = mustToken();
-      const resp = await fetch(url, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const resp = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       if(!resp.ok) throw new Error(`Gagal ambil gambar (${resp.status})`);
       const blob = await resp.blob();
 
@@ -1098,9 +1360,8 @@
 
           const imgUrl = `${base}/galeri/${encodeURIComponent(it.id)}/image`;
 
-          let jpeg = null;
           try{
-            jpeg = await imgUrlToJpegData(imgUrl, GALERI_MAX_W, GALERI_JPEG_QUALITY);
+            const jpeg = await imgUrlToJpegData(imgUrl, GALERI_MAX_W, GALERI_JPEG_QUALITY);
             pdf.addImage(jpeg, "JPEG", x, y, cellW, cellH, undefined, "FAST");
           }catch(e){
             pdf.setFontSize(10);
@@ -1117,7 +1378,7 @@
     }
 
     // ===========================
-    // PDF Export (produksi)
+    // PDF Export (layout rapi)
     // ===========================
     async function exportPdfForSelectedAnak(){
       const anakId = anakSelect.value;
@@ -1127,7 +1388,7 @@
       if(!list.length){ showMsg("Belum ada data monitoring untuk dibuat PDF.", "err"); return; }
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // ---- identitas user + anak
+      // identitas user + anak
       const userName = await getUserNameForPdf();
       const anakDetail = await getAnakDetailForPdf(anakId);
 
@@ -1135,59 +1396,144 @@
       const jkAnak = anakDetail?.jk ?? "—";
       const umurAnak = calcAgeText(anakDetail?.tanggal_lahir);
 
+      const exportedAt = toISODate(new Date());
       document.getElementById("reportMeta").textContent =
-        `${namaAnak} • diekspor: ${toISODate(new Date())} • total data: ${list.length}`;
+        `${namaAnak} • diekspor: ${exportedAt} • total data: ${list.length}`;
+      document.getElementById("reportRightMeta").textContent = `ID Anak: ${anakId}`;
 
-      document.getElementById("reportIdentity").innerHTML =
-        `Nama Ibu/User: <b>${escHtml(userName)}</b> &nbsp;|&nbsp; ` +
-        `Nama Anak: <b>${escHtml(namaAnak)}</b> &nbsp;|&nbsp; ` +
-        `JK: <b>${escHtml(jkAnak)}</b> &nbsp;|&nbsp; ` +
-        `Umur: <b>${escHtml(umurAnak)}</b>`;
+      document.getElementById("reportFooterRight").textContent = `Diekspor: ${exportedAt}`;
+      document.getElementById("reportFooterRight2").textContent = `Diekspor: ${exportedAt}`;
+      document.getElementById("reportChartRightMeta").textContent = `Total titik: ${list.length}`;
 
-      // ---- tabel ringkas (halaman 1)
+      // chips identitas
+      document.getElementById("reportIdentityChips").innerHTML = `
+        <div class="pdf-chip"><span>Nama Ibu/User</span><b>${escHtml(userName)}</b></div>
+        <div class="pdf-chip"><span>Nama Anak</span><b>${escHtml(namaAnak)}</b></div>
+        <div class="pdf-chip"><span>Jenis Kelamin</span><b>${escHtml(jkAnak)}</b></div>
+        <div class="pdf-chip"><span>Umur</span><b>${escHtml(umurAnak)}</b></div>
+      `;
+
+      // summary (ambil data terakhir)
+      const last = list[list.length - 1];
+      const prev = list.length > 1 ? list[list.length - 2] : null;
+
+      const lastDate = String(last?.tanggal_ukur ?? "").slice(0,10) || "—";
+      const lastBB = fmtNum(last?.berat_badan, 1);
+      const lastTB = fmtNum(last?.tinggi_badan, 1);
+
+      let deltaBB = "—";
+      let deltaTB = "—";
+      if(prev){
+        const dBB = Number(last?.berat_badan ?? 0) - Number(prev?.berat_badan ?? 0);
+        const dTB = Number(last?.tinggi_badan ?? 0) - Number(prev?.tinggi_badan ?? 0);
+        deltaBB = (Math.round(dBB*10)/10 >= 0 ? "+" : "") + (Math.round(dBB*10)/10);
+        deltaTB = (Math.round(dTB*10)/10 >= 0 ? "+" : "") + (Math.round(dTB*10)/10);
+      }
+
+      document.getElementById("reportSummary").innerHTML = `
+        <div class="sum">
+          <div class="k">Pengukuran Terakhir</div>
+          <div class="v">${escHtml(lastDate)}</div>
+          <div class="s">dibuat otomatis dari data terbaru</div>
+        </div>
+        <div class="sum">
+          <div class="k">BB Terakhir</div>
+          <div class="v">${escHtml(lastBB)} kg</div>
+          <div class="s">Δ dari sebelumnya: <b>${escHtml(deltaBB)}</b></div>
+        </div>
+        <div class="sum">
+          <div class="k">TB Terakhir</div>
+          <div class="v">${escHtml(lastTB)} cm</div>
+          <div class="s">Δ dari sebelumnya: <b>${escHtml(deltaTB)}</b></div>
+        </div>
+      `;
+
+      // tabel ringkas (biar halaman 1 rapi & tidak “ketarik”)
+      const newestFirst = list.slice().reverse();
+      const rows = newestFirst.slice(0, PDF_MAX_TABLE_ROWS);
+      const truncated = newestFirst.length > PDF_MAX_TABLE_ROWS;
+
       document.getElementById("reportRiwayat").innerHTML = `
-        <table class="table">
-          <thead><tr><th>Tanggal</th><th>BB</th><th>TB</th><th>Catatan</th></tr></thead>
+        <table class="rtable">
+          <thead>
+            <tr>
+              <th style="width:120px">Tanggal</th>
+              <th style="width:90px">BB</th>
+              <th style="width:90px">TB</th>
+              <th>Catatan</th>
+            </tr>
+          </thead>
           <tbody>
-            ${list.slice().reverse().map(x => `
+            ${rows.map(x => `
               <tr>
-                <td>${String(x.tanggal_ukur ?? "").slice(0,10)}</td>
-                <td>${x.berat_badan ?? "-"}</td>
-                <td>${x.tinggi_badan ?? "-"}</td>
-                <td>${escHtml((x.catatan ?? "").toString().slice(0,60) || "-")}</td>
+                <td>${escHtml(String(x.tanggal_ukur ?? "").slice(0,10) || "-")}</td>
+                <td>${escHtml(fmtNum(x.berat_badan, 1))}</td>
+                <td>${escHtml(fmtNum(x.tinggi_badan, 1))}</td>
+                <td>${escHtml((x.catatan ?? "").toString().slice(0,120) || "-")}</td>
               </tr>
             `).join("")}
           </tbody>
         </table>
       `;
 
-      // ---- grafik (halaman 2)
+      const noteEl = document.getElementById("reportNote");
+      if(truncated){
+        noteEl.style.display = "block";
+        noteEl.textContent = `Menampilkan ${PDF_MAX_TABLE_ROWS} data terbaru dari total ${list.length} data.`;
+      }else{
+        noteEl.style.display = "none";
+        noteEl.textContent = "";
+      }
+
+      // meta chart
+      document.getElementById("reportChartMeta").textContent =
+        `${namaAnak} • ${jkAnak} • umur: ${umurAnak}`;
+
+      // grafik (full width di PDF)
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
       const weights = list.map(x => Number(x.berat_badan ?? 0));
       const heights = list.map(x => Number(x.tinggi_badan ?? 0));
 
+      // mini info chart (min–max)
+      const wMin = Math.min(...weights);
+      const wMax = Math.max(...weights);
+      const hMin = Math.min(...heights);
+      const hMax = Math.max(...heights);
+      document.getElementById("reportBbMini").textContent = `min ${fmtNum(wMin,1)} • max ${fmtNum(wMax,1)} • terakhir ${lastBB}`;
+      document.getElementById("reportTbMini").textContent = `min ${fmtNum(hMin,1)} • max ${fmtNum(hMax,1)} • terakhir ${lastTB}`;
+
       if(window.__reportChartBB) window.__reportChartBB.destroy();
       if(window.__reportChartTB) window.__reportChartTB.destroy();
+
+      const commonReportOpts = {
+        responsive: false,
+        devicePixelRatio: 1,
+        plugins: { legend: { display:false } },
+        elements: { point: { radius:2, hoverRadius:3 } },
+        scales: {
+          x: { ticks: { font:{ size:10 }, maxRotation:0, autoSkip:true, maxTicksLimit:7 }, grid:{ display:false } },
+          y: { ticks: { font:{ size:10 } }, grid:{ color:"rgba(15,23,42,.08)" } }
+        }
+      };
 
       window.__reportChartBB = new Chart(document.getElementById("reportChartBB"), {
         type:"line",
         data:{ labels, datasets:[{ label:"BB (kg)", data:weights, tension:.35 }] },
-        options:{ responsive:false, plugins:{ legend:{display:false} } }
+        options: commonReportOpts
       });
 
       window.__reportChartTB = new Chart(document.getElementById("reportChartTB"), {
         type:"line",
         data:{ labels, datasets:[{ label:"TB (cm)", data:heights, tension:.35 }] },
-        options:{ responsive:false, plugins:{ legend:{display:false} } }
+        options: commonReportOpts
       });
 
-      document.getElementById("reportChartMeta").textContent =
-        `${namaAnak} • ${jkAnak} • umur: ${umurAnak}`;
-
-      // pastikan chart selesai render
+      // pastikan logo & chart siap sebelum screenshot
+      await waitImagesLoaded(document.getElementById("reportPage1"));
+      await waitImagesLoaded(document.getElementById("reportPage2"));
       await new Promise(r => setTimeout(r, 250));
 
-      // ---- ambil galeri list (SEMUA, tanpa limit)
+      // ambil galeri list (SEMUA)
       let galeriList = [];
       try{
         const g = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
@@ -1196,28 +1542,20 @@
         galeriList = [];
       }
 
-      // ---- buat PDF
+      // buat PDF
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF("p", "mm", "a4");
 
-      // Page 1: screenshot reportPage1 -> JPEG
+      // Page 1: screenshot A4 sheet -> JPEG, FIT (no distorsi)
       const page1Jpeg = await domToJpegData(document.getElementById("reportPage1"));
-      {
-        const pageW = pdf.internal.pageSize.getWidth();
-        const pageH = pdf.internal.pageSize.getHeight();
-        pdf.addImage(page1Jpeg, "JPEG", 0, 0, pageW, pageH, undefined, "FAST");
-      }
+      addJpegFitToPage(pdf, page1Jpeg, 0);
 
-      // Page 2: screenshot reportPage2 -> JPEG
+      // Page 2
       pdf.addPage();
       const page2Jpeg = await domToJpegData(document.getElementById("reportPage2"));
-      {
-        const pageW = pdf.internal.pageSize.getWidth();
-        const pageH = pdf.internal.pageSize.getHeight();
-        pdf.addImage(page2Jpeg, "JPEG", 0, 0, pageW, pageH, undefined, "FAST");
-      }
+      addJpegFitToPage(pdf, page2Jpeg, 0);
 
-      // Pages berikutnya: galeri grid (JPEG terkompresi per foto)
+      // Pages berikutnya: galeri grid (yang kamu bilang sudah bagus)
       if(galeriList.length){
         await addGaleriPagesToPdf(pdf, galeriList);
       } else {
