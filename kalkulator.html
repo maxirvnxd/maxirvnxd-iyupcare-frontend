@@ -83,6 +83,8 @@
       justify-content:flex-end;
       flex-wrap:wrap;
     }
+
+    /* Buttons */
     .btn{
       display:inline-flex;
       align-items:center;
@@ -94,9 +96,10 @@
       background: rgba(255,255,255,.80);
       font-weight: 950;
       font-size: 13px;
-      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease, filter .12s ease;
       white-space: nowrap;
       cursor:pointer;
+      color: inherit;
     }
     .btn:hover{
       border-color: rgba(30,99,214,.25);
@@ -109,9 +112,13 @@
       color:#fff;
     }
     .btn.primary:hover{ filter: brightness(.98); }
-    .btn.secondary{
-      background: rgba(255,255,255,.72);
+    .btn.secondary{ background: rgba(255,255,255,.72); }
+    .btn.success{
+      background: linear-gradient(180deg, rgba(31,157,85,1), rgba(20,122,66,1));
+      border-color: rgba(31,157,85,0);
+      color:#fff;
     }
+    .btn.success:hover{ filter: brightness(.98); }
     .btn:disabled{ opacity:.7; cursor:not-allowed; transform:none; box-shadow:none; }
 
     /* Hero */
@@ -137,6 +144,7 @@
       margin-bottom: 10px;
       flex-wrap:wrap;
     }
+    .btn.back{ color:#000; } /* ← Kembali hitam */
     .hero h1{
       margin:0;
       font-size: clamp(22px, 3.2vw, 34px);
@@ -150,20 +158,6 @@
       line-height: 1.65;
       max-width: 70ch;
     }
-    .chips{ margin-top: 12px; display:flex; gap:8px; flex-wrap:wrap; }
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      font-weight: 950;
-      font-size: 12px;
-      border:1px solid rgba(15,23,42,.10);
-      background: rgba(255,255,255,.72);
-    }
-    .chip.green{ border-color: rgba(31,157,85,.25); background: rgba(31,157,85,.10); }
-    .chip.orange{ border-color: rgba(242,153,74,.25); background: rgba(242,153,74,.10); }
 
     .hero-media{
       border:1px solid rgba(15,23,42,.10);
@@ -240,7 +234,7 @@
     .small{ font-size:12px; color:var(--muted); }
     .small-muted{ font-size:12px; color:var(--muted); opacity:.9; }
 
-    /* Alerts compatible dengan api.js */
+    /* Alerts (fallback) */
     .alert{
       border-radius: 14px;
       padding: 10px 12px;
@@ -278,7 +272,7 @@
       border-radius: 16px;
       overflow:hidden;
       background:#fff;
-      min-width: 720px;
+      min-width: 1050px;
     }
     thead th{
       background: rgba(30,99,214,.08);
@@ -305,10 +299,6 @@
       width:16px;height:16px;border:2px solid rgba(255,255,255,.55);
       border-top-color:#fff;border-radius:50%;display:inline-block;
       animation:spin .75s linear infinite;
-    }
-    .spinner.dark{
-      border-color: rgba(15,23,42,.20);
-      border-top-color: rgba(15,23,42,.75);
     }
     @keyframes spin{ to{ transform:rotate(360deg);} }
 
@@ -418,17 +408,19 @@
     .rtable thead th{
       background: rgba(30,99,214,.08);
       color: var(--ink);
-      font-size:11px;
+      font-size:10px;
       font-weight:900;
       text-align:left;
-      padding:10px 10px;
+      padding:9px 8px;
       border-bottom:1px solid rgba(15,23,42,.10);
+      white-space:nowrap;
     }
     .rtable tbody td{
-      font-size:11px;
-      padding:10px 10px;
+      font-size:10px;
+      padding:9px 8px;
       vertical-align:top;
       border-bottom:1px solid rgba(15,23,42,.08);
+      white-space:nowrap;
     }
     .rtable tbody tr:last-child td{ border-bottom:none; }
 
@@ -451,7 +443,7 @@
       .meta{ grid-template-columns: 1fr; }
       .topbar-inner{ gap: 10px; }
       .brand{ min-width: 0; }
-      table{ min-width: 640px; }
+      table{ min-width: 980px; }
     }
   </style>
 </head>
@@ -478,19 +470,13 @@
       <div class="hero-inner">
         <div>
           <div class="back-row">
-            <a class="btn" href="dashboard.html">← Kembali</a>
+            <a class="btn back" href="dashboard.html">← Kembali</a>
           </div>
 
           <h1>Kalkulator Gizi (Manual) berbasis data anak</h1>
           <p>
-            Pilih anak dari data yang sudah kamu input di halaman Monitoring, lalu isi BB/TB dan aktivitas.
-            Sistem akan memanggil endpoint <b>/api/kalkulator</b> (protected), menyimpan hasil, dan menampilkan riwayat per anak.
+            Pilih anak, isi BB/TB, usia, jenis kelamin, dan aktivitas. Hasil akan tersimpan dan riwayatnya tampil per anak.
           </p>
-
-          <div class="chips">
-            <div class="chip green">Auto isi JK & usia (jika tersedia)</div>
-            <div class="chip orange">Unduh PDF hasil + riwayat</div>
-          </div>
         </div>
 
         <div class="hero-media">
@@ -573,9 +559,9 @@
 
               <button class="btn secondary" type="button" id="btnReset">Reset</button>
 
-              <button class="btn" type="button" id="btnPdf">
+              <button class="btn success" type="button" id="btnPdf">
                 <span id="btnPdfText">Unduh PDF</span>
-                <span id="btnPdfSpin" class="spinner dark" style="display:none;"></span>
+                <span id="btnPdfSpin" class="spinner" style="display:none;"></span>
               </button>
 
               <div class="small" id="saveHint">—</div>
@@ -588,7 +574,7 @@
       <article class="card">
         <div class="card-inner">
           <h2 class="title">Hasil & Riwayat</h2>
-          <div class="desc">Klik salah satu baris riwayat untuk melihat detail respons JSON.</div>
+          <div class="desc">Klik salah satu baris riwayat untuk memperbarui ringkasan hasil.</div>
 
           <div class="meta" aria-label="Ringkasan hasil">
             <div class="box">
@@ -604,7 +590,7 @@
               <div class="v" id="sumStatus">—</div>
             </div>
             <div class="box">
-              <div class="k">Energi / Kalori</div>
+              <div class="k">Kebutuhan Kalori</div>
               <div class="v" id="sumEnergi">—</div>
             </div>
           </div>
@@ -623,17 +609,15 @@
                   <th>IMT</th>
                   <th>Z</th>
                   <th>Status</th>
+                  <th>Kebutuhan Kalori</th>
+                  <th>BB Ideal Min</th>
+                  <th>BB Ideal Max</th>
                 </tr>
               </thead>
               <tbody id="histBody">
-                <tr><td colspan="10" class="small">Pilih anak untuk memuat riwayat.</td></tr>
+                <tr><td colspan="13" class="small">Pilih anak untuk memuat riwayat.</td></tr>
               </tbody>
             </table>
-          </div>
-
-          <div style="margin-top:12px;">
-            <div class="small" style="margin-bottom:6px;">Detail JSON (baris terpilih)</div>
-            <pre id="rawResp" style="white-space:pre-wrap;margin:0;border:1px solid rgba(15,23,42,.10);border-radius:14px;background:#fff;padding:12px;max-height:280px;overflow:auto;">—</pre>
           </div>
         </div>
       </article>
@@ -707,7 +691,6 @@
     const saveHint = document.getElementById("saveHint");
 
     const histBody = document.getElementById("histBody");
-    const rawResp = document.getElementById("rawResp");
 
     const miniStatus = document.getElementById("miniStatus");
     const miniSub = document.getElementById("miniSub");
@@ -727,15 +710,7 @@
     const pdfFooterRight = document.getElementById("pdfFooterRight");
 
     // =========================
-    // State
-    // =========================
-    let anakList = [];
-    let selectedAnak = null;
-    let history = []; // per anak terpilih
-    let selectedHistoryIndex = -1;
-
-    // =========================
-    // Helpers
+    // Fallback showOk/showError (kalau global tidak ada)
     // =========================
     function esc(s){
       return String(s ?? "")
@@ -745,7 +720,26 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
+    if(typeof window.showOk !== "function"){
+      window.showOk = (el, text) => { el.innerHTML = `<div class="alert ok">${esc(text)}</div>`; };
+    }
+    if(typeof window.showError !== "function"){
+      window.showError = (el, err) => {
+        const t = (err && (err.message || err?.payload?.message)) ? (err.message || err.payload.message) : String(err || "Terjadi error");
+        el.innerHTML = `<div class="alert err">${esc(t)}</div>`;
+      };
+    }
 
+    // =========================
+    // State
+    // =========================
+    let anakList = [];
+    let selectedAnak = null;
+    let history = []; // per anak terpilih
+
+    // =========================
+    // Helpers
+    // =========================
     function toISODate(d){
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, "0");
@@ -869,14 +863,12 @@
       const jkRaw = selectedAnak.jenis_kelamin ?? selectedAnak.jk ?? selectedAnak.gender ?? "";
       const jkLP = normalizeGenderToLP(jkRaw);
 
-      // hint
       const hintParts = [];
       hintParts.push(`Nama: ${nama}`);
       if(tglLahir) hintParts.push(`Lahir: ${tglLahir}`);
       if(jkLP) hintParts.push(`JK: ${jkLP}`);
       anakHint.textContent = hintParts.join(" • ");
 
-      // auto fill usia (bulan) jika punya tanggal lahir
       if(tglLahir){
         const b = new Date(tglLahir + "T00:00:00");
         if(!Number.isNaN(b.getTime())){
@@ -885,7 +877,6 @@
         }
       }
 
-      // auto fill JK jika bisa dipetakan
       if(jkLP) jkEl.value = jkLP;
 
       setMini("Siap dihitung", `Anak terpilih: ${nama}`);
@@ -897,10 +888,45 @@
     function normalizeEntry(resp, payload){
       const r = resp?.data ?? resp ?? {};
 
-      const bmi = pick(r, ["bmi","imt","hasil.bmi","hasil.imt"], null);
-      const z = pick(r, ["zscore","z_score","hasil.zscore","hasil.z_score","result.zscore"], null);
-      const status = pick(r, ["status","status_gizi","hasil.status","hasil.status_gizi","kategori"], null);
-      const energi = pick(r, ["energi","kalori","kebutuhan_energi","kebutuhan_kalori","hasil.energi","hasil.kalori"], null);
+      const bmi = pick(r, ["bmi","imt","hasil.bmi","hasil.imt","result.bmi","result.imt"], null);
+      const z = pick(r, ["zscore","z_score","hasil.zscore","hasil.z_score","result.zscore","result.z_score"], null);
+      const status = pick(r, ["status","status_gizi","hasil.status","hasil.status_gizi","kategori","result.status"], null);
+
+      // kalori/energi
+      const kalori = pick(r, [
+        "kebutuhan_kalori","kebutuhan_energi","kalori","energi",
+        "hasil.kebutuhan_kalori","hasil.kebutuhan_energi","hasil.kalori","hasil.energi",
+        "result.kalori","result.energi"
+      ], null);
+
+      // BB ideal (range)
+      let bbIdealMin = pick(r, [
+        "bb_ideal_min","bbIdealMin","ideal_bb_min","ideal_weight_min",
+        "hasil.bb_ideal_min","hasil.bb_ideal.min","hasil.ideal_weight_min",
+        "result.bb_ideal_min","result.bb_ideal.min"
+      ], null);
+
+      let bbIdealMax = pick(r, [
+        "bb_ideal_max","bbIdealMax","ideal_bb_max","ideal_weight_max",
+        "hasil.bb_ideal_max","hasil.bb_ideal.max","hasil.ideal_weight_max",
+        "result.bb_ideal_max","result.bb_ideal.max"
+      ], null);
+
+      const bbIdeal = pick(r, [
+        "bb_ideal","bbIdeal","ideal_bb","ideal_weight",
+        "hasil.bb_ideal","hasil.ideal_weight",
+        "result.bb_ideal","result.ideal_weight"
+      ], null);
+
+      if(bbIdealMin == null || bbIdealMax == null){
+        if(Array.isArray(bbIdeal)){
+          if(bbIdealMin == null && bbIdeal.length > 0) bbIdealMin = bbIdeal[0];
+          if(bbIdealMax == null && bbIdeal.length > 1) bbIdealMax = bbIdeal[1];
+        } else if(bbIdeal && typeof bbIdeal === "object"){
+          if(bbIdealMin == null) bbIdealMin = bbIdeal.min ?? bbIdeal.minimum ?? bbIdeal.lower ?? null;
+          if(bbIdealMax == null) bbIdealMax = bbIdeal.max ?? bbIdeal.maximum ?? bbIdeal.upper ?? null;
+        }
+      }
 
       return {
         created_time: nowTime(),
@@ -914,15 +940,15 @@
         bmi,
         zscore: z,
         status,
-        energi,
+        kalori,
+        bb_ideal_min: bbIdealMin,
+        bb_ideal_max: bbIdealMax,
         raw: resp
       };
     }
 
     function saveHistoryToLocal(anakId, items){
-      try{
-        localStorage.setItem(storageKey(anakId), JSON.stringify(items));
-      }catch{}
+      try{ localStorage.setItem(storageKey(anakId), JSON.stringify(items)); }catch{}
     }
 
     function loadHistoryFromLocal(anakId){
@@ -936,7 +962,7 @@
       }
     }
 
-    // Coba beberapa endpoint umum (kalau backend kamu punya salah satunya)
+    // Coba beberapa endpoint umum (kalau backend punya salah satu)
     async function tryFetchHistoryFromBackend(anakId){
       const candidates = [
         `/anak/${anakId}/kalkulator`,
@@ -951,18 +977,16 @@
         try{
           const res = await api(path, { auth:true });
           const list = Array.isArray(res?.data) ? res.data : (Array.isArray(res) ? res : []);
-          if(!list.length) {
-            // kalau GET /kalkulator return list semua user, filter bila ada anak_id
+          if(!list.length){
             if(path === "/kalkulator"){
               const filtered = list.filter(x => String(x.anak_id ?? x.child_id ?? "") === String(anakId));
               return filtered;
             }
             return [];
           }
-          // filter jika endpoint umum mengembalikan semua
           const filtered = list.filter(x => {
             const aid = x.anak_id ?? x.child_id ?? null;
-            if(aid == null) return true; // kalau tidak ada field anak_id, biarkan
+            if(aid == null) return true;
             return String(aid) === String(anakId);
           });
           return filtered;
@@ -970,13 +994,10 @@
           lastErr = e;
         }
       }
-      // kalau tidak ada endpoint riwayat: kembalikan error supaya fallback ke local
       throw lastErr || new Error("Riwayat backend tidak tersedia.");
     }
 
-    // Convert backend rows -> entry style kita
     function normalizeHistoryRows(rows){
-      // rows bisa punya field beda-beda; kita hanya ambil yang umum
       return rows.map(x => {
         const tanggal = String(x.tanggal ?? x.date ?? x.created_at ?? "").slice(0,10) || null;
         const waktu = x.created_at ? String(x.created_at).replace("T"," ").slice(11,19) : "—";
@@ -998,16 +1019,30 @@
       });
     }
 
+    function applySummaryFromEntry(e){
+      sumBmi.textContent = fmt(e?.bmi, 2);
+      sumZ.textContent = fmt(e?.zscore, 2);
+      sumStatus.textContent = e?.status ? String(e.status) : "—";
+      sumEnergi.textContent = (e?.kalori !== null && e?.kalori !== undefined && e?.kalori !== "")
+        ? String(e.kalori)
+        : "—";
+
+      setMini(e?.status ? String(e.status) : "Selesai", `Terakhir dihitung: ${e?.tanggal || "—"}`);
+    }
+
+    function selectHistory(index){
+      if(index < 0 || index >= history.length) return;
+      applySummaryFromEntry(history[index]);
+    }
+
     function renderHistory(){
       if(!history.length){
-        histBody.innerHTML = `<tr><td colspan="10" class="small">Belum ada riwayat untuk anak ini.</td></tr>`;
-        rawResp.textContent = "—";
-        selectedHistoryIndex = -1;
+        histBody.innerHTML = `<tr><td colspan="13" class="small">Belum ada riwayat untuk anak ini.</td></tr>`;
         return;
       }
 
       histBody.innerHTML = history.slice().reverse().map((h, idxFromEnd) => {
-        const idx = history.length - 1 - idxFromEnd; // index asli
+        const idx = history.length - 1 - idxFromEnd;
         return `
           <tr data-idx="${idx}">
             <td>${esc(h.created_time || "—")}</td>
@@ -1020,29 +1055,15 @@
             <td>${esc(fmt(h.bmi,2))}</td>
             <td>${esc(fmt(h.zscore,2))}</td>
             <td>${esc(h.status || "—")}</td>
+            <td>${esc(fmt(h.kalori,0))}</td>
+            <td>${esc(fmt(h.bb_ideal_min,1))}</td>
+            <td>${esc(fmt(h.bb_ideal_max,1))}</td>
           </tr>
         `;
       }).join("");
 
       // auto select latest
       selectHistory(history.length - 1);
-    }
-
-    function applySummaryFromEntry(e){
-      sumBmi.textContent = fmt(e?.bmi, 2);
-      sumZ.textContent = fmt(e?.zscore, 2);
-      sumStatus.textContent = e?.status ? String(e.status) : "—";
-      sumEnergi.textContent = e?.energi ? String(e.energi) : "—";
-
-      setMini(e?.status ? String(e.status) : "Selesai", `Terakhir dihitung: ${e?.tanggal || "—"}`);
-    }
-
-    function selectHistory(index){
-      if(index < 0 || index >= history.length) return;
-      selectedHistoryIndex = index;
-      const e = history[index];
-      rawResp.textContent = JSON.stringify(e.raw, null, 2);
-      applySummaryFromEntry(e);
     }
 
     document.getElementById("histTable").addEventListener("click", (ev) => {
@@ -1078,13 +1099,10 @@
         return;
       }
 
-      // Try backend history, fallback local
       saveHint.textContent = "Memuat riwayat...";
       try{
         const rows = await tryFetchHistoryFromBackend(id);
-        // kalau backend mengembalikan row kalkulator, normalize jadi entry
         history = normalizeHistoryRows(rows);
-        // simpan juga ke local agar stabil
         saveHistoryToLocal(id, history);
         saveHint.textContent = `Riwayat dimuat (${history.length}).`;
       }catch(e){
@@ -1103,7 +1121,6 @@
       try{
         await loadAnak();
 
-        // auto select first real child if exists
         if(anakSelect.options.length > 1){
           anakSelect.selectedIndex = 1;
           anakSelect.dispatchEvent(new Event("change"));
@@ -1125,7 +1142,6 @@
       bbEl.value = "";
       tbEl.value = "";
       aktEl.value = "";
-      // tanggal tetap
       msg.innerHTML = "";
     });
 
@@ -1164,12 +1180,9 @@
 
         const entry = normalizeEntry(resp, payload);
 
-        // push ke history (per anak)
         history.push(entry);
         saveHistoryToLocal(anakId, history);
         renderHistory();
-
-        // auto select newest
         selectHistory(history.length - 1);
 
       } catch (err) {
@@ -1244,7 +1257,6 @@
         <div class="pdf-chip"><span>Total Riwayat</span><b>${esc(String(history.length))}</b></div>
       `;
 
-      // summary pakai data terbaru (kalau ada)
       const last = history.length ? history[history.length - 1] : null;
       pdfSummary.innerHTML = `
         <div class="psum">
@@ -1263,9 +1275,9 @@
           <div class="s">dari hasil</div>
         </div>
         <div class="psum">
-          <div class="k">Status</div>
-          <div class="v">${esc(last?.status || "—")}</div>
-          <div class="s">kategori</div>
+          <div class="k">Kalori</div>
+          <div class="v">${esc(fmt(last?.kalori,0))}</div>
+          <div class="s">kebutuhan</div>
         </div>
       `;
 
@@ -1273,16 +1285,19 @@
         <table class="rtable">
           <thead>
             <tr>
-              <th style="width:88px">Waktu</th>
-              <th style="width:92px">Tanggal</th>
-              <th style="width:60px">BB</th>
-              <th style="width:60px">TB</th>
-              <th style="width:60px">Usia</th>
-              <th style="width:42px">JK</th>
-              <th style="width:84px">Akt</th>
-              <th style="width:60px">IMT</th>
-              <th style="width:60px">Z</th>
-              <th>Status</th>
+              <th style="width:72px">Waktu</th>
+              <th style="width:80px">Tanggal</th>
+              <th style="width:44px">BB</th>
+              <th style="width:44px">TB</th>
+              <th style="width:44px">Usia</th>
+              <th style="width:36px">JK</th>
+              <th style="width:64px">Akt</th>
+              <th style="width:44px">IMT</th>
+              <th style="width:44px">Z</th>
+              <th style="width:72px">Status</th>
+              <th style="width:72px">Kalori</th>
+              <th style="width:56px">BB min</th>
+              <th style="width:56px">BB max</th>
             </tr>
           </thead>
           <tbody>
@@ -1298,6 +1313,9 @@
                 <td>${esc(fmt(r.bmi,2))}</td>
                 <td>${esc(fmt(r.zscore,2))}</td>
                 <td>${esc(r.status || "—")}</td>
+                <td>${esc(fmt(r.kalori,0))}</td>
+                <td>${esc(fmt(r.bb_ideal_min,1))}</td>
+                <td>${esc(fmt(r.bb_ideal_max,1))}</td>
               </tr>
             `).join("")}
           </tbody>
@@ -1331,9 +1349,9 @@
 
         const exportedAt = toISODate(new Date());
 
-        // chunk rows per page (fit A4)
+        // lebih aman karena kolom lebih banyak
         const rowsNewestFirst = history.slice().reverse();
-        const chunks = chunk(rowsNewestFirst, 14); // 14 row aman untuk A4
+        const chunks = chunk(rowsNewestFirst, 12);
 
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "mm", "a4");
