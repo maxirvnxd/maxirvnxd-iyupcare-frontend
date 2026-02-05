@@ -458,7 +458,11 @@
           </div>
 
           <div class="row" style="margin-top:12px; gap:10px;">
-            <button class="btn" type="submit" id="btnSimpanMonitoring">Simpan Data</button>
+            <!-- ✅ tombol Simpan Data sudah pakai spinner -->
+            <button class="btn" type="submit" id="btnSimpanMonitoring">
+              <span id="btnSimpanMonText">Simpan Data</span>
+              <span id="btnSimpanMonSpin" class="spinner" style="display:none;"></span>
+            </button>
             <button class="btn secondary" type="button" id="btnBatalInput">Tutup</button>
           </div>
         </form>
@@ -644,7 +648,6 @@
             <div class="t">Berat Badan (kg)</div>
             <div class="m" id="reportBbMini">—</div>
           </div>
-          <!-- width dibuat lebar supaya chart tidak “kecil di kiri” -->
           <canvas id="reportChartBB" width="738" height="240"></canvas>
         </div>
 
@@ -679,12 +682,12 @@
     // ===========================
     // CONFIG (ukuran vs kualitas)
     // ===========================
-    const PDF_SCREENSHOT_SCALE = 1.25;   // sedikit naik biar tajam, tetap aman ukuran
-    const PDF_JPEG_QUALITY = 0.78;       // lebih tajam untuk teks tabel; kalau size besar turunkan 0.72
-    const PDF_MAX_TABLE_ROWS = 10;       // biar page 1 tetap rapi (ubah kalau mau)
+    const PDF_SCREENSHOT_SCALE = 1.25;
+    const PDF_JPEG_QUALITY = 0.78;
+    const PDF_MAX_TABLE_ROWS = 10;
 
-    const GALERI_MAX_W = 900;            // 800–900 untuk target <10MB
-    const GALERI_JPEG_QUALITY = 0.70;    // turunkan ke 0.65 kalau masih besar
+    const GALERI_MAX_W = 900;
+    const GALERI_JPEG_QUALITY = 0.70;
 
     // ===========================
     // Auth + year
@@ -814,6 +817,18 @@
       btnUnduhPdf.disabled = isLoading;
       btnPdfSpin.style.display = isLoading ? "inline-block" : "none";
       btnPdfText.textContent = isLoading ? "Memproses..." : "Unduh PDF";
+    }
+
+    // ✅ Loading spinner untuk tombol Simpan Data (Monitoring)
+    const btnSimpanMonitoring = document.getElementById("btnSimpanMonitoring");
+    const btnSimpanMonText = document.getElementById("btnSimpanMonText");
+    const btnSimpanMonSpin = document.getElementById("btnSimpanMonSpin");
+
+    function setMonitoringSaveLoading(isLoading){
+      if(!btnSimpanMonitoring || !btnSimpanMonText || !btnSimpanMonSpin) return;
+      btnSimpanMonitoring.disabled = isLoading;
+      btnSimpanMonSpin.style.display = isLoading ? "inline-block" : "none";
+      btnSimpanMonText.textContent = isLoading ? "Menyimpan..." : "Simpan Data";
     }
 
     // ===========================
@@ -1122,7 +1137,7 @@
     })();
 
     // ===========================
-    // Submit monitoring
+    // Submit monitoring (✅ spinner aktif selama request)
     // ===========================
     document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1141,6 +1156,7 @@
         catatan: document.getElementById("catatan").value?.trim() || null,
       };
 
+      setMonitoringSaveLoading(true);
       try{
         await api(`/anak/${anakId}/monitoring`, { method:"POST", body:payload, auth:true });
         showMsg("Data berhasil disimpan.", "ok");
@@ -1158,6 +1174,8 @@
           : "";
         showMsg(detail || err.message || "Gagal menyimpan.", "err");
         console.error(err);
+      }finally{
+        setMonitoringSaveLoading(false);
       }
     });
 
@@ -1294,7 +1312,7 @@
       }
 
       const x = (pageW - w) / 2;
-      const y = margin; // top margin
+      const y = margin;
       pdf.addImage(jpegObj.dataUrl, "JPEG", x, y, w, h, undefined, "FAST");
     }
 
@@ -1388,7 +1406,6 @@
       if(!list.length){ showMsg("Belum ada data monitoring untuk dibuat PDF.", "err"); return; }
       list.sort((a,b) => String(a.tanggal_ukur).localeCompare(String(b.tanggal_ukur)));
 
-      // identitas user + anak
       const userName = await getUserNameForPdf();
       const anakDetail = await getAnakDetailForPdf(anakId);
 
@@ -1405,7 +1422,6 @@
       document.getElementById("reportFooterRight2").textContent = `Diekspor: ${exportedAt}`;
       document.getElementById("reportChartRightMeta").textContent = `Total titik: ${list.length}`;
 
-      // chips identitas
       document.getElementById("reportIdentityChips").innerHTML = `
         <div class="pdf-chip"><span>Nama Ibu/User</span><b>${escHtml(userName)}</b></div>
         <div class="pdf-chip"><span>Nama Anak</span><b>${escHtml(namaAnak)}</b></div>
@@ -1413,7 +1429,6 @@
         <div class="pdf-chip"><span>Umur</span><b>${escHtml(umurAnak)}</b></div>
       `;
 
-      // summary (ambil data terakhir)
       const last = list[list.length - 1];
       const prev = list.length > 1 ? list[list.length - 2] : null;
 
@@ -1448,7 +1463,6 @@
         </div>
       `;
 
-      // tabel ringkas (biar halaman 1 rapi & tidak “ketarik”)
       const newestFirst = list.slice().reverse();
       const rows = newestFirst.slice(0, PDF_MAX_TABLE_ROWS);
       const truncated = newestFirst.length > PDF_MAX_TABLE_ROWS;
@@ -1485,16 +1499,13 @@
         noteEl.textContent = "";
       }
 
-      // meta chart
       document.getElementById("reportChartMeta").textContent =
         `${namaAnak} • ${jkAnak} • umur: ${umurAnak}`;
 
-      // grafik (full width di PDF)
       const labels = list.map(x => String(x.tanggal_ukur ?? "").slice(0,10));
       const weights = list.map(x => Number(x.berat_badan ?? 0));
       const heights = list.map(x => Number(x.tinggi_badan ?? 0));
 
-      // mini info chart (min–max)
       const wMin = Math.min(...weights);
       const wMax = Math.max(...weights);
       const hMin = Math.min(...heights);
@@ -1528,12 +1539,10 @@
         options: commonReportOpts
       });
 
-      // pastikan logo & chart siap sebelum screenshot
       await waitImagesLoaded(document.getElementById("reportPage1"));
       await waitImagesLoaded(document.getElementById("reportPage2"));
       await new Promise(r => setTimeout(r, 250));
 
-      // ambil galeri list (SEMUA)
       let galeriList = [];
       try{
         const g = await api(`/anak/${anakId}/galeri`, { method:"GET", auth:true });
@@ -1542,20 +1551,16 @@
         galeriList = [];
       }
 
-      // buat PDF
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF("p", "mm", "a4");
 
-      // Page 1: screenshot A4 sheet -> JPEG, FIT (no distorsi)
       const page1Jpeg = await domToJpegData(document.getElementById("reportPage1"));
       addJpegFitToPage(pdf, page1Jpeg, 0);
 
-      // Page 2
       pdf.addPage();
       const page2Jpeg = await domToJpegData(document.getElementById("reportPage2"));
       addJpegFitToPage(pdf, page2Jpeg, 0);
 
-      // Pages berikutnya: galeri grid (yang kamu bilang sudah bagus)
       if(galeriList.length){
         await addGaleriPagesToPdf(pdf, galeriList);
       } else {
