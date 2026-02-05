@@ -317,7 +317,8 @@
       top:0;
       width:297mm;
       height:210mm;
-      padding:6mm;
+      /* sedikit diperkecil supaya ada ruang aman sisi kanan */
+      padding:5mm;
       box-sizing:border-box;
       background:#ffffff;
     }
@@ -325,10 +326,9 @@
       height:100%;
       border-radius:14px;
       border:1px solid rgba(15,23,42,.10);
-      /* Hilangkan shadow berat biar PNG lebih bersih & kecil */
       box-shadow:none;
-      /* ✅ Revisi: tambah right padding supaya kolom terakhir aman */
-      padding:5mm 10mm 5mm 5mm;
+      /* padding dibuat lebih simetris agar area tabel lebih lebar */
+      padding:5mm;
       box-sizing:border-box;
       display:flex;
       flex-direction:column;
@@ -421,16 +421,18 @@
       margin:0;
     }
 
-    /* Wrapper tabel: border & radius di wrapper (lebih aman, tidak nge-clip pixel) */
+    /* Wrapper tabel:
+       - tambahkan padding-right kecil supaya kolom terakhir tidak “keclip” 1-2px (kasus umum html2canvas)
+       - tetap rounded + rapi
+    */
     .rwrap{
       border:1px solid rgba(15,23,42,.10);
       border-radius:12px;
       overflow:hidden;
       background:#fff;
       width:100%;
-      /* ✅ Revisi: buffer kanan kecil supaya kolom terakhir tidak kepotong */
-      padding-right:2mm;
-      box-sizing:border-box;
+      padding-right:2px; /* anti-crop kanan */
+      padding-left:1px;
     }
 
     /* Table fixed layout + grid rapi */
@@ -440,21 +442,24 @@
       border-collapse:collapse;
       background:#fff;
     }
+
+    /* Header: izinkan wrap agar label lengkap tidak terpotong */
     .rtable thead th{
       background: rgba(30,99,214,.08);
       color: var(--ink);
-      font-size:8.6px;
+      font-size:8.2px;
       font-weight:900;
       text-align:left;
-      padding:3px 3px;
+      padding:2.5px 3px;
       border-bottom:1px solid rgba(15,23,42,.10);
-      white-space:nowrap;
+      white-space:normal;
+      line-height:1.12;
       overflow:hidden;
-      text-overflow:ellipsis;
     }
+
     .rtable tbody td{
-      font-size:8.6px;
-      padding:3px 3px;
+      font-size:8.2px;
+      padding:2.5px 3px;
       border-bottom:1px solid rgba(15,23,42,.08);
       white-space:nowrap;
       overflow:hidden;
@@ -463,17 +468,17 @@
     }
     .rtable tbody tr:last-child td{ border-bottom:none; }
 
-    /* garis vertical tipis biar kebaca tapi hemat ruang */
+    /* garis vertical tipis */
     .rtable th:not(:last-child),
     .rtable td:not(:last-child){
       border-right:1px solid rgba(15,23,42,.06);
     }
 
-    /* Status boleh wrap agar kolom tidak melebar */
+    /* Status boleh wrap agar kolom status bisa dipersempit */
     .rtable th.col-status,
     .rtable td.col-status{
       white-space:normal;
-      line-height:1.15;
+      line-height:1.12;
     }
 
     .pdf-footer{
@@ -1340,49 +1345,51 @@
           <div class="s">dari hasil</div>
         </div>
         <div class="psum">
-          <div class="k">Kalori</div>
+          <div class="k">Kebutuhan Kalori</div>
           <div class="v">${esc(fmt(last?.kalori,0))}</div>
           <div class="s">kebutuhan</div>
         </div>
       `;
 
-      /* ✅ Revisi utama:
-         - BB min & BB max: sama (12% & 12%)
-         - Lebar kolom dirapikan (total 100%)
+      /* Revisi kolom:
+         - Status dipersempit
+         - Kebutuhan Kalori diberi ruang cukup
+         - BB Ideal Min & BB Ideal Max dibuat sama (17% + 17%)
+         - Header ditulis lengkap sesuai permintaan
       */
       pdfTableWrap.innerHTML = `
         <div class="rwrap">
           <table class="rtable">
             <colgroup>
-              <col style="width:8%">
-              <col style="width:10%">
-              <col style="width:5%">
-              <col style="width:5%">
-              <col style="width:5%">
-              <col style="width:4%">
               <col style="width:7%">
-              <col style="width:5%">
-              <col style="width:4%">
-              <col style="width:16%">
+              <col style="width:9%">
+              <col style="width:4.8%">
+              <col style="width:4.8%">
+              <col style="width:4.8%">
+              <col style="width:3.8%">
+              <col style="width:7.2%">
+              <col style="width:4.6%">
+              <col style="width:3.8%">
               <col style="width:7%">
-              <col style="width:12%">
-              <col style="width:12%">
+              <col style="width:9.2%">
+              <col style="width:17%">
+              <col style="width:17%">
             </colgroup>
             <thead>
               <tr>
                 <th>Waktu</th>
-                <th>Tgl</th>
+                <th>Tanggal</th>
                 <th>BB</th>
                 <th>TB</th>
                 <th>Usia</th>
                 <th>JK</th>
-                <th>Akt</th>
+                <th>Aktivitas</th>
                 <th>IMT</th>
                 <th>Z</th>
                 <th class="col-status">Status</th>
-                <th>Kal</th>
-                <th>BB min</th>
-                <th>BB max</th>
+                <th>Kebutuhan Kalori</th>
+                <th>BB Ideal Min</th>
+                <th>BB Ideal Max</th>
               </tr>
             </thead>
             <tbody>
