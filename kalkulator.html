@@ -317,26 +317,26 @@
       top:0;
       width:1123px;
       height:794px;
-      padding:16px;              /* lebih kecil untuk ruang tabel */
+      padding:10px;              /* DIPERKETAT: ruang lebih besar untuk tabel */
       box-sizing:border-box;
       background:#ffffff;
     }
     .pdf-card{
       height:100%;
-      border-radius:18px;
+      border-radius:16px;
       border:1px solid rgba(15,23,42,.10);
       box-shadow:0 10px 30px rgba(15,23,42,.08);
-      padding:14px;              /* lebih kecil untuk ruang tabel */
+      padding:10px;              /* DIPERKETAT */
       box-sizing:border-box;
       display:flex;
       flex-direction:column;
-      gap:10px;
+      gap:8px;                   /* rapatkan */
     }
     .pdf-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:12px;
+      gap:10px;
     }
     .pdf-brand{
       display:flex;
@@ -345,30 +345,30 @@
       min-width: 0;
     }
     .pdf-logo{
-      width:42px;height:42px;border-radius:14px;object-fit:cover;
+      width:38px;height:38px;border-radius:12px;object-fit:cover;
       border:1px solid rgba(15,23,42,.10);
       background:#fff;
       display:block;
     }
     .pdf-title{
-      font-size:20px;
+      font-size:18px;
       font-weight:950;
       letter-spacing:.2px;
       line-height:1.1;
       margin:0;
     }
     .pdf-sub{
-      font-size:11px;
+      font-size:10px;
       color: var(--muted);
-      margin-top:3px;
+      margin-top:2px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width:860px; /* landscape lebih lebar */
+      max-width:920px;
     }
     .pdf-meta-right{
       text-align:right;
-      font-size:11px;
+      font-size:10px;
       color: var(--muted);
       white-space:nowrap;
     }
@@ -376,62 +376,69 @@
     .pdf-chips{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
+      gap:6px;
       margin-top:0;
     }
     .pdf-chip{
       border:1px solid rgba(15,23,42,.10);
       background: rgba(246,249,255,.75);
-      padding:6px 9px;
+      padding:5px 8px;
       border-radius:14px;
-      font-size:10px;
+      font-size:9px;
       line-height:1.2;
     }
-    .pdf-chip span{ display:block; color: var(--muted); font-size:9px; }
+    .pdf-chip span{ display:block; color: var(--muted); font-size:8px; }
     .pdf-chip b{ display:block; font-weight:900; color: var(--ink); margin-top:2px; }
 
     .pdf-summary{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap:8px;
+      gap:6px;
     }
     .psum{
       border:1px solid rgba(15,23,42,.10);
-      border-radius:16px;
-      padding:8px 10px;
+      border-radius:14px;
+      padding:7px 9px;
       background:#fff;
       overflow:hidden;
     }
-    .psum .k{ font-size:9px; color: var(--muted); }
-    .psum .v{ font-size:14px; font-weight:950; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .psum .s{ font-size:9px; color: var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .psum .k{ font-size:8px; color: var(--muted); }
+    .psum .v{ font-size:13px; font-weight:950; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .psum .s{ font-size:8px; color: var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-    /* Tabel PDF: fixed layout supaya kolom TIDAK keluar halaman */
+    .pdfTableTitle{
+      font-size:11px;
+      font-weight:900;
+      margin:2px 0 -2px;
+    }
+
+    /* Tabel PDF: dipaksa fit lebar, kolom TIDAK boleh overflow keluar */
     .rtable{
       width:100%;
-      table-layout:fixed;         /* kunci agar tidak overflow */
+      max-width:100%;
+      table-layout:fixed;         /* WAJIB: browser patuh pembagian kolom */
       border-collapse:separate;
       border-spacing:0;
       border:1px solid rgba(15,23,42,.10);
-      border-radius:16px;
+      border-radius:14px;
       overflow:hidden;
       background:#fff;
     }
     .rtable thead th{
       background: rgba(30,99,214,.08);
       color: var(--ink);
-      font-size:9px;
+      font-size:8px;              /* kecilkan */
       font-weight:900;
       text-align:left;
-      padding:6px 6px;            /* kecilkan padding agar muat */
+      padding:4px 4px;            /* RAPATKAN */
       border-bottom:1px solid rgba(15,23,42,.10);
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
     }
     .rtable tbody td{
-      font-size:9px;
-      padding:6px 6px;            /* kecilkan padding agar muat */
+      font-size:8px;              /* kecilkan */
+      padding:4px 4px;            /* RAPATKAN */
       vertical-align:top;
       border-bottom:1px solid rgba(15,23,42,.08);
       white-space:nowrap;
@@ -446,9 +453,9 @@
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      font-size:9px;
+      font-size:8px;
       color: var(--muted);
-      padding-top:8px;
+      padding-top:6px;
       border-top:1px solid rgba(15,23,42,.08);
     }
 
@@ -658,7 +665,7 @@
 
       <div class="pdf-summary" id="pdfSummary"></div>
 
-      <div style="font-size:12px;font-weight:900;margin:2px 0 -2px;">Riwayat Perhitungan</div>
+      <div class="pdfTableTitle">Riwayat Perhitungan</div>
       <div id="pdfTableWrap"></div>
 
       <div class="pdf-footer">
@@ -1223,7 +1230,7 @@
       }));
     }
 
-    async function domToJpegData(el, scale = 1.15, quality = 0.82){
+    async function domToJpegData(el, scale = 1.10, quality = 0.85){
       const canvas = await html2canvas(el, {
         scale,
         useCORS: true,
@@ -1297,26 +1304,39 @@
         </div>
       `;
 
-      /* NOTE:
-         - table-layout:fixed di CSS rtable memastikan semua kolom tetap masuk lebar halaman.
-         - width tiap kolom dibuat wajar; overflow akan ellipsis, tapi kolomnya tidak akan kepotong. */
+      // KUNCI: colgroup (total 100%) + table-layout:fixed -> tidak ada kolom yang overflow/crop
       pdfTableWrap.innerHTML = `
         <table class="rtable">
+          <colgroup>
+            <col style="width:7%">
+            <col style="width:9%">
+            <col style="width:5%">
+            <col style="width:5%">
+            <col style="width:5%">
+            <col style="width:4%">
+            <col style="width:8%">
+            <col style="width:5%">
+            <col style="width:5%">
+            <col style="width:17%">
+            <col style="width:10%">
+            <col style="width:10%">
+            <col style="width:10%">
+          </colgroup>
           <thead>
             <tr>
-              <th style="width:64px">Waktu</th>
-              <th style="width:76px">Tanggal</th>
-              <th style="width:44px">BB</th>
-              <th style="width:44px">TB</th>
-              <th style="width:44px">Usia</th>
-              <th style="width:36px">JK</th>
-              <th style="width:60px">Akt</th>
-              <th style="width:44px">IMT</th>
-              <th style="width:44px">Z</th>
-              <th style="width:78px">Status</th>
-              <th style="width:78px">Kalori</th>
-              <th style="width:64px">BB min</th>
-              <th style="width:64px">BB max</th>
+              <th>Waktu</th>
+              <th>Tanggal</th>
+              <th>BB</th>
+              <th>TB</th>
+              <th>Usia</th>
+              <th>JK</th>
+              <th>Akt</th>
+              <th>IMT</th>
+              <th>Z</th>
+              <th>Status</th>
+              <th>Kalori</th>
+              <th>BB min</th>
+              <th>BB max</th>
             </tr>
           </thead>
           <tbody>
@@ -1368,12 +1388,11 @@
 
         const exportedAt = toISODate(new Date());
 
-        // LANDSCAPE: tinggi lebih pendek -> aman pakai lebih sedikit row per halaman
+        // landscape lebih pendek -> jangan kebanyakan row per halaman
         const rowsNewestFirst = history.slice().reverse();
         const chunks = chunk(rowsNewestFirst, 9);
 
         const { jsPDF } = window.jspdf;
-        // orientation "l" = landscape
         const pdf = new jsPDF("l", "mm", "a4");
 
         for(let i=0; i<chunks.length; i++){
@@ -1393,7 +1412,7 @@
           await waitImagesLoaded(pdfPage);
           await new Promise(r => setTimeout(r, 120));
 
-          const jpg = await domToJpegData(pdfPage, 1.15, 0.82);
+          const jpg = await domToJpegData(pdfPage, 1.10, 0.85);
           addJpegFitToPage(pdf, jpg);
         }
 
