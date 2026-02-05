@@ -125,7 +125,13 @@
       margin-top:12px;display:flex;gap:12px;align-items:stretch;flex-wrap:wrap;
     }
     .child-card{
-      display:flex;gap:10px;align-items:flex-end;padding:12px 14px;flex:1;min-width:280px;
+      display:flex;
+      gap:10px;
+      align-items:flex-end;
+      padding:12px 14px;
+      flex:1;
+      min-width:280px;
+      flex-wrap:wrap; /* supaya 3 tombol tetap rapi di layar kecil */
     }
     .child-card .field{flex:1;min-width:220px;}
     .child-card label{display:block;}
@@ -407,7 +413,11 @@
             <label>Pilih Anak</label>
             <select id="anakSelect"></select>
           </div>
+
+          <!-- ✅ 3 tombol: tambah / edit / hapus -->
           <button class="btn secondary" type="button" id="btnTambahAnak">+ Tambah Anak</button>
+          <button class="btn secondary" type="button" id="btnEditAnak">Edit Anak</button>
+          <button class="btn secondary" type="button" id="btnHapusAnak">Hapus Anak</button>
         </div>
 
         <div class="right-tools">
@@ -458,7 +468,6 @@
           </div>
 
           <div class="row" style="margin-top:12px; gap:10px;">
-            <!-- ✅ tombol Simpan Data sudah pakai spinner -->
             <button class="btn" type="submit" id="btnSimpanMonitoring">
               <span id="btnSimpanMonText">Simpan Data</span>
               <span id="btnSimpanMonSpin" class="spinner" style="display:none;"></span>
@@ -556,7 +565,7 @@
     </div>
   </div>
 
-  <!-- MODAL: TAMBAH ANAK -->
+  <!-- MODAL: TAMBAH/EDIT ANAK -->
   <div class="modal-backdrop" id="modalAnak">
     <div class="modal">
       <h3>Tambah Anak</h3>
@@ -798,6 +807,10 @@
     const btnPdfText = document.getElementById("btnPdfText");
     const btnPdfSpin = document.getElementById("btnPdfSpin");
 
+    // tombol child actions
+    const btnEditAnak = document.getElementById("btnEditAnak");
+    const btnHapusAnak = document.getElementById("btnHapusAnak");
+
     let chartBB = null;
     let chartTB = null;
 
@@ -819,7 +832,9 @@
       btnPdfText.textContent = isLoading ? "Memproses..." : "Unduh PDF";
     }
 
-    // ✅ Loading spinner untuk tombol Simpan Data (Monitoring)
+    // ===========================
+    // Spinner tombol "Simpan Data" (Monitoring)
+    // ===========================
     const btnSimpanMonitoring = document.getElementById("btnSimpanMonitoring");
     const btnSimpanMonText = document.getElementById("btnSimpanMonText");
     const btnSimpanMonSpin = document.getElementById("btnSimpanMonSpin");
@@ -1137,7 +1152,7 @@
     })();
 
     // ===========================
-    // Submit monitoring (✅ spinner aktif selama request)
+    // Submit monitoring (spinner aktif selama request)
     // ===========================
     document.getElementById("formMonitoring").addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -1180,7 +1195,7 @@
     });
 
     // ===========================
-    // Modal tambah anak + loading
+    // Modal tambah/edit anak + loading
     // ===========================
     const modal = document.getElementById("modalAnak");
     const anakNama = document.getElementById("anakNama");
@@ -1198,18 +1213,8 @@
       btnSimpanAnakText.textContent = isLoading ? "Menyimpan" : "Simpan";
     }
 
-    function openModal(){
-      document.getElementById("modalMsg").innerHTML = "";
-      anakNama.value = "";
-      anakTglLahir.value = "";
-      anakJK.value = "";
-      modal.style.display = "flex";
-      setChildSaveLoading(false);
-      setTimeout(() => anakNama.focus(), 10);
-    }
     function closeModal(){ modal.style.display = "none"; }
 
-    document.getElementById("btnTambahAnak").addEventListener("click", openModal);
     document.getElementById("btnBatalModal").addEventListener("click", () => {
       if(btnSimpanAnak.disabled) return;
       closeModal();
@@ -1227,6 +1232,98 @@
       return s;
     }
 
+    // ===========================
+    // Mode modal: create vs edit
+    // ===========================
+    let modalMode = "create"; // "create" | "edit"
+    let editingAnakId = null;
+
+    function setModalTitle(t){
+      const h = modal.querySelector("h3");
+      if(h) h.textContent = t;
+    }
+
+    function openModalCreate(){
+      modalMode = "create";
+      editingAnakId = null;
+
+      document.getElementById("modalMsg").innerHTML = "";
+      anakNama.value = "";
+      anakTglLahir.value = "";
+      anakJK.value = "";
+
+      modal.style.display = "flex";
+      setChildSaveLoading(false);
+      setModalTitle("Tambah Anak");
+      setTimeout(() => anakNama.focus(), 10);
+    }
+
+    function openModalEdit(anak){
+      modalMode = "edit";
+      editingAnakId = anak?.id;
+
+      document.getElementById("modalMsg").innerHTML = "";
+      anakNama.value = anak?.nama_anak || anak?.name || anak?.nama || "";
+      anakTglLahir.value = String(anak?.tanggal_lahir || anak?.tgl_lahir || anak?.birth_date || "").slice(0,10);
+      anakJK.value = normalizeGender(anak?.jenis_kelamin || anak?.jk || anak?.gender || "");
+
+      modal.style.display = "flex";
+      setChildSaveLoading(false);
+      setModalTitle("Edit Anak");
+      setTimeout(() => anakNama.focus(), 10);
+    }
+
+    // tombol tambah anak -> create
+    document.getElementById("btnTambahAnak").addEventListener("click", openModalCreate);
+
+    // tombol edit anak
+    btnEditAnak.addEventListener("click", async () => {
+      const anakId = anakSelect.value;
+      if(!anakId){ showMsg("Pilih anak dulu.", "err"); return; }
+
+      try{
+        const res = await api(`/anak/${anakId}`, { method:"GET", auth:true });
+        const anak = res?.data || res;
+        openModalEdit(anak);
+      }catch(err){
+        showMsg(err.message || "Gagal memuat detail anak.", "err");
+        console.error(err);
+      }
+    });
+
+    // tombol hapus anak
+    btnHapusAnak.addEventListener("click", async () => {
+      const anakId = anakSelect.value;
+      if(!anakId){ showMsg("Pilih anak dulu.", "err"); return; }
+
+      const ok = confirm("Yakin ingin menghapus data anak ini? Data monitoring & galeri bisa ikut hilang tergantung backend.");
+      if(!ok) return;
+
+      try{
+        await api(`/anak/${anakId}`, { method:"DELETE", auth:true });
+        showMsg("Anak berhasil dihapus.", "ok");
+
+        await loadAnakList("anakSelect");
+        if(anakSelect.options.length > 1){
+          anakSelect.selectedIndex = 1;
+          const id = anakSelect.value;
+          await renderRiwayatAndCharts(id);
+          await loadGaleriByAnak(id);
+        }else{
+          riwayatBody.innerHTML = `<tr><td colspan="4" class="small">Belum ada data.</td></tr>`;
+          renderDbTable([]);
+          renderGaleriGrid([]);
+          chartHint.textContent = "";
+          if(chartBB) chartBB.destroy();
+          if(chartTB) chartTB.destroy();
+        }
+      }catch(err){
+        showMsg(err.message || "Gagal menghapus anak.", "err");
+        console.error(err);
+      }
+    });
+
+    // simpan anak (create/edit)
     btnSimpanAnak.addEventListener("click", async () => {
       const nama = anakNama.value.trim();
       const tgl  = anakTglLahir.value;
@@ -1240,24 +1337,48 @@
 
       try{
         setChildSaveLoading(true);
-        const created = await api("/anak", { method:"POST", auth:true, body });
 
-        closeModal();
-        showMsg("Anak berhasil ditambahkan.", "ok");
+        if(modalMode === "create"){
+          const created = await api("/anak", { method:"POST", auth:true, body });
 
-        await loadAnakList("anakSelect");
-        const newId = created?.data?.id || created?.id;
-        if(newId) anakSelect.value = String(newId);
-        else anakSelect.selectedIndex = anakSelect.options.length - 1;
+          closeModal();
+          showMsg("Anak berhasil ditambahkan.", "ok");
 
-        await renderRiwayatAndCharts(anakSelect.value);
-        await loadGaleriByAnak(anakSelect.value);
+          await loadAnakList("anakSelect");
+          const newId = created?.data?.id || created?.id;
+          if(newId) anakSelect.value = String(newId);
+          else anakSelect.selectedIndex = Math.max(0, anakSelect.options.length - 1);
+
+          const chosenId = anakSelect.value;
+          if(chosenId){
+            await renderRiwayatAndCharts(chosenId);
+            await loadGaleriByAnak(chosenId);
+          }else{
+            renderDbTable([]);
+            renderGaleriGrid([]);
+          }
+        } else {
+          if(!editingAnakId) throw new Error("ID anak tidak valid untuk edit.");
+
+          await api(`/anak/${editingAnakId}`, { method:"PUT", auth:true, body });
+
+          closeModal();
+          showMsg("Data anak berhasil diperbarui.", "ok");
+
+          const keepId = String(editingAnakId);
+          await loadAnakList("anakSelect");
+          anakSelect.value = keepId;
+
+          await renderRiwayatAndCharts(keepId);
+          await loadGaleriByAnak(keepId);
+        }
+
       }catch(err){
         const errors = err?.payload?.errors;
         const detail = errors
           ? Object.entries(errors).map(([k,v]) => `${k}: ${Array.isArray(v)?v.join(", "):v}`).join(" | ")
           : "";
-        showModalError(detail || err.message || "Gagal menambahkan anak.");
+        showModalError(detail || err.message || "Gagal menyimpan.");
         console.error(err);
       }finally{
         setChildSaveLoading(false);
