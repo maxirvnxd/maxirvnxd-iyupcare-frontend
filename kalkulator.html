@@ -108,7 +108,7 @@
     }
     .btn.primary{
       background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
-      border-color: rgba(30,99,214,.0);
+      border-color: rgba(30,99,214,0);
       color:#fff;
     }
     .btn.primary:hover{ filter: brightness(.98); }
@@ -272,7 +272,7 @@
       border-radius: 16px;
       overflow:hidden;
       background:#fff;
-      min-width: 1050px;
+      min-width: 1200px;
     }
     thead th{
       background: rgba(30,99,214,.08);
@@ -290,26 +290,34 @@
       border-bottom:1px solid rgba(15,23,42,.08);
       vertical-align:top;
       color: rgba(11,27,58,.92);
+      white-space:nowrap;
     }
     tbody tr:last-child td{ border-bottom:none; }
     tbody tr:hover td{ background: rgba(246,249,255,.85); cursor:pointer; }
 
     /* Spinner */
     .spinner{
-      width:16px;height:16px;border:2px solid rgba(255,255,255,.55);
-      border-top-color:#fff;border-radius:50%;display:inline-block;
+      width:16px;height:16px;
+      border:2px solid rgba(255,255,255,.55);
+      border-top-color:#fff;
+      border-radius:50%;
+      display:inline-block;
       animation:spin .75s linear infinite;
     }
     @keyframes spin{ to{ transform:rotate(360deg);} }
 
-    /* PDF sheet */
+    /* =========================
+       PDF (LANDSCAPE A4)
+       ========================= */
+
+    /* A4 landscape @~96dpi: 1123 x 794 */
     .pdf-sheet{
       position:absolute;
       left:-99999px;
       top:0;
-      width:794px;
-      height:1123px;
-      padding:26px;
+      width:1123px;
+      height:794px;
+      padding:16px;              /* lebih kecil untuk ruang tabel */
       box-sizing:border-box;
       background:#ffffff;
     }
@@ -318,45 +326,45 @@
       border-radius:18px;
       border:1px solid rgba(15,23,42,.10);
       box-shadow:0 10px 30px rgba(15,23,42,.08);
-      padding:18px;
+      padding:14px;              /* lebih kecil untuk ruang tabel */
       box-sizing:border-box;
       display:flex;
       flex-direction:column;
-      gap:12px;
+      gap:10px;
     }
     .pdf-header{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
+      gap:12px;
     }
     .pdf-brand{
       display:flex;
       align-items:center;
-      gap:12px;
+      gap:10px;
       min-width: 0;
     }
     .pdf-logo{
-      width:44px;height:44px;border-radius:14px;object-fit:cover;
+      width:42px;height:42px;border-radius:14px;object-fit:cover;
       border:1px solid rgba(15,23,42,.10);
       background:#fff;
       display:block;
     }
     .pdf-title{
-      font-size:22px;
+      font-size:20px;
       font-weight:950;
       letter-spacing:.2px;
       line-height:1.1;
       margin:0;
     }
     .pdf-sub{
-      font-size:12px;
+      font-size:11px;
       color: var(--muted);
-      margin-top:4px;
+      margin-top:3px;
       white-space:nowrap;
       overflow:hidden;
       text-overflow:ellipsis;
-      max-width:520px;
+      max-width:860px; /* landscape lebih lebar */
     }
     .pdf-meta-right{
       text-align:right;
@@ -364,40 +372,44 @@
       color: var(--muted);
       white-space:nowrap;
     }
+
     .pdf-chips{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
-      margin-top:2px;
+      margin-top:0;
     }
     .pdf-chip{
       border:1px solid rgba(15,23,42,.10);
       background: rgba(246,249,255,.75);
-      padding:7px 10px;
+      padding:6px 9px;
       border-radius:14px;
-      font-size:11px;
+      font-size:10px;
       line-height:1.2;
     }
-    .pdf-chip span{ display:block; color: var(--muted); font-size:10px; }
+    .pdf-chip span{ display:block; color: var(--muted); font-size:9px; }
     .pdf-chip b{ display:block; font-weight:900; color: var(--ink); margin-top:2px; }
 
     .pdf-summary{
       display:grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
-      gap:10px;
+      gap:8px;
     }
     .psum{
       border:1px solid rgba(15,23,42,.10);
       border-radius:16px;
-      padding:10px 12px;
+      padding:8px 10px;
       background:#fff;
+      overflow:hidden;
     }
-    .psum .k{ font-size:10px; color: var(--muted); }
-    .psum .v{ font-size:16px; font-weight:950; margin-top:2px; }
-    .psum .s{ font-size:10px; color: var(--muted); margin-top:2px; }
+    .psum .k{ font-size:9px; color: var(--muted); }
+    .psum .v{ font-size:14px; font-weight:950; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .psum .s{ font-size:9px; color: var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
+    /* Tabel PDF: fixed layout supaya kolom TIDAK keluar halaman */
     .rtable{
       width:100%;
+      table-layout:fixed;         /* kunci agar tidak overflow */
       border-collapse:separate;
       border-spacing:0;
       border:1px solid rgba(15,23,42,.10);
@@ -408,19 +420,23 @@
     .rtable thead th{
       background: rgba(30,99,214,.08);
       color: var(--ink);
-      font-size:10px;
+      font-size:9px;
       font-weight:900;
       text-align:left;
-      padding:9px 8px;
+      padding:6px 6px;            /* kecilkan padding agar muat */
       border-bottom:1px solid rgba(15,23,42,.10);
       white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .rtable tbody td{
-      font-size:10px;
-      padding:9px 8px;
+      font-size:9px;
+      padding:6px 6px;            /* kecilkan padding agar muat */
       vertical-align:top;
       border-bottom:1px solid rgba(15,23,42,.08);
       white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
     }
     .rtable tbody tr:last-child td{ border-bottom:none; }
 
@@ -430,7 +446,7 @@
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      font-size:10px;
+      font-size:9px;
       color: var(--muted);
       padding-top:8px;
       border-top:1px solid rgba(15,23,42,.08);
@@ -443,7 +459,7 @@
       .meta{ grid-template-columns: 1fr; }
       .topbar-inner{ gap: 10px; }
       .brand{ min-width: 0; }
-      table{ min-width: 980px; }
+      table{ min-width: 1200px; }
     }
   </style>
 </head>
@@ -624,7 +640,7 @@
     </section>
   </main>
 
-  <!-- PDF SHEET (A4 RATIO) -->
+  <!-- PDF SHEET (LANDSCAPE A4 CANVAS) -->
   <div id="pdfPage" class="pdf-sheet" aria-hidden="true">
     <div class="pdf-card">
       <div class="pdf-header">
@@ -1207,7 +1223,7 @@
       }));
     }
 
-    async function domToJpegData(el, scale = 1.25, quality = 0.78){
+    async function domToJpegData(el, scale = 1.15, quality = 0.82){
       const canvas = await html2canvas(el, {
         scale,
         useCORS: true,
@@ -1281,23 +1297,26 @@
         </div>
       `;
 
+      /* NOTE:
+         - table-layout:fixed di CSS rtable memastikan semua kolom tetap masuk lebar halaman.
+         - width tiap kolom dibuat wajar; overflow akan ellipsis, tapi kolomnya tidak akan kepotong. */
       pdfTableWrap.innerHTML = `
         <table class="rtable">
           <thead>
             <tr>
-              <th style="width:72px">Waktu</th>
-              <th style="width:80px">Tanggal</th>
+              <th style="width:64px">Waktu</th>
+              <th style="width:76px">Tanggal</th>
               <th style="width:44px">BB</th>
               <th style="width:44px">TB</th>
               <th style="width:44px">Usia</th>
               <th style="width:36px">JK</th>
-              <th style="width:64px">Akt</th>
+              <th style="width:60px">Akt</th>
               <th style="width:44px">IMT</th>
               <th style="width:44px">Z</th>
-              <th style="width:72px">Status</th>
-              <th style="width:72px">Kalori</th>
-              <th style="width:56px">BB min</th>
-              <th style="width:56px">BB max</th>
+              <th style="width:78px">Status</th>
+              <th style="width:78px">Kalori</th>
+              <th style="width:64px">BB min</th>
+              <th style="width:64px">BB max</th>
             </tr>
           </thead>
           <tbody>
@@ -1324,7 +1343,7 @@
     }
 
     // =========================
-    // PDF download
+    // PDF download (LANDSCAPE)
     // =========================
     btnPdf.addEventListener("click", async () => {
       msg.innerHTML = "";
@@ -1349,12 +1368,13 @@
 
         const exportedAt = toISODate(new Date());
 
-        // lebih aman karena kolom lebih banyak
+        // LANDSCAPE: tinggi lebih pendek -> aman pakai lebih sedikit row per halaman
         const rowsNewestFirst = history.slice().reverse();
-        const chunks = chunk(rowsNewestFirst, 12);
+        const chunks = chunk(rowsNewestFirst, 9);
 
         const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF("p", "mm", "a4");
+        // orientation "l" = landscape
+        const pdf = new jsPDF("l", "mm", "a4");
 
         for(let i=0; i<chunks.length; i++){
           if(i > 0) pdf.addPage();
@@ -1373,7 +1393,7 @@
           await waitImagesLoaded(pdfPage);
           await new Promise(r => setTimeout(r, 120));
 
-          const jpg = await domToJpegData(pdfPage, 1.25, 0.78);
+          const jpg = await domToJpegData(pdfPage, 1.15, 0.82);
           addJpegFitToPage(pdf, jpg);
         }
 
