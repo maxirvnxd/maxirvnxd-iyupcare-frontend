@@ -327,8 +327,8 @@
       border:1px solid rgba(15,23,42,.10);
       /* Hilangkan shadow berat biar PNG lebih bersih & kecil */
       box-shadow:none;
-      /* Extra right padding supaya kolom terakhir aman */
-      padding:5mm 7mm 5mm 5mm;
+      /* ✅ Revisi: tambah right padding supaya kolom terakhir aman */
+      padding:5mm 10mm 5mm 5mm;
       box-sizing:border-box;
       display:flex;
       flex-direction:column;
@@ -428,6 +428,9 @@
       overflow:hidden;
       background:#fff;
       width:100%;
+      /* ✅ Revisi: buffer kanan kecil supaya kolom terakhir tidak kepotong */
+      padding-right:2mm;
+      box-sizing:border-box;
     }
 
     /* Table fixed layout + grid rapi */
@@ -1259,7 +1262,6 @@
         });
         return { dataUrl: canvas.toDataURL("image/png"), w: canvas.width, h: canvas.height };
       }catch(e){
-        // fallback kalau device low-mem: turunkan scale sedikit
         if(scale > 1.6){
           const canvas = await html2canvas(el, {
             scale: 1.6,
@@ -1344,29 +1346,27 @@
         </div>
       `;
 
-      /* Kunci anti-crop:
-         - wrapper rwrap (border/radius aman)
-         - table-layout:fixed
-         - colgroup total 100% (status dipersempit + status boleh wrap)
-         - label header disingkat biar hemat lebar
+      /* ✅ Revisi utama:
+         - BB min & BB max: sama (12% & 12%)
+         - Lebar kolom dirapikan (total 100%)
       */
       pdfTableWrap.innerHTML = `
         <div class="rwrap">
           <table class="rtable">
             <colgroup>
-              <col style="width:7%">
-              <col style="width:9%">
-              <col style="width:5%">
-              <col style="width:5%">
-              <col style="width:5%">
-              <col style="width:4%">
-              <col style="width:7%">
-              <col style="width:5%">
-              <col style="width:4%">
-              <col style="width:10%">
               <col style="width:8%">
-              <col style="width:15%">
+              <col style="width:10%">
+              <col style="width:5%">
+              <col style="width:5%">
+              <col style="width:5%">
+              <col style="width:4%">
+              <col style="width:7%">
+              <col style="width:5%">
+              <col style="width:4%">
               <col style="width:16%">
+              <col style="width:7%">
+              <col style="width:12%">
+              <col style="width:12%">
             </colgroup>
             <thead>
               <tr>
