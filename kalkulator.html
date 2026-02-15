@@ -310,14 +310,12 @@
        PDF (LANDSCAPE A4) - NO CROP + TEXT CLEAR
        ========================= */
 
-    /* Render box benar-benar A4 landscape dengan unit mm */
     .pdf-sheet{
       position:absolute;
       left:-10000px;
       top:0;
       width:297mm;
       height:210mm;
-      /* sedikit diperkecil supaya ada ruang aman sisi kanan */
       padding:5mm;
       box-sizing:border-box;
       background:#ffffff;
@@ -327,7 +325,6 @@
       border-radius:14px;
       border:1px solid rgba(15,23,42,.10);
       box-shadow:none;
-      /* padding dibuat lebih simetris agar area tabel lebih lebar */
       padding:5mm;
       box-sizing:border-box;
       display:flex;
@@ -421,21 +418,16 @@
       margin:0;
     }
 
-    /* Wrapper tabel:
-       - tambahkan padding-right kecil supaya kolom terakhir tidak “keclip” 1-2px (kasus umum html2canvas)
-       - tetap rounded + rapi
-    */
     .rwrap{
       border:1px solid rgba(15,23,42,.10);
       border-radius:12px;
       overflow:hidden;
       background:#fff;
       width:100%;
-      padding-right:2px; /* anti-crop kanan */
+      padding-right:2px;
       padding-left:1px;
     }
 
-    /* Table fixed layout + grid rapi */
     .rtable{
       width:100%;
       table-layout:fixed;
@@ -443,7 +435,6 @@
       background:#fff;
     }
 
-    /* Header: izinkan wrap agar label lengkap tidak terpotong */
     .rtable thead th{
       background: rgba(30,99,214,.08);
       color: var(--ink);
@@ -468,13 +459,11 @@
     }
     .rtable tbody tr:last-child td{ border-bottom:none; }
 
-    /* garis vertical tipis */
     .rtable th:not(:last-child),
     .rtable td:not(:last-child){
       border-right:1px solid rgba(15,23,42,.06);
     }
 
-    /* Status boleh wrap agar kolom status bisa dipersempit */
     .rtable th.col-status,
     .rtable td.col-status{
       white-space:normal;
@@ -493,7 +482,6 @@
       border-top:1px solid rgba(15,23,42,.08);
     }
 
-    /* Mobile */
     @media (max-width: 980px){
       .hero-inner{ grid-template-columns: 1fr; }
       .section{ grid-template-columns: 1fr; }
@@ -982,6 +970,7 @@
       }
 
       return {
+        anak_id: payload?.anak_id ?? null, // ✅ tambahan (opsional tapi rapi)
         created_time: nowTime(),
         tanggal: payload?.tanggal || null,
         berat_badan: payload?.berat_badan,
@@ -1055,6 +1044,7 @@
         const waktu = x.created_at ? String(x.created_at).replace("T"," ").slice(11,19) : "—";
 
         const payload = {
+          anak_id: x.anak_id ?? x.child_id ?? null, // kalau backend ngirim
           nama: x.nama ?? x.name ?? null,
           tanggal,
           berat_badan: Number(x.berat_badan ?? x.bb ?? x.weight ?? 0) || null,
@@ -1188,21 +1178,30 @@
       msg.innerHTML = "";
     });
 
-    // Submit Kalkulator
+    // ==========================================================
+    // Submit Kalkulator (REVISI: wajib kirim anak_id ke backend)
+    // ==========================================================
     document.getElementById("formKalkulator").addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.innerHTML = "";
 
       try{
-        const anakId = anakSelect.value;
-        if(!anakId) throw new Error("Pilih anak dulu.");
+        const anakIdRaw = anakSelect.value;
+        const anakId = Number(anakIdRaw);
+        if(!anakIdRaw || !Number.isFinite(anakId) || anakId <= 0){
+          throw new Error("Pilih anak dulu.");
+        }
 
-        const anak = selectedAnak || anakList.find(a => String(a.id) === String(anakId));
+        const anak = selectedAnak || anakList.find(a => String(a.id) === String(anakIdRaw));
         const nama = (anak?.nama_anak ?? anak?.nama ?? anak?.name ?? "").toString().trim();
         if(!nama) throw new Error("Nama anak tidak valid. Cek data anak di Monitoring.");
 
         const payload = {
+          anak_id: anakId, // ✅ INI INTI PATCH
+
+          // tetap kirim nama untuk kompatibilitas (kalau backend masih pakai nama)
           nama,
+
           tanggal: tanggalEl.value || toISODate(new Date()),
           berat_badan: readNumberRequired(bbEl, "Berat badan"),
           tinggi_badan: readNumberRequired(tbEl, "Tinggi badan"),
@@ -1222,7 +1221,7 @@
         const entry = normalizeEntry(resp, payload);
 
         history.push(entry);
-        saveHistoryToLocal(anakId, history);
+        saveHistoryToLocal(anakId, history); // ✅ pakai angka
         renderHistory();
         selectHistory(history.length - 1);
 
@@ -1351,12 +1350,6 @@
         </div>
       `;
 
-      /* Revisi kolom:
-         - Status dipersempit
-         - Kebutuhan Kalori diberi ruang cukup
-         - BB Ideal Min & BB Ideal Max dibuat sama (17% + 17%)
-         - Header ditulis lengkap sesuai permintaan
-      */
       pdfTableWrap.innerHTML = `
         <div class="rwrap">
           <table class="rtable">
