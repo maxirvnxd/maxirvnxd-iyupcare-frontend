@@ -115,7 +115,7 @@
       padding: 18px 16px 28px;
     }
 
-    /* Card container (mirip style produk.html) */
+    /* Panel container */
     .panel{
       margin-top: 16px;
       border:1px solid rgba(15,23,42,.10);
@@ -177,12 +177,7 @@
     }
     .tab-panel.active{ display:block; }
 
-    /* Konten ahli */
-    .grid2{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
+    /* Cards */
     .card{
       border:1px solid rgba(15,23,42,.10);
       background: rgba(255,255,255,.82);
@@ -213,6 +208,114 @@
       margin-top: 8px;
     }
 
+    /* AI Chat UI */
+    .chat-shell{
+      border: 1px solid rgba(15,23,42,.10);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.70);
+      overflow:hidden;
+    }
+    .chat-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+      background: rgba(255,255,255,.65);
+    }
+    .chat-title{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight: 950;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:50%;
+      background: rgba(31,157,85,.75);
+      box-shadow: 0 0 0 4px rgba(31,157,85,.12);
+    }
+    .chat-status{
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .chat-box{
+      height: 430px;
+      padding: 14px;
+      overflow:auto;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .bubble{
+      max-width: 78%;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.92);
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .bubble.me{
+      align-self:flex-end;
+      border-color: rgba(30,99,214,.20);
+      background: rgba(30,99,214,.08);
+    }
+    .bubble.ai{
+      align-self:flex-start;
+      border-color: rgba(31,157,85,.18);
+      background: rgba(31,157,85,.06);
+    }
+    .bubble.sys{
+      align-self:center;
+      max-width: 90%;
+      text-align:center;
+      border-style: dashed;
+      color: var(--muted);
+      background: rgba(255,255,255,.70);
+    }
+
+    .composer{
+      display:flex;
+      gap:10px;
+      padding: 12px;
+      border-top: 1px solid rgba(15,23,42,.08);
+      background: rgba(255,255,255,.65);
+      align-items:flex-end;
+    }
+    .composer textarea{
+      width:100%;
+      min-height: 44px;
+      max-height: 140px;
+      resize: vertical;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.12);
+      outline: none;
+      font: inherit;
+      font-size: 13px;
+      background: rgba(255,255,255,.92);
+    }
+    .composer .send{
+      min-width: 104px;
+    }
+    .hint{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    /* Konten ahli */
+    .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
     .foot{
       margin-top: 16px;
       padding: 14px 0 4px;
@@ -226,12 +329,14 @@
     @media (max-width: 980px){
       .brand{ min-width: 0; }
       .grid2{ grid-template-columns: 1fr; }
+      .chat-box{ height: 380px; }
+      .composer .send{ min-width: 92px; }
     }
   </style>
 </head>
 
 <body>
-  <!-- Topbar (gaya produk.html) -->
+  <!-- Topbar -->
   <header class="topbar">
     <div class="topbar-inner">
       <div class="brand">
@@ -269,42 +374,39 @@
 
       <!-- TAB AI -->
       <div class="tab-panel active" data-panel="ai">
-        <div class="muted">
-          Chat akan muncul sebagai widget (Tawk.to). Klik gelembung chat di kanan bawah.
-        </div>
-
-        <!-- Area khusus (opsional) untuk memberi konteks, widget tetap floating -->
-        <div class="card" style="margin-top:12px">
+        <div class="card">
           <div class="card-inner">
             <div class="badge blue">Tanya AI</div>
             <div class="muted" style="margin-top:10px">
-              Silakan tulis pertanyaan seputar gizi anak, pola makan, atau penggunaan fitur iYup Care.
+              Tulis pertanyaan seputar gizi anak, pola makan, MPASI, atau penggunaan fitur iYup Care.
+              Tekan <b>Enter</b> untuk kirim (Shift+Enter untuk baris baru).
+            </div>
+
+            <div class="chat-shell" style="margin-top:12px">
+              <div class="chat-top">
+                <div class="chat-title">
+                  <span class="dot"></span>
+                  Asisten iYup Care
+                </div>
+                <div class="chat-status" id="chatStatus">Siap</div>
+              </div>
+
+              <div class="chat-box" id="chatBox">
+                <div class="bubble ai">Halo! Saya asisten iYup Care. Tanyakan apa saja seputar gizi anak ya.</div>
+                <div class="bubble sys">Catatan: AI bukan pengganti dokter. Jika gejala berat/darurat, segera ke fasilitas kesehatan.</div>
+              </div>
+
+              <div class="composer">
+                <textarea id="chatInput" placeholder="Contoh: Anak 2 tahun susah makan, menu apa yang cocok?"></textarea>
+                <button class="btnx primary send" id="sendBtn" type="button">Kirim</button>
+              </div>
+            </div>
+
+            <div class="hint">
+              Tips: Sertakan usia anak, BB/TB (kalau ada), dan keluhan utama agar jawabannya lebih tepat.
             </div>
           </div>
         </div>
-
-        <!-- Load Tawk.to hanya ketika tab AI aktif -->
-        <script>
-          // loader aman: jangan load dua kali
-          function loadTawkOnce(){
-            if (window.__TAWK_LOADED__) return;
-            window.__TAWK_LOADED__ = true;
-
-            <!--Start of Tawk.to Script-->
-            var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
-            (function(){
-              var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-              s1.async=true;
-              s1.src='https://embed.tawk.to/6992c18d8e48ac1c386b8cf7/1jhik85cn';
-              s1.charset='UTF-8';
-              s1.setAttribute('crossorigin','*');
-              s0.parentNode.insertBefore(s1,s0);
-            })();
-            <!--End of Tawk.to Script-->
-          }
-          // default: tab AI aktif saat pertama buka
-          loadTawkOnce();
-        </script>
       </div>
 
       <!-- TAB AHLI -->
@@ -347,7 +449,6 @@
   <script>
     // tetap pakai auth untuk user web
     requireAuthOrRedirect();
-
     document.getElementById("year").textContent = new Date().getFullYear();
 
     // Logout
@@ -358,7 +459,7 @@
       location.href = "login.html";
     });
 
-    // Tabs (tanpa komunitas)
+    // Tabs
     const root = document.getElementById("tabsRoot");
     const tabBtns = root.querySelectorAll(".tabbtn[data-tab]");
     const panels = root.querySelectorAll(".tab-panel[data-panel]");
@@ -366,15 +467,111 @@
     function setActiveTab(key){
       tabBtns.forEach(b => b.classList.toggle("active", b.dataset.tab === key));
       panels.forEach(p => p.classList.toggle("active", p.dataset.panel === key));
+    }
+    tabBtns.forEach(btn => btn.addEventListener("click", () => setActiveTab(btn.dataset.tab)));
 
-      // kalau pindah ke AI, pastikan widget sudah diload
-      if (key === "ai" && typeof loadTawkOnce === "function") {
-        loadTawkOnce();
+    // ================== AI CHAT ==================
+    // Pastikan ini sesuai worker kamu (yang sudah berhasil di Postman)
+    const WORKER_CHAT_URL = "https://iyupcare-ai.maxitabusiness.workers.dev/ai/chat";
+
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const chatStatus = document.getElementById("chatStatus");
+
+    // Simpan history agar model punya konteks (dibatasi biar hemat kuota)
+    const history = [
+      { role:"assistant", content:"Halo! Saya asisten iYup Care. Tanyakan apa saja seputar gizi anak ya." }
+    ];
+    const MAX_HISTORY = 18; // total item history (user+assistant), hemat kuota
+
+    function addBubble(text, who){
+      const div = document.createElement("div");
+      div.className = "bubble " + (who === "me" ? "me" : who === "sys" ? "sys" : "ai");
+      div.textContent = text;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      return div;
+    }
+
+    function setBusy(busy, label){
+      sendBtn.disabled = busy;
+      chatInput.disabled = busy;
+      chatStatus.textContent = label || (busy ? "Menjawab..." : "Siap");
+      sendBtn.textContent = busy ? "Menjawab..." : "Kirim";
+    }
+
+    function trimHistory(){
+      // keep initial assistant + last messages
+      if(history.length <= MAX_HISTORY) return;
+      // sisakan 1 item pertama + (MAX_HISTORY-1) terakhir
+      const keepFirst = history[0];
+      const tail = history.slice(-(MAX_HISTORY - 1));
+      history.length = 0;
+      history.push(keepFirst, ...tail);
+    }
+
+    async function askAI(userText){
+      history.push({ role:"user", content:userText });
+      trimHistory();
+
+      const res = await fetch(WORKER_CHAT_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history })
+      });
+
+      const ct = res.headers.get("content-type") || "";
+      if(!ct.includes("application/json")){
+        const t = await res.text();
+        throw new Error("Respon bukan JSON (kemungkinan URL salah / Access aktif / CORS). Potongan: " + t.slice(0,120));
+      }
+
+      const data = await res.json();
+      if(!res.ok){
+        const msg = data?.error || ("HTTP " + res.status);
+        const retry = data?.retryAfterSec ? (" (retry " + data.retryAfterSec + "s)") : "";
+        throw new Error(msg + retry);
+      }
+
+      const reply = String(data?.reply || "").trim();
+      if(!reply) throw new Error("Reply kosong dari AI.");
+
+      history.push({ role:"assistant", content: reply });
+      trimHistory();
+      return reply;
+    }
+
+    async function handleSend(){
+      const text = (chatInput.value || "").trim();
+      if(!text) return;
+
+      addBubble(text, "me");
+      chatInput.value = "";
+
+      const loadingBubble = addBubble("…", "ai");
+      setBusy(true, "Menjawab...");
+
+      try{
+        const reply = await askAI(text);
+        loadingBubble.textContent = reply;
+      }catch(err){
+        loadingBubble.textContent = "Gagal memanggil AI: " + (err?.message || err);
+      }finally{
+        setBusy(false, "Siap");
+        chatBox.scrollTop = chatBox.scrollHeight;
+        chatInput.focus();
       }
     }
 
-    tabBtns.forEach(btn => {
-      btn.addEventListener("click", () => setActiveTab(btn.dataset.tab));
+    sendBtn.addEventListener("click", handleSend);
+
+    // Enter = kirim, Shift+Enter = baris baru
+    chatInput.addEventListener("keydown", (e) => {
+      if(e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        handleSend();
+      }
     });
   </script>
 </body>
