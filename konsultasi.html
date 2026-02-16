@@ -20,7 +20,6 @@
       --shadow2: 0 12px 30px rgba(15,23,42,.08);
       --primary:#1e63d6;
       --green:#1f9d55;
-      --orange:#f2994a;
       --radius:18px;
       --max:1100px;
     }
@@ -37,7 +36,7 @@
     }
     a{ color:inherit; text-decoration:none; }
 
-    /* Topbar (samakan dengan produk.html) */
+    /* Topbar */
     .topbar{
       position: sticky;
       top: 0;
@@ -108,6 +107,16 @@
     }
     .btnx.primary:hover{ filter: brightness(.98); }
 
+    /* Back button (panel header) */
+    .btnx.back{
+      padding: 9px 12px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.92);
+      border:1px solid rgba(15,23,42,.12);
+      color: #111;
+      font-weight: 900;
+    }
+
     /* Page wrap */
     .wrap{
       max-width: var(--max);
@@ -127,6 +136,13 @@
     .panel-head{
       padding: 16px;
       border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+    .panel-head .head-row{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:10px;
+      margin-bottom: 10px;
     }
     .panel-head h1{
       margin:0;
@@ -302,6 +318,15 @@
     .composer .send{
       min-width: 104px;
     }
+
+    /* WhatsApp button */
+    .btnx.whatsapp{
+      background: linear-gradient(180deg, rgba(31,157,85,1), rgba(22,122,66,1));
+      border-color: rgba(31,157,85,.0);
+      color:#fff;
+    }
+    .btnx.whatsapp:hover{ filter: brightness(.98); }
+
     .hint{
       margin-top: 10px;
       color: var(--muted);
@@ -309,11 +334,12 @@
       line-height: 1.6;
     }
 
-    /* Konten ahli */
-    .grid2{
+    /* Single contact layout */
+    .grid1{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 14px;
+      margin-top: 2px;
     }
 
     .foot{
@@ -325,10 +351,8 @@
       text-align:center;
     }
 
-    /* Responsive */
     @media (max-width: 980px){
       .brand{ min-width: 0; }
-      .grid2{ grid-template-columns: 1fr; }
       .chat-box{ height: 380px; }
       .composer .send{ min-width: 92px; }
     }
@@ -347,12 +371,9 @@
         </div>
       </div>
 
+      <!-- Hanya 1 tombol: Dashboard (biru) -->
       <div class="actions">
-        <a class="btnx" href="dashboard.html">Dashboard</a>
-        <a class="btnx" href="monitoring.html">Monitoring</a>
-        <a class="btnx" href="kalkulator.html">Kalkulator</a>
-        <a class="btnx" href="produk.html">Produk</a>
-        <a class="btnx primary" href="#" id="logoutLink">Logout</a>
+        <a class="btnx primary" href="dashboard.html" id="dashboardBtn">Dashboard</a>
       </div>
     </div>
   </header>
@@ -360,6 +381,11 @@
   <main class="wrap">
     <section class="panel" id="tabsRoot">
       <div class="panel-head">
+        <!-- Tombol kembali di atas judul -->
+        <div class="head-row">
+          <a class="btnx back" href="dashboard.html">← Kembali</a>
+        </div>
+
         <h1>Konsultasi</h1>
         <div class="small">
           Gunakan <b>Tanya AI</b> untuk chat cepat, atau <b>Konsultasi Ahli</b> untuk menghubungi tenaga pendamping via WhatsApp.
@@ -409,27 +435,26 @@
         </div>
       </div>
 
-      <!-- TAB AHLI -->
+      <!-- TAB AHLI (hanya 1 kontak) -->
       <div class="tab-panel" data-panel="ahli">
-        <div class="grid2" style="margin-top:2px">
+        <div class="grid1">
           <div class="card">
             <div class="card-inner">
               <div class="badge green">Ahli Gizi</div>
-              <h3 style="margin:12px 0 0">Nama Ahli 1</h3>
-              <div class="muted">Spesialis gizi anak & stunting.</div>
-              <div style="margin-top:12px">
-                <a class="btnx" href="https://wa.me/628xxxxxxxxxx" target="_blank" rel="noreferrer">Chat via WA</a>
-              </div>
-            </div>
-          </div>
 
-          <div class="card">
-            <div class="card-inner">
-              <div class="badge blue">Bidan/Perawat</div>
-              <h3 style="margin:12px 0 0">Nama Ahli 2</h3>
-              <div class="muted">Pendamping tumbuh kembang.</div>
+              <h3 style="margin:12px 0 0">ALIFLAELA, SGz</h3>
+              <div class="muted">
+                Nutrisionis Pelaksana di Puskesmas Biromaru. Pendamping edukasi gizi anak (pola makan, MPASI, dan pencegahan stunting) dengan pendekatan praktis yang mudah diterapkan di rumah.
+              </div>
+
               <div style="margin-top:12px">
-                <a class="btnx primary" href="https://wa.me/628xxxxxxxxxx" target="_blank" rel="noreferrer">Chat via WA</a>
+                <a class="btnx whatsapp" href="https://wa.me/6281340901201" target="_blank" rel="noreferrer">
+                  Chat via WA
+                </a>
+              </div>
+
+              <div class="hint">
+                Jika ingin konsultasi lebih tepat, siapkan data: usia anak, BB/TB terbaru, pola makan harian, serta keluhan utama.
               </div>
             </div>
           </div>
@@ -450,14 +475,6 @@
     // tetap pakai auth untuk user web
     requireAuthOrRedirect();
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Logout
-    document.getElementById("logoutLink").addEventListener("click", async (e) => {
-      e.preventDefault();
-      try { await api("/auth/logout", { method:"POST", auth:true }); } catch {}
-      clearToken();
-      location.href = "login.html";
-    });
 
     // Tabs
     const root = document.getElementById("tabsRoot");
@@ -483,7 +500,7 @@
     const history = [
       { role:"assistant", content:"Halo! Saya asisten iYup Care. Tanyakan apa saja seputar gizi anak ya." }
     ];
-    const MAX_HISTORY = 18; // total item history (user+assistant), hemat kuota
+    const MAX_HISTORY = 18; // hemat kuota
 
     function addBubble(text, who){
       const div = document.createElement("div");
@@ -502,9 +519,7 @@
     }
 
     function trimHistory(){
-      // keep initial assistant + last messages
       if(history.length <= MAX_HISTORY) return;
-      // sisakan 1 item pertama + (MAX_HISTORY-1) terakhir
       const keepFirst = history[0];
       const tail = history.slice(-(MAX_HISTORY - 1));
       history.length = 0;
@@ -524,7 +539,7 @@
       const ct = res.headers.get("content-type") || "";
       if(!ct.includes("application/json")){
         const t = await res.text();
-        throw new Error("Respon bukan JSON (kemungkinan URL salah / Access aktif / CORS). Potongan: " + t.slice(0,120));
+        throw new Error("Respon bukan JSON (URL salah / Access aktif / CORS). Potongan: " + t.slice(0,120));
       }
 
       const data = await res.json();
