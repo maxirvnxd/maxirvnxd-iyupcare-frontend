@@ -38,6 +38,38 @@
     a{ color:inherit; text-decoration:none; }
     .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
 
+    /* ===== Spinner + Loading Button ===== */
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner{
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 2px solid rgba(15,23,42,.22);
+      border-top-color: rgba(15,23,42,.72);
+      animation: spin .7s linear infinite;
+      flex: 0 0 auto;
+    }
+    .btn2 .spinner{ border-color: rgba(255,255,255,.35); border-top-color: rgba(255,255,255,.95); }
+    .btn2:not(.primary) .spinner{ border-color: rgba(15,23,42,.18); border-top-color: rgba(15,23,42,.65); }
+
+    .btn2[disabled],
+    .icon-btn[disabled],
+    .logout[disabled]{
+      opacity: .75;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn2.loading{
+      pointer-events:none;
+    }
+    .btn2 .btn-label{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+    }
+
     /* Topbar */
     .topbar{
       position: sticky;
@@ -339,16 +371,8 @@
       background: rgba(30,99,214,.10);
       border-color: rgba(30,99,214,.22);
     }
-    .menu-item .l{
-      font-weight: 950;
-      font-size: 13px;
-    }
-    .menu-item .d{
-      margin-top: 2px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.35;
-    }
+    .menu-item .l{ font-weight: 950; font-size: 13px; }
+    .menu-item .d{ margin-top: 2px; color: var(--muted); font-size: 12px; line-height: 1.35; }
     .menu-item .ico{
       width: 42px; height:42px;
       border-radius: 16px;
@@ -502,9 +526,7 @@
 
   <div id="msg"></div>
 
-  <!-- =======================
-       PANEL: OVERVIEW
-  ======================== -->
+  <!-- PANEL: OVERVIEW -->
   <section class="panel active" id="p-overview">
     <section class="grid2">
       <article class="card2">
@@ -559,9 +581,7 @@
     </section>
   </section>
 
-  <!-- =======================
-       PANEL: USERS (TABLE)
-  ======================== -->
+  <!-- PANEL: USERS -->
   <section class="panel" id="p-users">
     <section class="card2" style="margin-top:14px;">
       <div class="card-inner">
@@ -569,7 +589,7 @@
           <div class="title2">Users</div>
           <div class="row">
             <input id="userSearch" class="input" placeholder="Cari name/email/username...">
-            <button class="btn2 primary" id="btnLoadUsers" type="button">Muat</button>
+            <button class="btn2 primary" id="btnLoadUsers" type="button"><span class="btn-label">Muat</span></button>
           </div>
         </div>
 
@@ -592,9 +612,7 @@
     </section>
   </section>
 
-  <!-- =======================
-       PANEL: EDIT USER
-  ======================== -->
+  <!-- PANEL: EDIT USER -->
   <section class="panel" id="p-edit">
     <section class="card2" style="margin-top:14px;">
       <div class="card-inner">
@@ -603,7 +621,7 @@
 
         <div class="row" style="margin-top:10px;">
           <input id="editSearch" class="input" placeholder="Cari nama/email...">
-          <button class="btn2 primary" id="btnLoadEditList" type="button">Muat List</button>
+          <button class="btn2 primary" id="btnLoadEditList" type="button"><span class="btn-label">Muat List</span></button>
         </div>
 
         <div id="editList" style="margin-top:12px;"></div>
@@ -617,9 +635,7 @@
     </section>
   </section>
 
-  <!-- =======================
-       PANEL: MONITORING
-  ======================== -->
+  <!-- PANEL: MONITORING -->
   <section class="panel" id="p-monitoring">
     <section class="card2" style="margin-top:14px;">
       <div class="card-inner">
@@ -627,14 +643,14 @@
         <div class="muted">Pilih user → pilih anak → tampilkan monitoring.</div>
 
         <div class="row" style="margin-top:10px;">
-          <button class="btn2 primary" id="btnLoadUsersForMon" type="button">Muat Users</button>
+          <button class="btn2 primary" id="btnLoadUsersForMon" type="button"><span class="btn-label">Muat Users</span></button>
           <select id="monUserPick" class="input" style="min-width:260px;">
             <option value="">- pilih user -</option>
           </select>
           <select id="monAnakPick" class="input" style="min-width:260px;">
             <option value="">- pilih anak -</option>
           </select>
-          <button class="btn2" id="btnLoadMon" type="button">Muat Monitoring</button>
+          <button class="btn2" id="btnLoadMon" type="button"><span class="btn-label">Muat Monitoring</span></button>
         </div>
 
         <div class="muted" id="monMeta" style="margin-top:10px;">—</div>
@@ -663,9 +679,7 @@
     </section>
   </section>
 
-  <!-- =======================
-       PANEL: GALERI (placeholder)
-  ======================== -->
+  <!-- PANEL: GALERI -->
   <section class="panel" id="p-galeri">
     <section class="card2" style="margin-top:14px;">
       <div class="card-inner">
@@ -681,9 +695,7 @@
     </section>
   </section>
 
-  <!-- =======================
-       PANEL: KALKULATOR (placeholder)
-  ======================== -->
+  <!-- PANEL: KALKULATOR -->
   <section class="panel" id="p-kalkulator">
     <section class="card2" style="margin-top:14px;">
       <div class="card-inner">
@@ -709,6 +721,15 @@
   function showMsgVisible(){ msgEl.style.display = "block"; }
   function hideMsg(){ msgEl.style.display = "none"; msgEl.innerHTML = ""; }
 
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function showErr(err){
     showMsgVisible();
     if(typeof window.showError === "function") return window.showError(msgEl, err);
@@ -720,39 +741,54 @@
     msgEl.innerHTML = `<div class="alert ok">${escapeHtml(String(text || "OK"))}</div>`;
   }
 
-  function escapeHtml(s){
-    return String(s ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
   function requireAdminOrRedirect(){
     const t = window.getAdminToken ? window.getAdminToken() : localStorage.getItem("admin_token");
     if(!t) location.href = "admin-login.html";
   }
 
-  // Drawer
+  /* ===== Loading helpers ===== */
+  function setBtnLoading(btn, isLoading, loadingText){
+    if(!btn) return;
+
+    if(!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
+    if(!btn.dataset.origDisabled) btn.dataset.origDisabled = btn.disabled ? "1" : "0";
+
+    if(isLoading){
+      btn.disabled = true;
+      btn.classList.add("loading");
+      const label = loadingText || "Memuat...";
+      btn.innerHTML = `<span class="btn-label"><span class="spinner"></span>${escapeHtml(label)}</span>`;
+    }else{
+      btn.classList.remove("loading");
+      // restore disabled state
+      btn.disabled = (btn.dataset.origDisabled === "1");
+      // restore html
+      btn.innerHTML = btn.dataset.origHtml;
+    }
+  }
+
+  async function withBtnLoading(btn, fn, loadingText){
+    setBtnLoading(btn, true, loadingText);
+    try{
+      return await fn();
+    }finally{
+      setBtnLoading(btn, false);
+    }
+  }
+
+  /* ===== Drawer ===== */
   const drawer = document.getElementById("drawer");
   const overlay = document.getElementById("drawerOverlay");
   const btnMenu = document.getElementById("btnMenu");
   const btnDrawerClose = document.getElementById("btnDrawerClose");
 
-  function openDrawer(){
-    drawer.classList.add("open");
-    overlay.classList.add("open");
-  }
-  function closeDrawer(){
-    drawer.classList.remove("open");
-    overlay.classList.remove("open");
-  }
+  function openDrawer(){ drawer.classList.add("open"); overlay.classList.add("open"); }
+  function closeDrawer(){ drawer.classList.remove("open"); overlay.classList.remove("open"); }
   btnMenu.addEventListener("click", openDrawer);
   btnDrawerClose.addEventListener("click", closeDrawer);
   overlay.addEventListener("click", closeDrawer);
 
-  // Panels navigation
+  /* ===== Panels navigation ===== */
   const menuItems = Array.from(document.querySelectorAll(".menu-item"));
   const panels = Array.from(document.querySelectorAll(".panel"));
   function setPanel(id){
@@ -763,14 +799,17 @@
   }
   menuItems.forEach(mi => mi.addEventListener("click", () => setPanel(mi.dataset.panel)));
 
-  // Logout
-  document.getElementById("btnLogout").addEventListener("click", async ()=>{
-    try{ await apiAdmin("/auth/logout",{method:"POST"}); }catch(e){}
-    window.clearAdminToken();
-    location.href = "index.html";
+  /* ===== Logout ===== */
+  document.getElementById("btnLogout").addEventListener("click", async (e)=>{
+    const btn = e.currentTarget;
+    await withBtnLoading(btn, async ()=>{
+      try{ await apiAdmin("/auth/logout",{method:"POST"}); }catch(e){}
+      window.clearAdminToken();
+      location.href = "index.html";
+    }, "Keluar...");
   });
 
-  // Health
+  /* ===== Health ===== */
   let cachedAdmin = null;
 
   async function checkHealth(){
@@ -792,7 +831,7 @@
     }
   }
 
-  // Stats (render KPI, bukan JSON mentah)
+  /* ===== Stats ===== */
   function fmtDate(iso){
     try{
       const d = new Date(iso);
@@ -825,9 +864,7 @@
       document.getElementById("kpiMon").textContent = mon;
       document.getElementById("kpiKal").textContent = kal;
 
-      hintEl.innerHTML =
-        `Info: user baru 7 hari terakhir: <b>${escapeHtml(String(usersNew7))}</b>.`;
-
+      hintEl.innerHTML = `Info: user baru 7 hari terakhir: <b>${escapeHtml(String(usersNew7))}</b>.`;
     }catch(e){
       metaEl.textContent = "Gagal memuat stats.";
       kpiWrap.style.display = "none";
@@ -836,7 +873,7 @@
     }
   }
 
-  // Users table
+  /* ===== Users table ===== */
   async function loadUsers(){
     const search = document.getElementById("userSearch").value.trim();
     const qs = new URLSearchParams();
@@ -864,13 +901,17 @@
     });
   }
 
-  document.getElementById("btnLoadUsers").addEventListener("click", async () => {
+  document.getElementById("btnLoadUsers").addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
     hideMsg();
-    try{ await loadUsers(); }
-    catch(e){ showErr(e); }
+    try{
+      await withBtnLoading(btn, async ()=>{ await loadUsers(); }, "Memuat...");
+    }catch(err){
+      showErr(err);
+    }
   });
 
-  // Edit list
+  /* ===== Edit list ===== */
   async function loadEditList(){
     const q = document.getElementById("editSearch").value.trim();
     const qs = new URLSearchParams();
@@ -895,21 +936,30 @@
             <div class="muted">${escapeHtml(u.email || "-")} • role: ${escapeHtml(u.role || "user")} • id: ${escapeHtml(u.id)}</div>
           </div>
           <div class="row">
-            <button class="btn2" data-act="toggle" data-id="${escapeHtml(u.id)}" type="button">✏️ Edit</button>
+            <button class="btn2" data-act="toggle" data-id="${escapeHtml(u.id)}" type="button">
+              <span class="btn-label">✏️ Edit</span>
+            </button>
           </div>
         </div>
 
         <div class="editor" data-editor="${escapeHtml(u.id)}" style="display:none;margin-top:12px;">
           <div class="muted">Ubah password (butuh dukungan PATCH /admin/users/{id}). Kalau backend belum mendukung, tombol ini akan error.</div>
+
           <div class="grid" style="margin-top:10px;">
             <input class="input" data-pass="${escapeHtml(u.id)}" type="password" placeholder="Password baru">
             <input class="input" data-pass2="${escapeHtml(u.id)}" type="password" placeholder="Konfirmasi password">
           </div>
 
           <div class="row" style="margin-top:10px;">
-            <button class="btn2 primary" data-act="setpass" data-id="${escapeHtml(u.id)}" type="button">Simpan Password</button>
-            <button class="btn2" data-act="force" data-id="${escapeHtml(u.id)}" type="button">Force Change Password</button>
-            <button class="btn2 danger" data-act="reset" data-id="${escapeHtml(u.id)}" type="button">Reset Password</button>
+            <button class="btn2 primary" data-act="setpass" data-id="${escapeHtml(u.id)}" type="button">
+              <span class="btn-label">Simpan Password</span>
+            </button>
+            <button class="btn2" data-act="force" data-id="${escapeHtml(u.id)}" type="button">
+              <span class="btn-label">Force Change Password</span>
+            </button>
+            <button class="btn2 danger" data-act="reset" data-id="${escapeHtml(u.id)}" type="button">
+              <span class="btn-label">Reset Password</span>
+            </button>
           </div>
 
           <div class="hint">
@@ -923,7 +973,7 @@
       wrap.appendChild(box);
     });
 
-    // bind edit toggle
+    // toggle
     wrap.querySelectorAll("button[data-act='toggle']").forEach(btn => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
@@ -933,7 +983,7 @@
       });
     });
 
-    // bind set password
+    // set password
     wrap.querySelectorAll("button[data-act='setpass']").forEach(btn => {
       btn.addEventListener("click", async () => {
         hideMsg();
@@ -943,68 +993,71 @@
         if(!p1 || !p2) return showErr({message:"Password & konfirmasi wajib diisi."});
         if(p1 !== p2) return showErr({message:"Konfirmasi password tidak sama."});
 
-        btn.disabled = true;
         try{
-          await apiAdmin(`/admin/users/${id}`, {
-            method: "PATCH",
-            body: { password: p1, password_confirmation: p2 }
-          });
+          await withBtnLoading(btn, async ()=>{
+            await apiAdmin(`/admin/users/${id}`, {
+              method: "PATCH",
+              body: { password: p1, password_confirmation: p2 }
+            });
+          }, "Menyimpan...");
+
           showOkText(`Password user ${id} berhasil diubah.`);
         }catch(e){
           showErr(e);
-        }finally{
-          btn.disabled = false;
         }
       });
     });
 
-    // bind force change
+    // force change
     wrap.querySelectorAll("button[data-act='force']").forEach(btn => {
       btn.addEventListener("click", async () => {
         hideMsg();
         const id = btn.getAttribute("data-id");
-        btn.disabled = true;
+
         try{
-          await apiAdmin(`/admin/users/${id}/force-change-password`, { method:"POST" });
+          await withBtnLoading(btn, async ()=>{
+            await apiAdmin(`/admin/users/${id}/force-change-password`, { method:"POST" });
+          }, "Memproses...");
+
           showOkText(`User ${id} dipaksa ganti password pada login berikutnya.`);
         }catch(e){
           showErr(e);
-        }finally{
-          btn.disabled = false;
         }
       });
     });
 
-    // bind reset password
+    // reset password
     wrap.querySelectorAll("button[data-act='reset']").forEach(btn => {
       btn.addEventListener("click", async () => {
         hideMsg();
         const id = btn.getAttribute("data-id");
         if(!confirm(`Reset password untuk user ${id}?`)) return;
 
-        btn.disabled = true;
         try{
-          const r = await apiAdmin(`/admin/users/${id}/reset-password`, { method:"POST" });
-          // respon backend bisa beda-beda; tampilkan ringkas
+          const r = await withBtnLoading(btn, async ()=>{
+            return await apiAdmin(`/admin/users/${id}/reset-password`, { method:"POST" });
+          }, "Mereset...");
+
           showOkText(`Reset password berhasil. Response: ${escapeHtml(JSON.stringify(r))}`);
         }catch(e){
           showErr(e);
-        }finally{
-          btn.disabled = false;
         }
       });
     });
   }
 
-  document.getElementById("btnLoadEditList").addEventListener("click", async () => {
+  document.getElementById("btnLoadEditList").addEventListener("click", async (e) => {
+    const btn = e.currentTarget;
     hideMsg();
-    try{ await loadEditList(); }
-    catch(e){ showErr(e); }
+    try{
+      await withBtnLoading(btn, async ()=>{ await loadEditList(); }, "Memuat...");
+    }catch(err){
+      showErr(err);
+    }
   });
 
-  // Monitoring drilldown
+  /* ===== Monitoring drilldown ===== */
   async function loadUsersForMonitoring(){
-    hideMsg();
     const pick = document.getElementById("monUserPick");
     pick.innerHTML = `<option value="">Memuat...</option>`;
 
@@ -1023,8 +1076,6 @@
 
     const res = await apiAdmin(`/admin/users/${userId}/anak`);
     const rows = res?.data || res || [];
-
-    // Admin endpoint kamu kemungkinan return {data:[...]} atau [...]
     const list = Array.isArray(rows) ? rows : (Array.isArray(rows?.data) ? rows.data : []);
 
     anakPick.innerHTML = `<option value="">- pilih anak -</option>` +
@@ -1057,38 +1108,47 @@
     });
   }
 
-  document.getElementById("btnLoadUsersForMon").addEventListener("click", async ()=>{
-    try{ await loadUsersForMonitoring(); }
-    catch(e){ showErr(e); }
+  document.getElementById("btnLoadUsersForMon").addEventListener("click", async (e)=>{
+    const btn = e.currentTarget;
+    hideMsg();
+    try{
+      await withBtnLoading(btn, async ()=>{ await loadUsersForMonitoring(); }, "Memuat...");
+    }catch(err){
+      showErr(err);
+    }
   });
 
   document.getElementById("monUserPick").addEventListener("change", async (e)=>{
+    hideMsg();
     const id = e.target.value;
     if(!id){
       document.getElementById("monAnakPick").innerHTML = `<option value="">- pilih anak -</option>`;
       return;
     }
-    try{ await loadAnakForUser(id); }
-    catch(err){ showErr(err); }
+    try{
+      await loadAnakForUser(id);
+    }catch(err){
+      showErr(err);
+    }
   });
 
-  document.getElementById("btnLoadMon").addEventListener("click", async ()=>{
+  document.getElementById("btnLoadMon").addEventListener("click", async (e)=>{
+    const btn = e.currentTarget;
     hideMsg();
     const anakId = document.getElementById("monAnakPick").value;
     if(!anakId) return showErr({message:"Pilih anak dulu."});
-    try{ await loadMonitoring(anakId); }
-    catch(e){ showErr(e); }
+
+    try{
+      await withBtnLoading(btn, async ()=>{ await loadMonitoring(anakId); }, "Memuat...");
+    }catch(err){
+      showErr(err);
+    }
   });
 
   /* ===== INIT ===== */
   (async function(){
     requireAdminOrRedirect();
-
-    // paralel: health + stats
-    await Promise.all([
-      checkHealth(),
-      loadStats()
-    ]);
+    await Promise.all([ checkHealth(), loadStats() ]);
   })();
 </script>
 
