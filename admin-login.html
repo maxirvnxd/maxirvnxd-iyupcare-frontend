@@ -322,6 +322,8 @@
     const msg = document.getElementById("msg");
     const btnLogin = document.getElementById("btnLogin");
     const btnBack = document.getElementById("btnBack");
+    const inUsername = document.getElementById("username");
+    const inPassword = document.getElementById("password");
 
     function showMsgVisible(){ msg.style.display = "block"; }
 
@@ -342,6 +344,7 @@
       if(typeof window.showError === "function") return window.showError(msg, err);
       msg.innerHTML = `<div class="alert err">${String(err?.message || err || "Gagal")}</div>`;
     }
+
     function showOkText(text){
       showMsgVisible();
       if(typeof window.showOk === "function") return window.showOk(msg, text);
@@ -352,8 +355,8 @@
       msg.innerHTML = "";
       showMsgVisible();
 
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value;
+      const username = inUsername.value.trim();
+      const password = inPassword.value;
 
       if(!username || !password){
         showErr({message:"Username dan password wajib diisi."});
@@ -362,6 +365,10 @@
 
       setLoading(true);
       try{
+        // bersihkan token admin lama biar tidak nyangkut
+        if(typeof window.clearAdminToken === "function") window.clearAdminToken();
+        else localStorage.removeItem("admin_token");
+
         const resp = await api("/auth/login", {
           method: "POST",
           body: { username, password }
@@ -374,18 +381,19 @@
           throw new Error("Token tidak ditemukan dari response login.");
         }
 
-        if(typeof window.setToken === "function") window.setToken(token);
-        else localStorage.setItem("token", token);
+        // ✅ SIMPAN TOKEN ADMIN
+        if(typeof window.setAdminToken === "function") window.setAdminToken(token);
+        else localStorage.setItem("admin_token", token);
 
+        // Validasi admin
         if(role !== "admin"){
-          if(typeof window.clearToken === "function") window.clearToken();
-          else localStorage.removeItem("token");
-
+          if(typeof window.clearAdminToken === "function") window.clearAdminToken();
+          else localStorage.removeItem("admin_token");
           throw new Error("Akun ini bukan admin. Akses ditolak.");
         }
 
         showOkText("Login admin berhasil. Mengalihkan...");
-        setTimeout(() => location.href = "admin.html", 250);
+        setTimeout(() => location.href = "admin.html", 350);
       }catch(e){
         showErr(e);
       }finally{
@@ -395,8 +403,11 @@
 
     btnLogin.addEventListener("click", doAdminLogin);
 
-    // Enter to login
-    document.addEventListener("keydown", (e) => {
+    // Enter to login (hanya dari input)
+    inUsername.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") btnLogin.click();
+    });
+    inPassword.addEventListener("keydown", (e) => {
       if(e.key === "Enter") btnLogin.click();
     });
   </script>

@@ -1,13 +1,9 @@
 // =========================================================
-// api.js (PROD-READY for iYupCare)
-// Default behavior:
-// - Local dev (localhost/127.0.0.1/file): http://127.0.0.1:8000/api
-// - Non-local (Vercel/production): https://maxirvnxd-iyupcare-backend.hf.space/api
-//
-// Override options (highest priority first):
-// A) window.__API_BASE__ = "https://.../api"   (set BEFORE loading api.js)
-// B) <meta name="api-base" content="https://.../api">  (in HTML <head>)
-// C) localStorage API_BASE via setApiBase("https://.../api")
+// api.js (PROD + ADMIN READY for iYupCare)
+// - Support USER token ("token")
+// - Support ADMIN token ("admin_token")
+// - api(...) => default pakai token user
+// - apiAdmin(...) => pakai token admin
 // =========================================================
 
 (() => {
@@ -18,25 +14,20 @@
   const DEFAULT_HF_API_BASE = "https://maxirvnxd-iyupcare-backend.hf.space/api";
 
   const STORAGE_KEY_TOKEN = "token";
+  const STORAGE_KEY_ADMIN_TOKEN = "admin_token";
   const STORAGE_KEY_API_BASE = "API_BASE";
 
   function normalizeApiBase(url) {
     if (!url || typeof url !== "string") return null;
     let u = url.trim();
-
-    // allow "/api" relative
     if (u.startsWith("/")) return u.replace(/\/+$/, "");
-
-    // must be http(s)
     if (!/^https?:\/\//i.test(u)) return null;
-
     return u.replace(/\/+$/, "");
   }
 
   function isLocalEnvironment() {
     const host = (location.hostname || "").toLowerCase();
     const proto = (location.protocol || "").toLowerCase();
-
     return (
       proto === "file:" ||
       host === "localhost" ||
@@ -46,67 +37,70 @@
   }
 
   function detectApiBase() {
-    // 1) Explicit global variable (highest priority)
     if (typeof window.__API_BASE__ === "string") {
       const v = normalizeApiBase(window.__API_BASE__);
       if (v) return v;
     }
 
-    // 2) Meta tag
     const meta = document.querySelector('meta[name="api-base"]');
     if (meta && typeof meta.content === "string") {
       const v = normalizeApiBase(meta.content);
       if (v) return v;
     }
 
-    // 3) localStorage override
     const fromStorage = localStorage.getItem(STORAGE_KEY_API_BASE);
     if (fromStorage) {
       const v = normalizeApiBase(fromStorage);
       if (v) return v;
     }
 
-    // 4) Default by environment
-    if (isLocalEnvironment()) return DEFAULT_LOCAL_API_BASE;
-    return DEFAULT_HF_API_BASE;
+    return isLocalEnvironment()
+      ? DEFAULT_LOCAL_API_BASE
+      : DEFAULT_HF_API_BASE;
   }
 
   let API_BASE = detectApiBase();
 
-  // Expose minimal helpers globally for your other scripts
-  window.getApiBase = function getApiBase() {
-    return API_BASE;
-  };
+  window.getApiBase = () => API_BASE;
 
-  window.setApiBase = function setApiBase(url) {
+  window.setApiBase = function (url) {
     const v = normalizeApiBase(url);
-    if (!v) {
-      throw new Error(
-        "API_BASE tidak valid. Contoh benar: https://.../api atau http://127.0.0.1:8000/api"
-      );
-    }
+    if (!v) throw new Error("API_BASE tidak valid.");
     API_BASE = v;
     localStorage.setItem(STORAGE_KEY_API_BASE, v);
     return v;
   };
 
-  window.clearApiBase = function clearApiBase() {
+  window.clearApiBase = function () {
     localStorage.removeItem(STORAGE_KEY_API_BASE);
     API_BASE = detectApiBase();
     return API_BASE;
   };
 
   // -------------------- TOKEN HELPERS --------------------
-  window.setToken = function setToken(token) {
+  window.setToken = function (token) {
     localStorage.setItem(STORAGE_KEY_TOKEN, token);
   };
 
-  window.getToken = function getToken() {
+  window.getToken = function () {
     return localStorage.getItem(STORAGE_KEY_TOKEN);
   };
 
-  window.clearToken = function clearToken() {
+  window.clearToken = function () {
     localStorage.removeItem(STORAGE_KEY_TOKEN);
+  };
+
+  // ADMIN TOKEN
+  window.setAdminToken = function (token) {
+    localStorage.setItem(STORAGE_KEY_ADMIN_TOKEN, token);
+  };
+
+  window.getAdminToken = function () {
+    return localStorage.getItem(STORAGE_KEY_ADMIN_TOKEN);
+  };
+
+  window.clearAdminToken = function () {
+    localStorage.removeItem(STORAGE_KEY_ADMIN_TOKEN);
   };
 
   // -------------------- RESPONSE PARSER --------------------
@@ -119,8 +113,8 @@
     if (contentType.includes("application/json")) {
       try {
         return JSON.parse(text);
-      } catch (e) {
-        return { raw: text, parse_error: String(e) };
+      } catch {
+        return { raw: text };
       }
     }
 
@@ -130,42 +124,27 @@
   function buildErrorMessage(resStatus, data) {
     let msg = `HTTP ${resStatus}`;
 
-    if (data && typeof data === "object") {
-      if (typeof data.message === "string" && data.message.trim()) {
-        msg = data.message;
-      } else if (typeof data.error === "string" && data.error.trim()) {
-        msg = data.error;
-      }
+    if (data?.message) msg = data.message;
+    if (data?.error) msg = data.error;
 
-      // Laravel validation format: { message, errors: { field: [..] } }
-      if (data.errors && typeof data.errors === "object") {
-        const parts = [];
-        for (const [field, arr] of Object.entries(data.errors)) {
-          if (Array.isArray(arr) && arr.length) parts.push(`${field}: ${arr[0]}`);
-        }
-        if (parts.length) msg = parts.join(" | ");
+    if (data?.errors) {
+      const parts = [];
+      for (const [field, arr] of Object.entries(data.errors)) {
+        if (Array.isArray(arr) && arr.length)
+          parts.push(`${field}: ${arr[0]}`);
       }
+      if (parts.length) msg = parts.join(" | ");
     }
 
     return msg;
   }
 
   function isFormDataBody(body) {
-    // aman untuk browser modern
     return typeof FormData !== "undefined" && body instanceof FormData;
   }
 
-  // -------------------- MAIN API FUNCTION --------------------
-  /**
-   * JSON:
-   * api("/auth/login", { method:"POST", body:{...} })
-   * api("/kalkulator", { method:"POST", body:{...}, auth:true })
-   *
-   * Multipart:
-   * api(`/anak/${id}/galeri`, { method:"POST", auth:true, body: fd, isFormData:true })
-   * atau cukup body: fd (auto-detect)
-   */
-  window.api = async function api(
+  // -------------------- CORE REQUEST --------------------
+  async function coreApi(
     path,
     {
       method = "GET",
@@ -173,37 +152,39 @@
       auth = false,
       headers: extraHeaders = {},
       signal = undefined,
-      isFormData = false, // <--- baru (opsional)
+      tokenKey = "user", // "user" or "admin"
     } = {}
   ) {
     const cleanPath = String(path || "");
-    const finalPath = cleanPath.startsWith("/") ? cleanPath : `/${cleanPath}`;
+    const finalPath = cleanPath.startsWith("/")
+      ? cleanPath
+      : `/${cleanPath}`;
 
-    const m = String(method || "GET").toUpperCase();
+    const m = method.toUpperCase();
     const hasBody = body !== null && body !== undefined && m !== "GET";
-
-    const bodyIsFD = isFormData === true || isFormDataBody(body);
+    const bodyIsFD = isFormDataBody(body);
 
     const headers = {
       Accept: "application/json",
       ...extraHeaders,
     };
 
-    // Kalau request punya body:
-    // - JSON: set Content-Type application/json dan stringify
-    // - FormData: JANGAN set Content-Type (biar boundary otomatis)
     if (hasBody && !bodyIsFD) {
       headers["Content-Type"] = "application/json";
     }
 
     if (auth) {
-      const token = window.getToken();
+      let token =
+        tokenKey === "admin"
+          ? window.getAdminToken()
+          : window.getToken();
+
       if (!token) {
-        const err = new Error("TOKEN_MISSING: Login dulu agar ada token.");
+        const err = new Error("TOKEN_MISSING: Login dulu.");
         err.status = 401;
-        err.payload = null;
         throw err;
       }
+
       headers["Authorization"] = `Bearer ${token}`;
     }
 
@@ -221,9 +202,8 @@
         signal,
       });
     } catch (netErr) {
-      const err = new Error(`NETWORK_ERROR: ${netErr?.message || "fetch gagal"}`);
+      const err = new Error("NETWORK_ERROR: " + netErr.message);
       err.status = 0;
-      err.payload = null;
       throw err;
     }
 
@@ -237,40 +217,37 @@
     }
 
     return data;
+  }
+
+  // USER API
+  window.api = function (path, options = {}) {
+    return coreApi(path, { ...options, tokenKey: "user" });
   };
 
-  // -------------------- UI HELPERS (optional) --------------------
-  window.showOk = function showOk(el, text) {
+  // ADMIN API
+  window.apiAdmin = function (path, options = {}) {
+    return coreApi(path, {
+      ...options,
+      auth: true,
+      tokenKey: "admin",
+    });
+  };
+
+  // -------------------- UI HELPERS --------------------
+  window.showOk = function (el, text) {
     if (!el) return;
+    el.style.display = "block";
     el.innerHTML = `<div class="alert ok">${text}</div>`;
   };
 
-  window.showError = function showError(el, err) {
+  window.showError = function (el, err) {
     if (!el) return;
+    el.style.display = "block";
 
     let msg = "Terjadi error.";
     if (typeof err === "string") msg = err;
     else if (err?.message) msg = err.message;
 
-    const details =
-      err?.payload
-        ? `<pre style="white-space:pre-wrap;margin:8px 0 0">${escapeHtml(
-            JSON.stringify(err.payload, null, 2)
-          )}</pre>`
-        : "";
-
-    el.innerHTML = `<div class="alert err">${escapeHtml(msg)}${details}</div>`;
+    el.innerHTML = `<div class="alert err">${msg}</div>`;
   };
-
-  function escapeHtml(s) {
-    return String(s)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  // Optional quick check:
-  // console.log("[api.js] API_BASE =", API_BASE);
 })();
