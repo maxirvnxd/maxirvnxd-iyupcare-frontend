@@ -35,6 +35,7 @@
         radial-gradient(800px 520px at 90% 90%, rgba(242,153,74,.10), transparent 55%),
         var(--bg);
     }
+    body.noscroll{ overflow:hidden; }
     a{ color:inherit; text-decoration:none; }
     .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
 
@@ -61,9 +62,7 @@
       transform: none !important;
     }
 
-    .btn2.loading{
-      pointer-events:none;
-    }
+    .btn2.loading{ pointer-events:none; }
     .btn2 .btn-label{
       display:inline-flex;
       align-items:center;
@@ -285,7 +284,7 @@
       background: rgba(255,255,255,.78);
     }
 
-    /* Drawer */
+    /* ===== Drawer (NOW FROM LEFT) ===== */
     .drawer-overlay{
       position: fixed;
       inset: 0;
@@ -299,14 +298,16 @@
     .drawer{
       position: fixed;
       top: 0;
-      right: 0;
+      left: 0;              /* ← from left */
+      right: auto;
       height: 100vh;
       width: min(360px, 92vw);
       background: rgba(255,255,255,.92);
       backdrop-filter: blur(10px);
-      border-left: 1px solid rgba(15,23,42,.10);
-      box-shadow: -18px 0 50px rgba(15,23,42,.12);
-      transform: translateX(100%);
+      border-right: 1px solid rgba(15,23,42,.10); /* ← border on right */
+      border-left: none;
+      box-shadow: 18px 0 50px rgba(15,23,42,.12); /* ← shadow to the right */
+      transform: translateX(-100%);               /* ← hide to left */
       transition: transform .22s ease;
       z-index: 60;
       display:flex;
@@ -760,9 +761,7 @@
       btn.innerHTML = `<span class="btn-label"><span class="spinner"></span>${escapeHtml(label)}</span>`;
     }else{
       btn.classList.remove("loading");
-      // restore disabled state
       btn.disabled = (btn.dataset.origDisabled === "1");
-      // restore html
       btn.innerHTML = btn.dataset.origHtml;
     }
   }
@@ -776,21 +775,35 @@
     }
   }
 
-  /* ===== Drawer ===== */
+  /* ===== Drawer (left) ===== */
   const drawer = document.getElementById("drawer");
   const overlay = document.getElementById("drawerOverlay");
   const btnMenu = document.getElementById("btnMenu");
   const btnDrawerClose = document.getElementById("btnDrawerClose");
 
-  function openDrawer(){ drawer.classList.add("open"); overlay.classList.add("open"); }
-  function closeDrawer(){ drawer.classList.remove("open"); overlay.classList.remove("open"); }
+  function openDrawer(){
+    drawer.classList.add("open");
+    overlay.classList.add("open");
+    document.body.classList.add("noscroll");
+  }
+  function closeDrawer(){
+    drawer.classList.remove("open");
+    overlay.classList.remove("open");
+    document.body.classList.remove("noscroll");
+  }
+
   btnMenu.addEventListener("click", openDrawer);
   btnDrawerClose.addEventListener("click", closeDrawer);
   overlay.addEventListener("click", closeDrawer);
 
+  document.addEventListener("keydown", (e)=>{
+    if(e.key === "Escape") closeDrawer();
+  });
+
   /* ===== Panels navigation ===== */
   const menuItems = Array.from(document.querySelectorAll(".menu-item"));
   const panels = Array.from(document.querySelectorAll(".panel"));
+
   function setPanel(id){
     menuItems.forEach(x => x.classList.toggle("active", x.dataset.panel === id));
     panels.forEach(p => p.classList.toggle("active", p.id === id));
@@ -973,7 +986,6 @@
       wrap.appendChild(box);
     });
 
-    // toggle
     wrap.querySelectorAll("button[data-act='toggle']").forEach(btn => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-id");
@@ -983,7 +995,6 @@
       });
     });
 
-    // set password
     wrap.querySelectorAll("button[data-act='setpass']").forEach(btn => {
       btn.addEventListener("click", async () => {
         hideMsg();
@@ -1008,7 +1019,6 @@
       });
     });
 
-    // force change
     wrap.querySelectorAll("button[data-act='force']").forEach(btn => {
       btn.addEventListener("click", async () => {
         hideMsg();
@@ -1026,7 +1036,6 @@
       });
     });
 
-    // reset password
     wrap.querySelectorAll("button[data-act='reset']").forEach(btn => {
       btn.addEventListener("click", async () => {
         hideMsg();
