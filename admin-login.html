@@ -216,6 +216,7 @@
     }
     .btn2.primary:hover{ filter: brightness(.98); }
     .btn2.secondary:hover{ border-color: rgba(30,99,214,.25); }
+    .btn2[disabled]{ opacity:.75; cursor:not-allowed; }
 
     .spinner{
       width: 16px;
@@ -231,7 +232,6 @@
       border-top-color: rgba(15,23,42,.65);
     }
     .btn2.is-loading .spinner{ display:inline-block; }
-
     @keyframes spin { to { transform: rotate(360deg); } }
 
     #msg{
@@ -273,17 +273,17 @@
   <div class="auth-wrap">
     <div class="auth-card">
       <section class="auth-left">
-        <div class="hero-badge">🛡️ Khusus Admin • 🔒 Akses Terbatas</div>
-        <h2 class="hero-title">Masuk ke Panel Administrator.</h2>
+        <div class="hero-badge">🛡️ Khusus Admin • 🔒 Token tersimpan</div>
+        <h2 class="hero-title">Masuk sebagai Admin.</h2>
         <p class="hero-desc">
           Halaman ini hanya untuk akun dengan role <b>admin</b>.
-          Sistem akan memverifikasi role setelah login berhasil.
+          Jika login berhasil tapi bukan admin, akses akan ditolak.
         </p>
       </section>
 
       <section class="auth-right">
         <h1 class="form-title">Login Admin</h1>
-        <p class="form-sub">Gunakan username dan password admin.</p>
+        <p class="form-sub">Gunakan <b>username</b> admin + password.</p>
 
         <div id="msg"></div>
 
@@ -307,7 +307,7 @@
             <span class="spinner" aria-hidden="true"></span>
           </button>
 
-          <button class="btn2 secondary" type="button" onclick="location.href='index.html'">
+          <button class="btn2 secondary" id="btnBack" type="button" onclick="location.href='index.html'">
             <span class="btn-text">Kembali</span>
             <span class="spinner" aria-hidden="true"></span>
           </button>
@@ -317,5 +317,88 @@
   </div>
 
   <script src="js/api.js"></script>
+
+  <script>
+    const msg = document.getElementById("msg");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnBack = document.getElementById("btnBack");
+
+    function showMsgVisible(){ msg.style.display = "block"; }
+
+    function setLoading(isLoading){
+      if(isLoading){
+        btnLogin.classList.add("is-loading");
+        btnLogin.disabled = true;
+        btnBack.disabled = true;
+      }else{
+        btnLogin.classList.remove("is-loading");
+        btnLogin.disabled = false;
+        btnBack.disabled = false;
+      }
+    }
+
+    function showErr(err){
+      showMsgVisible();
+      if(typeof window.showError === "function") return window.showError(msg, err);
+      msg.innerHTML = `<div class="alert err">${String(err?.message || err || "Gagal")}</div>`;
+    }
+    function showOkText(text){
+      showMsgVisible();
+      if(typeof window.showOk === "function") return window.showOk(msg, text);
+      msg.innerHTML = `<div class="alert ok">${String(text)}</div>`;
+    }
+
+    async function doAdminLogin(){
+      msg.innerHTML = "";
+      showMsgVisible();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if(!username || !password){
+        showErr({message:"Username dan password wajib diisi."});
+        return;
+      }
+
+      setLoading(true);
+      try{
+        const resp = await api("/auth/login", {
+          method: "POST",
+          body: { username, password }
+        });
+
+        const token = resp?.token;
+        const role  = resp?.user?.role;
+
+        if(!token){
+          throw new Error("Token tidak ditemukan dari response login.");
+        }
+
+        if(typeof window.setToken === "function") window.setToken(token);
+        else localStorage.setItem("token", token);
+
+        if(role !== "admin"){
+          if(typeof window.clearToken === "function") window.clearToken();
+          else localStorage.removeItem("token");
+
+          throw new Error("Akun ini bukan admin. Akses ditolak.");
+        }
+
+        showOkText("Login admin berhasil. Mengalihkan...");
+        setTimeout(() => location.href = "admin.html", 250);
+      }catch(e){
+        showErr(e);
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    btnLogin.addEventListener("click", doAdminLogin);
+
+    // Enter to login
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") btnLogin.click();
+    });
+  </script>
 </body>
 </html>
