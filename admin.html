@@ -19,6 +19,8 @@
       --shadow2: 0 12px 30px rgba(15,23,42,.08);
       --primary:#1e63d6;
       --green:#1f9d55;
+      --orange:#f2994a;
+      --red:#dc2626;
       --radius:18px;
       --max:1100px;
     }
@@ -33,9 +35,10 @@
         radial-gradient(800px 520px at 90% 90%, rgba(242,153,74,.10), transparent 55%),
         var(--bg);
     }
-
+    a{ color:inherit; text-decoration:none; }
     .wrap{ max-width: var(--max); margin:0 auto; padding: 18px 16px 28px; }
 
+    /* Topbar */
     .topbar{
       position: sticky;
       top: 0;
@@ -44,7 +47,6 @@
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(15,23,42,.08);
     }
-
     .topbar-inner{
       max-width: var(--max);
       margin: 0 auto;
@@ -52,24 +54,46 @@
       display:flex;
       align-items:center;
       justify-content:space-between;
+      gap: 10px;
+      flex-wrap: wrap;
     }
-
     .brand{
       display:flex;
       align-items:center;
       gap:10px;
+      min-width: 220px;
+      flex: 1 1 auto;
     }
-
     .brand img{
-      width:38px;
-      height:38px;
+      width:38px;height:38px;
       border-radius:14px;
       border:1px solid rgba(15,23,42,.10);
       box-shadow:0 10px 20px rgba(15,23,42,.12);
+      object-fit: cover;
+      background:#fff;
     }
+    .brand .b1{ font-weight:950; letter-spacing:.2px; }
+    .brand .b2{ font-size:12px; color:var(--muted); margin-top:2px; }
 
-    .brand .b1{ font-weight:950; }
-    .brand .b2{ font-size:12px; color:var(--muted); }
+    .top-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex: 0 0 auto;
+      margin-left:auto;
+    }
+    .icon-btn{
+      width:42px; height:42px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.78);
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(15,23,42,.06);
+      font-size: 18px;
+      display:grid; place-items:center;
+      transition: transform .12s ease, border-color .12s ease;
+    }
+    .icon-btn:hover{ border-color: rgba(30,99,214,.25); transform: translateY(-1px); }
 
     .logout{
       padding: 11px 14px;
@@ -78,8 +102,12 @@
       background: rgba(31,157,85,.12);
       font-weight: 950;
       cursor:pointer;
+      transition: transform .12s ease, filter .12s ease;
+      white-space: nowrap;
     }
+    .logout:hover{ filter: brightness(.98); transform: translateY(-1px); }
 
+    /* Page head */
     .page-head{
       padding: 18px 0 8px;
       display:flex;
@@ -88,36 +116,27 @@
       flex-wrap:wrap;
       gap:10px;
     }
-
     .page-head h1{
       margin:0;
       font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: -.3px;
     }
-
-    .sub{
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
+    .sub{ margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.6; }
     .pill{
       display:inline-flex;
       align-items:center;
+      gap:8px;
       padding: 10px 12px;
       border-radius: 999px;
       font-weight: 950;
       border:1px solid rgba(30,99,214,.18);
       background: rgba(30,99,214,.10);
       font-size: 13px;
+      white-space: nowrap;
     }
 
-    .grid2{
-      margin-top: 14px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 14px;
-    }
-
+    /* Cards */
+    .grid2{ margin-top: 14px; display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .card2{
       border:1px solid rgba(15,23,42,.10);
       background: rgba(255,255,255,.82);
@@ -126,16 +145,60 @@
       box-shadow: var(--shadow2);
       overflow:hidden;
     }
-
     .card-inner{ padding: 16px; }
-
-    .title2{
-      margin: 0 0 6px;
-      font-size: 18px;
-      font-weight:900;
-    }
-
+    .title2{ margin: 0 0 6px; font-size: 18px; font-weight:900; }
     .muted{ color:var(--muted); font-size:13px; }
+
+    /* Stats layout */
+    .kpi-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .kpi{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      background: rgba(255,255,255,.75);
+      padding: 12px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .kpi .n{ font-weight: 950; font-size: 20px; line-height:1.05; }
+    .kpi .l{ color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .kpi .tag{
+      min-width: 40px;
+      height: 40px;
+      border-radius: 16px;
+      display:grid;
+      place-items:center;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(30,99,214,.10);
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+    .kpi .tag.green{ background: rgba(31,157,85,.10); }
+    .kpi .tag.orange{ background: rgba(242,153,74,.10); }
+
+    /* Users table + controls */
+    .row{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .input{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.78);
+      font-weight:900;
+      font-size:13px;
+      outline: none;
+    }
+    .input:focus{ border-color: rgba(30,99,214,.35); box-shadow: 0 0 0 4px rgba(30,99,214,.10); }
 
     .btn2{
       padding: 10px 14px;
@@ -144,21 +207,22 @@
       background: rgba(255,255,255,.78);
       font-weight: 900;
       cursor:pointer;
+      transition: transform .12s ease, border-color .12s ease;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      white-space: nowrap;
     }
-
+    .btn2:hover{ border-color: rgba(30,99,214,.25); transform: translateY(-1px); }
     .btn2.primary{
       background: linear-gradient(180deg, rgba(30,99,214,1), rgba(20,76,175,1));
       border-color:transparent;
       color:#fff;
     }
-
-    .input{
-      padding:10px 12px;
-      border-radius:14px;
-      border:1px solid rgba(15,23,42,.12);
-      background: rgba(255,255,255,.78);
-      font-weight:900;
-      font-size:13px;
+    .btn2.danger{
+      background: rgba(220,38,38,.10);
+      border-color: rgba(220,38,38,.25);
+      color:#991b1b;
     }
 
     .table{
@@ -166,15 +230,182 @@
       border-collapse:collapse;
       font-size:13px;
     }
-
     .table th,.table td{
       border-bottom:1px solid rgba(15,23,42,.08);
-      padding:8px;
+      padding:10px 8px;
       text-align:left;
+      vertical-align: top;
+      white-space: nowrap;
+    }
+    .table th{ color: rgba(11,27,58,.85); font-weight: 950; font-size: 12px; }
+    .table td{ color: rgba(11,27,58,.92); }
+    .table td.wrapcell{ white-space: normal; max-width: 420px; }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size: 12px;
+      border:1px solid rgba(15,23,42,.12);
+      background: rgba(255,255,255,.78);
+    }
+
+    /* Drawer */
+    .drawer-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,.35);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 50;
+    }
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100vh;
+      width: min(360px, 92vw);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-left: 1px solid rgba(15,23,42,.10);
+      box-shadow: -18px 0 50px rgba(15,23,42,.12);
+      transform: translateX(100%);
+      transition: transform .22s ease;
+      z-index: 60;
+      display:flex;
+      flex-direction: column;
+    }
+    .drawer.open{ transform: translateX(0); }
+    .drawer-overlay.open{ opacity: 1; pointer-events: auto; }
+
+    .drawer-head{
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .drawer-hello{
+      font-weight: 950;
+      font-size: 16px;
+      letter-spacing: -.1px;
+    }
+    .drawer-sub{
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    .drawer-close{
+      width:42px;height:42px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.78);
+      cursor:pointer;
+      display:grid;place-items:center;
+      font-size: 18px;
+    }
+    .drawer-menu{
+      padding: 10px;
+      display:flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow:auto;
+    }
+    .menu-item{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      background: rgba(255,255,255,.70);
+      padding: 12px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease;
+    }
+    .menu-item:hover{
+      border-color: rgba(30,99,214,.25);
+      box-shadow: 0 12px 26px rgba(15,23,42,.08);
+      transform: translateY(-1px);
+    }
+    .menu-item.active{
+      background: rgba(30,99,214,.10);
+      border-color: rgba(30,99,214,.22);
+    }
+    .menu-item .l{
+      font-weight: 950;
+      font-size: 13px;
+    }
+    .menu-item .d{
+      margin-top: 2px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .menu-item .ico{
+      width: 42px; height:42px;
+      border-radius: 16px;
+      display:grid; place-items:center;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(30,99,214,.10);
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+
+    /* Panels */
+    .panel{ display:none; }
+    .panel.active{ display:block; }
+
+    /* Inline editor */
+    .editor{
+      margin-top: 10px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius: 16px;
+      background: rgba(255,255,255,.75);
+      padding: 12px;
+    }
+    .editor .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .hint{
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.75);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    #msg{
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(15,23,42,.10);
+      background: rgba(255,255,255,.75);
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.55;
+      display:none;
     }
 
     @media (max-width:980px){
       .grid2{ grid-template-columns:1fr; }
+      .kpi-grid{ grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width:520px){
+      .kpi-grid{ grid-template-columns: 1fr; }
+      .table th,.table td{ padding: 10px 6px; }
     }
   </style>
 </head>
@@ -184,15 +415,80 @@
 <header class="topbar">
   <div class="topbar-inner">
     <div class="brand">
-      <img src="assets/logo-innoviyup.png">
+      <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
       <div>
         <div class="b1">iYup Care</div>
         <div class="b2">Admin Dashboard</div>
       </div>
     </div>
-    <button class="logout" id="btnLogout">Logout</button>
+
+    <div class="top-actions">
+      <button class="icon-btn" id="btnMenu" type="button" title="Menu">☰</button>
+      <button class="logout" id="btnLogout" type="button">Logout</button>
+    </div>
   </div>
 </header>
+
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div>
+      <div class="drawer-hello" id="drawerHello">Halo Admin!</div>
+      <div class="drawer-sub" id="drawerSub">Memuat profil…</div>
+    </div>
+    <button class="drawer-close" id="btnDrawerClose" type="button" title="Tutup">✕</button>
+  </div>
+
+  <div class="drawer-menu" id="drawerMenu">
+    <div class="menu-item active" data-panel="p-overview">
+      <div>
+        <div class="l">Ringkasan</div>
+        <div class="d">Health + System Stats</div>
+      </div>
+      <div class="ico">📊</div>
+    </div>
+
+    <div class="menu-item" data-panel="p-users">
+      <div>
+        <div class="l">Lihat Semua User</div>
+        <div class="d">Tabel user (search)</div>
+      </div>
+      <div class="ico">👥</div>
+    </div>
+
+    <div class="menu-item" data-panel="p-edit">
+      <div>
+        <div class="l">Edit Data User</div>
+        <div class="d">Password / Force-change</div>
+      </div>
+      <div class="ico">✏️</div>
+    </div>
+
+    <div class="menu-item" data-panel="p-monitoring">
+      <div>
+        <div class="l">Data Monitoring</div>
+        <div class="d">Pilih user → anak → monitoring</div>
+      </div>
+      <div class="ico">📈</div>
+    </div>
+
+    <div class="menu-item" data-panel="p-galeri">
+      <div>
+        <div class="l">Galeri Foto</div>
+        <div class="d">Butuh endpoint admin</div>
+      </div>
+      <div class="ico">🖼️</div>
+    </div>
+
+    <div class="menu-item" data-panel="p-kalkulator">
+      <div>
+        <div class="l">Kalkulator Gizi</div>
+        <div class="d">Butuh endpoint admin</div>
+      </div>
+      <div class="ico">🧮</div>
+    </div>
+  </div>
+</aside>
 
 <main class="wrap">
 
@@ -204,46 +500,203 @@
     <div class="pill">Protected Admin Area</div>
   </div>
 
-  <section class="grid2">
-    <article class="card2">
-      <div class="card-inner">
-        <div class="title2">Admin Health</div>
-        <div id="healthText" class="muted">Memuat...</div>
-      </div>
-    </article>
+  <div id="msg"></div>
 
-    <article class="card2">
-      <div class="card-inner">
-        <div class="title2">System Stats</div>
-        <div id="statsText" class="muted">Memuat...</div>
-      </div>
-    </article>
+  <!-- =======================
+       PANEL: OVERVIEW
+  ======================== -->
+  <section class="panel active" id="p-overview">
+    <section class="grid2">
+      <article class="card2">
+        <div class="card-inner">
+          <div class="title2">Admin Health</div>
+          <div id="healthText" class="muted">Memuat...</div>
+        </div>
+      </article>
+
+      <article class="card2">
+        <div class="card-inner">
+          <div class="title2">System Stats</div>
+          <div class="muted" id="statsMeta">Memuat...</div>
+
+          <div class="kpi-grid" id="statsKpi" style="display:none;">
+            <div class="kpi">
+              <div>
+                <div class="n" id="kpiUsers">—</div>
+                <div class="l">Total Users</div>
+              </div>
+              <div class="tag">👥</div>
+            </div>
+
+            <div class="kpi">
+              <div>
+                <div class="n" id="kpiAnak">—</div>
+                <div class="l">Total Anak</div>
+              </div>
+              <div class="tag green">👶</div>
+            </div>
+
+            <div class="kpi">
+              <div>
+                <div class="n" id="kpiMon">—</div>
+                <div class="l">Total Monitoring</div>
+              </div>
+              <div class="tag orange">📈</div>
+            </div>
+
+            <div class="kpi">
+              <div>
+                <div class="n" id="kpiKal">—</div>
+                <div class="l">Total Kalkulator</div>
+              </div>
+              <div class="tag">🧮</div>
+            </div>
+          </div>
+
+          <div class="hint" id="statsHint" style="display:none;"></div>
+        </div>
+      </article>
+    </section>
   </section>
 
-  <section class="card2" style="margin-top:16px;">
-    <div class="card-inner">
-      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-        <div class="title2">Users</div>
-        <div style="display:flex;gap:8px;">
-          <input id="userSearch" class="input" placeholder="Cari user...">
-          <button class="btn2 primary" id="btnLoadUsers">Muat</button>
+  <!-- =======================
+       PANEL: USERS (TABLE)
+  ======================== -->
+  <section class="panel" id="p-users">
+    <section class="card2" style="margin-top:14px;">
+      <div class="card-inner">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div class="title2">Users</div>
+          <div class="row">
+            <input id="userSearch" class="input" placeholder="Cari name/email/username...">
+            <button class="btn2 primary" id="btnLoadUsers" type="button">Muat</button>
+          </div>
+        </div>
+
+        <div class="muted" id="usersMeta" style="margin-top:6px;">—</div>
+
+        <div style="overflow:auto;margin-top:12px;">
+          <table class="table" id="usersTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
       </div>
+    </section>
+  </section>
 
-      <div style="overflow:auto;margin-top:12px;">
-        <table class="table" id="usersTable">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Nama</th>
-              <th>Email</th>
-              <th>Role</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+  <!-- =======================
+       PANEL: EDIT USER
+  ======================== -->
+  <section class="panel" id="p-edit">
+    <section class="card2" style="margin-top:14px;">
+      <div class="card-inner">
+        <div class="title2">Edit Data User</div>
+        <div class="muted">Klik ✏️ untuk membuka editor user.</div>
+
+        <div class="row" style="margin-top:10px;">
+          <input id="editSearch" class="input" placeholder="Cari nama/email...">
+          <button class="btn2 primary" id="btnLoadEditList" type="button">Muat List</button>
+        </div>
+
+        <div id="editList" style="margin-top:12px;"></div>
+
+        <div class="hint">
+          Catatan penting:
+          <br>• Reset password & force-change tersedia (endpoint sudah ada).
+          <br>• “Reset data monitoring/galeri/kalkulator” tidak bisa dibuat benar tanpa endpoint backend khusus.
+        </div>
       </div>
-    </div>
+    </section>
+  </section>
+
+  <!-- =======================
+       PANEL: MONITORING
+  ======================== -->
+  <section class="panel" id="p-monitoring">
+    <section class="card2" style="margin-top:14px;">
+      <div class="card-inner">
+        <div class="title2">Data Monitoring</div>
+        <div class="muted">Pilih user → pilih anak → tampilkan monitoring.</div>
+
+        <div class="row" style="margin-top:10px;">
+          <button class="btn2 primary" id="btnLoadUsersForMon" type="button">Muat Users</button>
+          <select id="monUserPick" class="input" style="min-width:260px;">
+            <option value="">- pilih user -</option>
+          </select>
+          <select id="monAnakPick" class="input" style="min-width:260px;">
+            <option value="">- pilih anak -</option>
+          </select>
+          <button class="btn2" id="btnLoadMon" type="button">Muat Monitoring</button>
+        </div>
+
+        <div class="muted" id="monMeta" style="margin-top:10px;">—</div>
+
+        <div style="overflow:auto;margin-top:12px;">
+          <table class="table" id="monTable">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Tanggal</th>
+                <th>BB</th>
+                <th>TB</th>
+                <th>Catatan</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="hint" id="monHint">
+          Ini pakai endpoint admin drilldown yang kamu sudah punya:
+          <br>• GET /admin/users/{id}/anak
+          <br>• GET /admin/anak/{anak_id}/monitoring
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- =======================
+       PANEL: GALERI (placeholder)
+  ======================== -->
+  <section class="panel" id="p-galeri">
+    <section class="card2" style="margin-top:14px;">
+      <div class="card-inner">
+        <div class="title2">Galeri Foto</div>
+        <div class="hint">
+          Fitur ini belum bisa jalan karena routes admin kamu belum punya endpoint galeri.
+          <br><br>
+          Kalau mau ini berfungsi, minimal kamu perlu endpoint seperti:
+          <br>• GET /admin/anak/{anak_id}/galeri
+          <br>• atau GET /admin/users/{id}/galeri (agregasi)
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- =======================
+       PANEL: KALKULATOR (placeholder)
+  ======================== -->
+  <section class="panel" id="p-kalkulator">
+    <section class="card2" style="margin-top:14px;">
+      <div class="card-inner">
+        <div class="title2">Kalkulator Gizi</div>
+        <div class="hint">
+          Fitur ini belum bisa jalan karena routes admin kamu belum punya endpoint kalkulator (per user/per anak).
+          <br><br>
+          Kalau mau ini berfungsi, minimal kamu perlu endpoint seperti:
+          <br>• GET /admin/anak/{anak_id}/kalkulator
+          <br>• GET /admin/users/{id}/kalkulator
+        </div>
+      </div>
+    </section>
   </section>
 
 </main>
@@ -251,69 +704,392 @@
 <script src="js/api.js"></script>
 
 <script>
-function requireAdminOrRedirect(){
-  const t = window.getAdminToken ? window.getAdminToken() : localStorage.getItem("admin_token");
-  if(!t) location.href = "admin-login.html";
-}
+  const msgEl = document.getElementById("msg");
 
-async function checkHealth(){
-  const h = await apiAdmin("/admin/health");
-  document.getElementById("adminMe").textContent =
-    `Login sebagai: ${h?.user?.name} (${h?.user?.email})`;
-  document.getElementById("healthText").textContent = "OK ✅";
-}
+  function showMsgVisible(){ msgEl.style.display = "block"; }
+  function hideMsg(){ msgEl.style.display = "none"; msgEl.innerHTML = ""; }
 
-async function loadStats(){
-  try{
-    const s = await apiAdmin("/admin/stats");
-    document.getElementById("statsText").textContent =
-      JSON.stringify(s);
-  }catch(e){
-    document.getElementById("statsText").textContent =
-      "Endpoint /admin/stats belum siap.";
+  function showErr(err){
+    showMsgVisible();
+    if(typeof window.showError === "function") return window.showError(msgEl, err);
+    msgEl.innerHTML = `<div class="alert err">${escapeHtml(String(err?.message || err || "Gagal"))}</div>`;
   }
-}
+  function showOkText(text){
+    showMsgVisible();
+    if(typeof window.showOk === "function") return window.showOk(msgEl, text);
+    msgEl.innerHTML = `<div class="alert ok">${escapeHtml(String(text || "OK"))}</div>`;
+  }
 
-async function loadUsers(){
-  const search = document.getElementById("userSearch").value.trim();
-  const qs = new URLSearchParams();
-  if(search) qs.set("search", search);
+  function escapeHtml(s){
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
 
-  const res = await apiAdmin("/admin/users?" + qs.toString());
-  const rows = res?.data || [];
+  function requireAdminOrRedirect(){
+    const t = window.getAdminToken ? window.getAdminToken() : localStorage.getItem("admin_token");
+    if(!t) location.href = "admin-login.html";
+  }
 
-  const tbody = document.querySelector("#usersTable tbody");
-  tbody.innerHTML = "";
+  // Drawer
+  const drawer = document.getElementById("drawer");
+  const overlay = document.getElementById("drawerOverlay");
+  const btnMenu = document.getElementById("btnMenu");
+  const btnDrawerClose = document.getElementById("btnDrawerClose");
 
-  rows.forEach(u=>{
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td>${u.id}</td>
-      <td>${u.name}</td>
-      <td>${u.email}</td>
-      <td>${u.role}</td>
-    `;
-    tbody.appendChild(tr);
+  function openDrawer(){
+    drawer.classList.add("open");
+    overlay.classList.add("open");
+  }
+  function closeDrawer(){
+    drawer.classList.remove("open");
+    overlay.classList.remove("open");
+  }
+  btnMenu.addEventListener("click", openDrawer);
+  btnDrawerClose.addEventListener("click", closeDrawer);
+  overlay.addEventListener("click", closeDrawer);
+
+  // Panels navigation
+  const menuItems = Array.from(document.querySelectorAll(".menu-item"));
+  const panels = Array.from(document.querySelectorAll(".panel"));
+  function setPanel(id){
+    menuItems.forEach(x => x.classList.toggle("active", x.dataset.panel === id));
+    panels.forEach(p => p.classList.toggle("active", p.id === id));
+    hideMsg();
+    closeDrawer();
+  }
+  menuItems.forEach(mi => mi.addEventListener("click", () => setPanel(mi.dataset.panel)));
+
+  // Logout
+  document.getElementById("btnLogout").addEventListener("click", async ()=>{
+    try{ await apiAdmin("/auth/logout",{method:"POST"}); }catch(e){}
+    window.clearAdminToken();
+    location.href = "index.html";
   });
-}
 
-document.getElementById("btnLogout").addEventListener("click", async ()=>{
-  try{ await apiAdmin("/auth/logout",{method:"POST"}); }catch(e){}
-  window.clearAdminToken();
-  location.href = "index.html";
-});
+  // Health
+  let cachedAdmin = null;
 
-document.getElementById("btnLoadUsers").addEventListener("click", loadUsers);
+  async function checkHealth(){
+    try{
+      const h = await apiAdmin("/admin/health");
+      cachedAdmin = h?.user || null;
 
-/* ===== INIT PARALLEL ===== */
-(async function(){
-  requireAdminOrRedirect();
+      const nm = h?.user?.name || "Admin";
+      const em = h?.user?.email || "-";
 
-  await Promise.all([
-    checkHealth(),
-    loadStats()
-  ]);
-})();
+      document.getElementById("adminMe").textContent = `Login sebagai: ${nm} (${em})`;
+      document.getElementById("healthText").textContent = "OK ✅";
+
+      document.getElementById("drawerHello").textContent = `Halo ${nm}!`;
+      document.getElementById("drawerSub").textContent = `${em} • role: admin`;
+    }catch(e){
+      window.clearAdminToken();
+      location.href = "admin-login.html";
+    }
+  }
+
+  // Stats (render KPI, bukan JSON mentah)
+  function fmtDate(iso){
+    try{
+      const d = new Date(iso);
+      if(Number.isNaN(d.getTime())) return String(iso || "-");
+      return d.toLocaleString("id-ID");
+    }catch{ return String(iso || "-"); }
+  }
+
+  async function loadStats(){
+    const metaEl = document.getElementById("statsMeta");
+    const kpiWrap = document.getElementById("statsKpi");
+    const hintEl = document.getElementById("statsHint");
+
+    try{
+      const s = await apiAdmin("/admin/stats");
+
+      const stats = s?.stats || {};
+      const users = stats?.users?.total ?? "-";
+      const usersNew7 = stats?.users?.new_last_7_days ?? 0;
+      const anak = stats?.anak?.total ?? "-";
+      const mon = stats?.monitoring?.total ?? "-";
+      const kal = stats?.kalkulator?.total ?? "-";
+
+      metaEl.textContent = `Terakhir diperbarui: ${fmtDate(s?.generated_at_utc || "")}`;
+      kpiWrap.style.display = "grid";
+      hintEl.style.display = "block";
+
+      document.getElementById("kpiUsers").textContent = users;
+      document.getElementById("kpiAnak").textContent = anak;
+      document.getElementById("kpiMon").textContent = mon;
+      document.getElementById("kpiKal").textContent = kal;
+
+      hintEl.innerHTML =
+        `Info: user baru 7 hari terakhir: <b>${escapeHtml(String(usersNew7))}</b>.`;
+
+    }catch(e){
+      metaEl.textContent = "Gagal memuat stats.";
+      kpiWrap.style.display = "none";
+      hintEl.style.display = "block";
+      hintEl.textContent = "Endpoint /admin/stats belum siap atau error.";
+    }
+  }
+
+  // Users table
+  async function loadUsers(){
+    const search = document.getElementById("userSearch").value.trim();
+    const qs = new URLSearchParams();
+    if(search) qs.set("search", search);
+    qs.set("per_page", "50");
+
+    const res = await apiAdmin("/admin/users?" + qs.toString());
+    const rows = res?.data || [];
+
+    document.getElementById("usersMeta").textContent =
+      res?.meta ? `Total: ${res.meta.total} • Page ${res.meta.current_page}/${res.meta.last_page}` : `Rows: ${rows.length}`;
+
+    const tbody = document.querySelector("#usersTable tbody");
+    tbody.innerHTML = "";
+
+    rows.forEach(u=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(u.id)}</td>
+        <td class="wrapcell">${escapeHtml(u.name || "-")}</td>
+        <td class="wrapcell">${escapeHtml(u.email || "-")}</td>
+        <td><span class="badge">${escapeHtml(u.role || "user")}</span></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("btnLoadUsers").addEventListener("click", async () => {
+    hideMsg();
+    try{ await loadUsers(); }
+    catch(e){ showErr(e); }
+  });
+
+  // Edit list
+  async function loadEditList(){
+    const q = document.getElementById("editSearch").value.trim();
+    const qs = new URLSearchParams();
+    if(q) qs.set("search", q);
+    qs.set("per_page", "50");
+
+    const res = await apiAdmin("/admin/users?" + qs.toString());
+    const rows = res?.data || [];
+
+    const wrap = document.getElementById("editList");
+    wrap.innerHTML = "";
+
+    rows.forEach(u => {
+      const box = document.createElement("div");
+      box.className = "editor";
+      box.style.marginBottom = "10px";
+
+      box.innerHTML = `
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:950;">${escapeHtml(u.name || "-")}</div>
+            <div class="muted">${escapeHtml(u.email || "-")} • role: ${escapeHtml(u.role || "user")} • id: ${escapeHtml(u.id)}</div>
+          </div>
+          <div class="row">
+            <button class="btn2" data-act="toggle" data-id="${escapeHtml(u.id)}" type="button">✏️ Edit</button>
+          </div>
+        </div>
+
+        <div class="editor" data-editor="${escapeHtml(u.id)}" style="display:none;margin-top:12px;">
+          <div class="muted">Ubah password (butuh dukungan PATCH /admin/users/{id}). Kalau backend belum mendukung, tombol ini akan error.</div>
+          <div class="grid" style="margin-top:10px;">
+            <input class="input" data-pass="${escapeHtml(u.id)}" type="password" placeholder="Password baru">
+            <input class="input" data-pass2="${escapeHtml(u.id)}" type="password" placeholder="Konfirmasi password">
+          </div>
+
+          <div class="row" style="margin-top:10px;">
+            <button class="btn2 primary" data-act="setpass" data-id="${escapeHtml(u.id)}" type="button">Simpan Password</button>
+            <button class="btn2" data-act="force" data-id="${escapeHtml(u.id)}" type="button">Force Change Password</button>
+            <button class="btn2 danger" data-act="reset" data-id="${escapeHtml(u.id)}" type="button">Reset Password</button>
+          </div>
+
+          <div class="hint">
+            “Reset Password” menggunakan endpoint: POST /admin/users/{id}/reset-password (sudah ada).
+            <br>“Force Change” menggunakan endpoint: POST /admin/users/{id}/force-change-password (sudah ada).
+            <br>“Simpan Password” mencoba PATCH /admin/users/{id}. Kalau AdminUserController kamu belum menerima field password, ini akan gagal.
+          </div>
+        </div>
+      `;
+
+      wrap.appendChild(box);
+    });
+
+    // bind edit toggle
+    wrap.querySelectorAll("button[data-act='toggle']").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const id = btn.getAttribute("data-id");
+        const ed = wrap.querySelector(`[data-editor="${CSS.escape(id)}"]`);
+        if(!ed) return;
+        ed.style.display = (ed.style.display === "none") ? "block" : "none";
+      });
+    });
+
+    // bind set password
+    wrap.querySelectorAll("button[data-act='setpass']").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        hideMsg();
+        const id = btn.getAttribute("data-id");
+        const p1 = wrap.querySelector(`[data-pass="${CSS.escape(id)}"]`)?.value || "";
+        const p2 = wrap.querySelector(`[data-pass2="${CSS.escape(id)}"]`)?.value || "";
+        if(!p1 || !p2) return showErr({message:"Password & konfirmasi wajib diisi."});
+        if(p1 !== p2) return showErr({message:"Konfirmasi password tidak sama."});
+
+        btn.disabled = true;
+        try{
+          await apiAdmin(`/admin/users/${id}`, {
+            method: "PATCH",
+            body: { password: p1, password_confirmation: p2 }
+          });
+          showOkText(`Password user ${id} berhasil diubah.`);
+        }catch(e){
+          showErr(e);
+        }finally{
+          btn.disabled = false;
+        }
+      });
+    });
+
+    // bind force change
+    wrap.querySelectorAll("button[data-act='force']").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        hideMsg();
+        const id = btn.getAttribute("data-id");
+        btn.disabled = true;
+        try{
+          await apiAdmin(`/admin/users/${id}/force-change-password`, { method:"POST" });
+          showOkText(`User ${id} dipaksa ganti password pada login berikutnya.`);
+        }catch(e){
+          showErr(e);
+        }finally{
+          btn.disabled = false;
+        }
+      });
+    });
+
+    // bind reset password
+    wrap.querySelectorAll("button[data-act='reset']").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        hideMsg();
+        const id = btn.getAttribute("data-id");
+        if(!confirm(`Reset password untuk user ${id}?`)) return;
+
+        btn.disabled = true;
+        try{
+          const r = await apiAdmin(`/admin/users/${id}/reset-password`, { method:"POST" });
+          // respon backend bisa beda-beda; tampilkan ringkas
+          showOkText(`Reset password berhasil. Response: ${escapeHtml(JSON.stringify(r))}`);
+        }catch(e){
+          showErr(e);
+        }finally{
+          btn.disabled = false;
+        }
+      });
+    });
+  }
+
+  document.getElementById("btnLoadEditList").addEventListener("click", async () => {
+    hideMsg();
+    try{ await loadEditList(); }
+    catch(e){ showErr(e); }
+  });
+
+  // Monitoring drilldown
+  async function loadUsersForMonitoring(){
+    hideMsg();
+    const pick = document.getElementById("monUserPick");
+    pick.innerHTML = `<option value="">Memuat...</option>`;
+
+    const res = await apiAdmin("/admin/users?per_page=100");
+    const rows = res?.data || [];
+
+    pick.innerHTML = `<option value="">- pilih user -</option>` +
+      rows.map(u => `<option value="${escapeHtml(u.id)}">${escapeHtml(u.name || u.email || ("User "+u.id))}</option>`).join("");
+
+    document.getElementById("monAnakPick").innerHTML = `<option value="">- pilih anak -</option>`;
+  }
+
+  async function loadAnakForUser(userId){
+    const anakPick = document.getElementById("monAnakPick");
+    anakPick.innerHTML = `<option value="">Memuat...</option>`;
+
+    const res = await apiAdmin(`/admin/users/${userId}/anak`);
+    const rows = res?.data || res || [];
+
+    // Admin endpoint kamu kemungkinan return {data:[...]} atau [...]
+    const list = Array.isArray(rows) ? rows : (Array.isArray(rows?.data) ? rows.data : []);
+
+    anakPick.innerHTML = `<option value="">- pilih anak -</option>` +
+      list.map(a => {
+        const id = a?.id ?? a?.anak_id ?? "";
+        const nm = a?.nama ?? a?.name ?? a?.nama_anak ?? `Anak ${id}`;
+        return `<option value="${escapeHtml(id)}">${escapeHtml(nm)}</option>`;
+      }).join("");
+  }
+
+  async function loadMonitoring(anakId){
+    const res = await apiAdmin(`/admin/anak/${anakId}/monitoring`);
+    const rows = res?.data || res || [];
+    const list = Array.isArray(rows) ? rows : (Array.isArray(rows?.data) ? rows.data : []);
+
+    document.getElementById("monMeta").textContent = `Rows: ${list.length} (anak_id: ${anakId})`;
+
+    const tbody = document.querySelector("#monTable tbody");
+    tbody.innerHTML = "";
+    list.forEach(x => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${escapeHtml(x?.id ?? "-")}</td>
+        <td>${escapeHtml(String(x?.tanggal_ukur ?? x?.tanggal ?? x?.created_at ?? "-").slice(0,10))}</td>
+        <td>${escapeHtml(x?.berat_badan ?? x?.bb ?? "-")}</td>
+        <td>${escapeHtml(x?.tinggi_badan ?? x?.tb ?? "-")}</td>
+        <td class="wrapcell">${escapeHtml(x?.catatan ?? "")}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  document.getElementById("btnLoadUsersForMon").addEventListener("click", async ()=>{
+    try{ await loadUsersForMonitoring(); }
+    catch(e){ showErr(e); }
+  });
+
+  document.getElementById("monUserPick").addEventListener("change", async (e)=>{
+    const id = e.target.value;
+    if(!id){
+      document.getElementById("monAnakPick").innerHTML = `<option value="">- pilih anak -</option>`;
+      return;
+    }
+    try{ await loadAnakForUser(id); }
+    catch(err){ showErr(err); }
+  });
+
+  document.getElementById("btnLoadMon").addEventListener("click", async ()=>{
+    hideMsg();
+    const anakId = document.getElementById("monAnakPick").value;
+    if(!anakId) return showErr({message:"Pilih anak dulu."});
+    try{ await loadMonitoring(anakId); }
+    catch(e){ showErr(e); }
+  });
+
+  /* ===== INIT ===== */
+  (async function(){
+    requireAdminOrRedirect();
+
+    // paralel: health + stats
+    await Promise.all([
+      checkHealth(),
+      loadStats()
+    ]);
+  })();
 </script>
 
 </body>
