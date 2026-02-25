@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- API BASE (HF) - jangan dihapus -->
+  <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
+
+  <title>Login Admin — iYup Care</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
+        <div>
+          <div class="b1">iYup Care</div>
+          <div class="b2">Admin Panel</div>
+        </div>
+      </div>
+
+      <nav class="nav-actions" aria-label="Navigasi">
+        <a class="nav-pill" href="index.html">Beranda</a>
+        <a class="nav-pill" href="login.html">Masuk User</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <section class="auth-left">
+        <div class="hero-badge">🛡️ Khusus Admin • 🔒 Token tersimpan</div>
+        <h2 class="hero-title">Masuk sebagai Admin</h2>
+        <p class="hero-desc">
+          Halaman ini hanya untuk akun dengan role <b>admin</b>.
+          Jika login berhasil tapi bukan admin, akses akan ditolak.
+        </p>
+      </section>
+
+      <section class="auth-right">
+        <h1 class="form-title">Login Admin</h1>
+        <p class="form-sub">Gunakan <b>username</b> admin + password.</p>
+
+        <div id="msg"></div>
+
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="control">
+            <input id="username" type="text" placeholder="admin" autocomplete="username" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="control">
+            <input id="password" type="password" placeholder="password" autocomplete="current-password" />
+          </div>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn2 primary" id="btnLogin" type="button">
+            <span class="btn-text">Masuk Admin</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+
+          <button class="btn2 secondary" id="btnBack" type="button" onclick="location.href='index.html'">
+            <span class="btn-text">Kembali</span>
+            <span class="spinner" aria-hidden="true"></span>
+          </button>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+
+  <script>
+    const msg = document.getElementById("msg");
+    const btnLogin = document.getElementById("btnLogin");
+    const btnBack = document.getElementById("btnBack");
+
+    function setLoading(isLoading){
+      if(isLoading){
+        btnLogin.classList.add("is-loading");
+        btnLogin.disabled = true;
+        btnBack.disabled = true;
+      }else{
+        btnLogin.classList.remove("is-loading");
+        btnLogin.disabled = false;
+        btnBack.disabled = false;
+      }
+    }
+
+    function showErr(err){
+      if(typeof window.showError === "function") return window.showError(msg, err);
+      msg.innerHTML = `<div class="alert err">${String(err?.message || err || "Gagal")}</div>`;
+    }
+    function showOkText(text){
+      if(typeof window.showOk === "function") return window.showOk(msg, text);
+      msg.innerHTML = `<div class="alert ok">${String(text)}</div>`;
+    }
+
+    async function doAdminLogin(){
+      msg.innerHTML = "";
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if(!username || !password){
+        showErr({message:"Username dan password wajib diisi."});
+        return;
+      }
+
+      setLoading(true);
+      try{
+        // backend kamu mendukung username/password (required_without email)
+        const resp = await api("/auth/login", {
+          method: "POST",
+          body: { username, password }
+        });
+
+        const token = resp?.token;
+        const role = resp?.user?.role;
+
+        if(!token){
+          throw new Error("Token tidak ditemukan dari response login.");
+        }
+
+        // Simpan token (pakai helper api.js)
+        if(typeof window.setToken === "function") window.setToken(token);
+        else localStorage.setItem("token", token);
+
+        // Validasi admin
+        if(role !== "admin"){
+          // kalau bukan admin, buang token biar tidak “nyangkut”
+          if(typeof window.clearToken === "function") window.clearToken();
+          else localStorage.removeItem("token");
+
+          throw new Error("Akun ini bukan admin. Akses ditolak.");
+        }
+
+        showOkText("Login admin berhasil. Mengalihkan...");
+        setTimeout(() => location.href = "admin.html", 250);
+      }catch(e){
+        showErr(e);
+      }finally{
+        setLoading(false);
+      }
+    }
+
+    btnLogin.addEventListener("click", doAdminLogin);
+
+    // Enter to login
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") btnLogin.click();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="api-base" content="https://maxirvnxd-iyupcare-backend.hf.space/api" />
+  <title>Admin Panel — iYup Care</title>
+
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    .admin-wrap{max-width:1100px;margin:22px auto;padding:0 16px;}
+    .admin-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+    .admin-title{font-size:20px;font-weight:800;color:var(--ink,#0b1b3a);}
+    .admin-sub{color:var(--muted,#5b6b80);font-size:13px;margin-top:4px}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap}
+    .tab{border:1px solid rgba(15,23,42,.12);background:#fff;padding:10px 12px;border-radius:999px;cursor:pointer;font-weight:700;font-size:13px}
+    .tab.active{background:#1e63d6;color:#fff;border-color:#1e63d6}
+    .card{background:#fff;border:1px solid rgba(15,23,42,.10);border-radius:18px;padding:14px;box-shadow:0 12px 30px rgba(15,23,42,.08);}
+    .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    @media (max-width:900px){.grid2{grid-template-columns:1fr}}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .input{border:1px solid rgba(15,23,42,.14);border-radius:12px;padding:10px 12px;min-width:240px}
+    .btn{border:0;border-radius:12px;padding:10px 12px;font-weight:800;cursor:pointer}
+    .btn.primary{background:#1e63d6;color:#fff}
+    .btn.ghost{background:#fff;border:1px solid rgba(15,23,42,.14)}
+    .table{width:100%;border-collapse:collapse}
+    .table th,.table td{border-bottom:1px solid rgba(15,23,42,.08);padding:10px 8px;text-align:left;font-size:13px;vertical-align:top}
+    .badge{display:inline-block;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid rgba(15,23,42,.12)}
+    .badge.ok{background:rgba(31,157,85,.10);color:#167a40;border-color:rgba(31,157,85,.25)}
+    .badge.off{background:rgba(242,153,74,.12);color:#a85b08;border-color:rgba(242,153,74,.25)}
+    .badge.danger{background:rgba(220,38,38,.10);color:#b91c1c;border-color:rgba(220,38,38,.25)}
+    .muted{color:var(--muted,#5b6b80)}
+    .right{display:flex;gap:8px;align-items:center}
+    .mini{font-size:12px}
+    .msgbox{margin:10px 0}
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <img src="assets/logo-innoviyup.png" alt="Logo InnoviYup">
+        <div>
+          <div class="b1">iYup Care</div>
+          <div class="b2">Admin Panel</div>
+        </div>
+      </div>
+
+      <nav class="nav-actions" aria-label="Navigasi">
+        <a class="nav-pill" href="dashboard.html">Dashboard User</a>
+        <button class="nav-pill primary" id="btnLogout" type="button">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="admin-wrap">
+    <div class="admin-head">
+      <div>
+        <div class="admin-title">Admin Dashboard</div>
+        <div class="admin-sub" id="adminMe">Memuat profil admin…</div>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Tab Admin">
+        <button class="tab active" data-tab="stats" type="button">Stats</button>
+        <button class="tab" data-tab="users" type="button">Users</button>
+        <button class="tab" data-tab="logs" type="button">Audit Logs</button>
+      </div>
+    </div>
+
+    <div id="msg" class="msgbox"></div>
+
+    <!-- STATS -->
+    <section id="tab-stats" class="card">
+      <h3 style="margin:0 0 10px">Ringkasan</h3>
+      <div class="grid2">
+        <div class="card" style="box-shadow:none">
+          <div class="muted mini">Admin health</div>
+          <div style="font-weight:900;margin-top:6px" id="healthText">Memuat…</div>
+        </div>
+        <div class="card" style="box-shadow:none">
+          <div class="muted mini">Stats</div>
+          <div style="font-weight:900;margin-top:6px" id="statsText">Memuat…</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- USERS -->
+    <section id="tab-users" class="card" style="display:none;margin-top:12px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">Users</h3>
+        <div class="row">
+          <input id="userSearch" class="input" placeholder="Cari name/email/username…" />
+          <button class="btn primary" id="btnLoadUsers" type="button">Muat</button>
+        </div>
+      </div>
+
+      <div class="muted mini" id="usersMeta">—</div>
+
+      <div style="overflow:auto;margin-top:10px">
+        <table class="table" id="usersTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nama</th>
+              <th>Email</th>
+              <th>Role</th>
+              <th>Active</th>
+              <th>Must Change</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- LOGS -->
+    <section id="tab-logs" class="card" style="display:none;margin-top:12px">
+      <div class="row" style="justify-content:space-between;margin-bottom:10px">
+        <h3 style="margin:0">Audit Logs</h3>
+        <div class="row">
+          <input id="logSearch" class="input" placeholder="Cari action/entity/route/ip/ua…" />
+          <button class="btn primary" id="btnLoadLogs" type="button">Muat</button>
+        </div>
+      </div>
+
+      <div class="muted mini" id="logsMeta">—</div>
+
+      <div style="overflow:auto;margin-top:10px">
+        <table class="table" id="logsTable">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Waktu</th>
+              <th>Admin</th>
+              <th>Target</th>
+              <th>Action</th>
+              <th>Entity</th>
+              <th>Meta</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="js/api.js"></script>
+
+  <script>
+    const msg = document.getElementById("msg");
+
+    function showErr(err){
+      if(typeof window.showError === "function") return window.showError(msg, err);
+      msg.innerHTML = `<div class="alert err">${String(err?.message || err || "Gagal")}</div>`;
+    }
+    function showOkText(text){
+      if(typeof window.showOk === "function") return window.showOk(msg, text);
+      msg.innerHTML = `<div class="alert ok">${String(text)}</div>`;
+    }
+
+    function requireTokenOrRedirect(){
+      const t = (typeof window.getToken === "function") ? window.getToken() : localStorage.getItem("token");
+      if(!t) location.href = "admin-login.html";
+      return t;
+    }
+
+    async function requireAdminOrRedirect(){
+      requireTokenOrRedirect();
+      try{
+        // cek /api/admin/health (route kamu ada)
+        const h = await api("/admin/health", { auth:true });
+        document.getElementById("adminMe").textContent =
+          `Login sebagai admin: ${h?.user?.name || "Admin"} (${h?.user?.email || "-"})`;
+        document.getElementById("healthText").textContent = "OK ✅ (admin protected route)";
+      }catch(e){
+        // token ada tapi bukan admin / invalid
+        if(typeof window.clearToken === "function") window.clearToken();
+        else localStorage.removeItem("token");
+        location.href = "admin-login.html";
+      }
+    }
+
+    // Tabs
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    function setTab(name){
+      tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+      document.getElementById("tab-stats").style.display = (name==="stats") ? "block" : "none";
+      document.getElementById("tab-users").style.display = (name==="users") ? "block" : "none";
+      document.getElementById("tab-logs").style.display  = (name==="logs")  ? "block" : "none";
+    }
+    tabs.forEach(t => t.addEventListener("click", () => setTab(t.dataset.tab)));
+
+    // Logout
+    document.getElementById("btnLogout").addEventListener("click", async () => {
+      try{ await api("/auth/logout", { method:"POST", auth:true }); }catch(e){ /* ignore */ }
+      if(typeof window.clearToken === "function") window.clearToken();
+      else localStorage.removeItem("token");
+      location.href = "index.html";
+    });
+
+    // Load Stats
+    async function loadStats(){
+      try{
+        // optional: kalau endpoint stats ada
+        const s = await api("/admin/stats", { auth:true });
+        document.getElementById("statsText").textContent = JSON.stringify(s);
+      }catch(e){
+        document.getElementById("statsText").textContent = "Endpoint /admin/stats belum siap / error.";
+      }
+    }
+
+    // Load Users
+    async function loadUsers(){
+      msg.innerHTML = "";
+      const search = document.getElementById("userSearch").value.trim();
+      try{
+        const qs = new URLSearchParams();
+        if(search) qs.set("search", search);
+        qs.set("per_page", "20");
+
+        const res = await api("/admin/users?" + qs.toString(), { auth:true });
+        const rows = res?.data || [];
+        const meta = res?.meta ? `total: ${res.meta.total}, page: ${res.meta.current_page}/${res.meta.last_page}` : "—";
+        document.getElementById("usersMeta").textContent = meta;
+
+        const tbody = document.querySelector("#usersTable tbody");
+        tbody.innerHTML = "";
+
+        rows.forEach(u => {
+          const tr = document.createElement("tr");
+
+          const active = (u?.is_active === false || u?.is_active === 0) ? "off" : "ok";
+          const must = (u?.must_change_password === true || u?.must_change_password === 1) ? "danger" : "ok";
+
+          tr.innerHTML = `
+            <td>${u.id}</td>
+            <td>${u.name || "-"}</td>
+            <td>${u.email || "-"}</td>
+            <td><span class="badge">${u.role || "user"}</span></td>
+            <td><span class="badge ${active}">${active==="ok" ? "active" : "disabled"}</span></td>
+            <td><span class="badge ${must}">${must==="danger" ? "YES" : "NO"}</span></td>
+            <td>
+              <button class="btn ghost mini" data-act="force" data-id="${u.id}" type="button">Force Change</button>
+            </td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        // bind actions
+        tbody.querySelectorAll("button[data-act='force']").forEach(btn => {
+          btn.addEventListener("click", async () => {
+            const id = btn.getAttribute("data-id");
+            if(!id) return;
+            btn.disabled = true;
+            try{
+              await api(`/admin/users/${id}/force-change-password`, { method:"POST", auth:true });
+              showOkText(`User ${id} dipaksa ganti password (must_change_password=true).`);
+              await loadUsers();
+            }catch(e){
+              showErr(e);
+            }finally{
+              btn.disabled = false;
+            }
+          });
+        });
+
+      }catch(e){
+        showErr(e);
+      }
+    }
+
+    // Load Logs
+    async function loadLogs(){
+      msg.innerHTML = "";
+      const search = document.getElementById("logSearch").value.trim();
+      try{
+        const qs = new URLSearchParams();
+        if(search) qs.set("search", search);
+        qs.set("per_page", "20");
+
+        const res = await api("/admin/audit-logs?" + qs.toString(), { auth:true });
+        const rows = res?.data || [];
+        const meta = res?.meta ? `total: ${res.meta.total}, page: ${res.meta.current_page}/${res.meta.last_page}` : "—";
+        document.getElementById("logsMeta").textContent = meta;
+
+        const tbody = document.querySelector("#logsTable tbody");
+        tbody.innerHTML = "";
+
+        rows.forEach(r => {
+          const metaObj = r?.audit_meta ?? r?.meta ?? null;
+          const metaText = metaObj ? JSON.stringify(metaObj) : "-";
+          tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.id}</td>
+            <td>${r.created_at || "-"}</td>
+            <td>${r.admin_user_id ?? "-"}</td>
+            <td>${r.target_user_id ?? "-"}</td>
+            <td>${r.action || "-"}</td>
+            <td>${(r.entity_type || "-") + ":" + (r.entity_id || "-")}</td>
+            <td><span class="muted mini">${metaText}</span></td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+      }catch(e){
+        showErr(e);
+      }
+    }
+
+    document.getElementById("btnLoadUsers").addEventListener("click", loadUsers);
+    document.getElementById("btnLoadLogs").addEventListener("click", loadLogs);
+
+    // Boot
+    (async function init(){
+      await requireAdminOrRedirect();
+      await loadStats();
+    })();
+  </script>
+</body>
+</html>
